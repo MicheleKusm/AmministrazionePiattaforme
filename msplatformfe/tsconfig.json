@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "outDir": "./dist",
+    "module": "ESNext",
+    "target": "ES6",
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "jsx": "react-jsx",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@Containers/*": [
+        "src/containers/*"
+      ],
+      "@Api/*": [
+        "src/api/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "src/declaration.d.ts"
+  ]
+}

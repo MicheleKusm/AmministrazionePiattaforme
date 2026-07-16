@@ -1,0 +1,16 @@
+# OS / IDE
+.idea/
+.vscode/
+*.iml
+
+# Backend
+**/target/
+**/.flattened-pom.xml
+
+# Frontend
+**/node_modules/
+**/dist/
+**/.eslintcache
+
+# Logs
+*.log
