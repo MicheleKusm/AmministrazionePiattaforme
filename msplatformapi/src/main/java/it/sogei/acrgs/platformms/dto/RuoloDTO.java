@@ -15,13 +15,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RuoloDTO implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1705589902821418056L;
+    private static final long serialVersionUID = 1154258101572695947L;
+
     private Long id;
+    private Long idPiattaforma;
+
     @Size(max = 255)
     private String nome;
-    private Boolean richiedibileDaProcesso;
+
     @Size(max = 255)
     private String descrizione;
-    private Long idPiattaforma;
 }
-

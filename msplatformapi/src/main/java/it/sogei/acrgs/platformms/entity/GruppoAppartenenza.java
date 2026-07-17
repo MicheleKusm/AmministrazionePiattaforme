@@ -1,45 +1,50 @@
 package it.sogei.acrgs.platformms.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "GRUPPO_APPARTENENZA_RUOLI")
 public class GruppoAppartenenza implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 6590168389251915981L;
+    private static final long serialVersionUID = -5705767017724854640L;
 
     @Id
-    @Column(name = "ID_GRUPPO_APPARTENENZA", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gruppo_appartenenza_generator")
-    @SequenceGenerator(name = "gruppo_appartenenza_generator", sequenceName = "SEQ_GRUPPO_APPARTENENZA", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_gruppo")
+    @SequenceGenerator(name = "seq_gruppo", sequenceName = "SEQ_GRUPPO_DI_APPARTENENZA_RUOLI", allocationSize = 1)
+    @Column(name = "ID_GRUPPO_APPARTENENZA")
     private Long id;
 
-    @Size(max = 100)
     @NotNull
-    @Column(name = "CATEGORIA", nullable = false)
-    private String categoria;
+    @Column(name = "ID_PIATTAFORMA", nullable = false)
+    private Long idPiattaforma;
 
+    @NotNull
+    @Size(max = 255)
+    @Column(name = "NOME", nullable = false, length = 255)
+    private String nome;
+
+    @NotNull
     @Size(max = 300)
-    @Column(name = "DESCRIZIONE")
+    @Column(name = "DESCRIZIONE", nullable = false, length = 300)
     private String descrizione;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "RUOLI_REF_APPARTENENZA",
-            joinColumns = @JoinColumn(name = "ID_GRUPPO_APPARTENENZA"),
-            inverseJoinColumns = @JoinColumn(name = "ID_RUOLO")
-    )
-    private Set<Ruolo> ruoli = new LinkedHashSet<>();
 }

@@ -10,32 +10,43 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PiattaformaDTO implements Serializable {
-
     @Serial
-    private static final long serialVersionUID = -7018824416171345087L;
+    private static final long serialVersionUID = 3482677254725443697L;
+
     private Long id;
-    @Size(max = 255)
-    private String descrizione;
+
     @Size(max = 255)
     private String nome;
+
+    @Size(max = 255)
+    private String descrizione;
+
     @Size(max = 255)
     private String url;
-    @Size(max = 255)
-    private String objClass;
-    @Size(max = 100)
-    private String codiceIct;
+
     @Size(max = 500)
     private String canale;
-    @Size(max = 4000)
-    private String configJson;
-    private Boolean ripetibile;
+
+    @Size(max = 255)
+    private String objClass;
+
     private Boolean readOnly;
+
+    @Size(max = 100)
+    private String codiceIct;
+
+    @Size(max = 255)
+    private String oamMetadataName;
+
+    @Size(max = 255)
+    private String oamMetadataValue;
+
     private Boolean richiedibileDaCruscotto;
     private Boolean richiedibileInCorso;
+    private Boolean ripetibile;
     private Boolean utilizzoModelloAutorizzativo;
 }
-
