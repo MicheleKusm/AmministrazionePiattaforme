@@ -1,6 +1,6 @@
 package it.sogei.acrgs.platformms.controller.rest;
 
-import it.sogei.acrgs.platformms.dto.PlatformDto;
+import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +14,8 @@ import java.util.List;
 public class PlatformController {
 
     @GetMapping
-    public ResponseEntity<List<PlatformDto>> getPlatforms(@RequestParam(defaultValue = "") String search) {
-        PlatformDto sample = new PlatformDto(
+    public ResponseEntity<List<PiattaformaDTO>> getPlatforms(@RequestParam(defaultValue = "") String search) {
+        PiattaformaDTO sample = new PiattaformaDTO(
                 1L,
                 "PCC",
                 "Piattaforma di Interscambio Credit Commerciale NGS",
