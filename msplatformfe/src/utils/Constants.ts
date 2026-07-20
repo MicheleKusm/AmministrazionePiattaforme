@@ -1,0 +1,23 @@
+export class Constants {
+    static readonly common = {
+        TICKET: "TICKET",
+        VERTICALE: "VERTICALE",
+        CERCA_PIATTAFORMA: "Cerca piattaforma...",
+        ELENCO: "Elenco",
+        PIATTAFORMA: "Piattaforma",
+        RUOLI: "Ruoli",
+        GRUPPI: "Gruppi",
+        ABILITAZIONE: "Abilitazione",
+        CRUSCOTTO: "Cruscotto",
+        RIEPILOGO: "Riepilogo",
+        RICHIEDIBILE_DA_CRUSCOTTO: "Richiedibile da cruscotto",
+        READ_ONLY: "In sola lettura",
+        RICHIEDIBILE_IN_CORSO: "Richiedibile in corso",
+        RIPETIBILE: "Ripetibile",
+        UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo"
+    } as const
+
+    static readonly api = {
+        API_PIATTAFORME: "/api/piattaforme"
+    } as const
+}
