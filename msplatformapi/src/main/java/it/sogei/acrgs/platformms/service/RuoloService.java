@@ -20,6 +20,11 @@ public class RuoloService {
         return ruoloRepository.findByIdPiattaforma(idPiattaforma).stream().map(this::toDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<RuoloDTO> listAll() {
+        return ruoloRepository.findAll().stream().map(this::toDto).toList();
+    }
+
     @Transactional
     public RuoloDTO create(RuoloDTO dto) {
         Ruolo ruolo = new Ruolo();
