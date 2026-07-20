@@ -16,7 +16,7 @@ export type Piattaforma = {
 };
 
 export type Ruolo = {
-    id?: number;
+    id: number;
     idPiattaforma?: number;
     nome: string;
     descrizione: string;

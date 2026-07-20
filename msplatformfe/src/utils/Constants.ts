@@ -18,6 +18,8 @@ export class Constants {
     } as const
 
     static readonly api = {
-        API_PIATTAFORME: "/api/piattaforme"
-    } as const
+        API_PIATTAFORME: "/api/piattaforme",
+        API_RUOLI: "/api/ruoli",
+        API_RUOLI_ALL: "/api/ruoli/all",
+    } as const;
 }

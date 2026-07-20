@@ -28,6 +28,11 @@ public class RuoloController {
         return ResponseEntity.ok(ruoloService.listByPiattaforma(piattaformaId));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<RuoloDTO>> listAll() {
+        return ResponseEntity.ok(ruoloService.listAll());
+    }
+
     @PostMapping
     public ResponseEntity<RuoloDTO> create(@RequestBody RuoloDTO dto) {
         return ResponseEntity.ok(ruoloService.create(dto));

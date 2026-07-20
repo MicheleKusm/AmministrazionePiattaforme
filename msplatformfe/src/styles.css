@@ -188,3 +188,75 @@ button {
     display: grid;
     gap: 10px;
 }
+
+/* Tabella ruoli */
+
+.ruoli-table {
+    overflow-x: auto;
+}
+
+.ruoli-table table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.ruoli-table th,
+.ruoli-table td {
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+}
+
+.ruoli-table thead {
+    background-color: #f9fafb;
+}
+
+.ruoli-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ruoli-table .text-gray-900 {
+    color: #111827;
+}
+
+.ruoli-table .text-gray-500 {
+    color: #6b7280;
+}
+
+.ruoli-table .whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.ruoli-table .flex {
+    display: flex;
+}
+
+.ruoli-table .gap-3 {
+    gap: 0.75rem;
+}
+
+.ruoli-table .btn-secondary {
+    background-color: #6b7280;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.ruoli-table .btn-danger {
+    background-color: #ef4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.ruoli-table .btn-secondary:hover {
+    background-color: #4b5563;
+}
+
+.ruoli-table .btn-danger:hover {
+    background-color: #dc2626;
+}

@@ -47,4 +47,7 @@ public class Ruolo implements Serializable {
     @Size(max = 255)
     @Column(name = "DESCRIZIONE", nullable = false, length = 255)
     private String descrizione;
+
+    @Column(name = "RICHIEDIBILE_DA_PROCESSO")
+    private Long richiedibileDaProcesso;
 }
