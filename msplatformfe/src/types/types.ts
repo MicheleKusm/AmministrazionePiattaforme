@@ -1,3 +1,9 @@
+export type RuoliStepProps = {
+    onAdd: () => void
+    onEdit: (ruolo: Ruolo) => void
+    onDelete: (ruolo: Ruolo) => void
+}
+
 export type Piattaforma = {
     id?: number;
     nome: string;

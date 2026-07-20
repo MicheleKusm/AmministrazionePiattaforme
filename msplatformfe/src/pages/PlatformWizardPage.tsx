@@ -11,7 +11,7 @@ import { PiattaformaStep } from "../components/wizard/PiattaformaStep";
 import { RiepilogoStep } from "../components/wizard/RiepilogoStep";
 import { RuoliStep } from "../components/wizard/RuoliStep";
 import { Stepper } from "../components/wizard/Stepper";
-import { emptyPiattaforma, type Gruppo, type Piattaforma, type Ruolo } from "../types";
+import { emptyPiattaforma, type Gruppo, type Piattaforma, type Ruolo } from "../types/types";
 
 type PlatformWizardPageProps = {
     initialPiattaforma: Piattaforma;
@@ -67,10 +67,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
             {step === 3 && (
                 <RuoliStep
-                    onAdd={() => setRoleDraft({ nome: "", descrizione: "", richiedibileDaProcesso: false })}
+                    onAdd={() => setRoleDraft({ id: 0, nome: "", descrizione: "", richiedibileDaProcesso: false })}
                     onDelete={(r) => setRuoli(ruoli.filter((x) => x !== r))}
                     onEdit={setRoleDraft}
-                    ruoli={ruoli}
                 />
             )}
 

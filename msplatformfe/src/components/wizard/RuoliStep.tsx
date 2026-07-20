@@ -1,13 +1,7 @@
-import type { Ruolo } from "../../types/types"
+import type { Ruolo, RuoliStepProps } from "../../types/types"
 import { useEffect, useState } from "react";
 import { Constants } from "../../utils/Constants"
 import { RuoliTable} from "../../components/tables/RuoliTable"
-
-type RuoliStepProps = {
-    onAdd: () => void;
-    onEdit: (ruolo: Ruolo) => void;
-    onDelete: (ruolo: Ruolo) => void;
-};
 
 export function RuoliStep({ onAdd, onEdit, onDelete }: RuoliStepProps) {
     const [ruoli, setRuoli] = useState<Ruolo[]>([]);
