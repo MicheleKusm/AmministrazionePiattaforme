@@ -4,6 +4,8 @@ export type RuoliStepProps = {
     onDelete: (ruolo: Ruolo) => void
 }
 
+export type TipoAbilitazione = "TICKET" | "VERTICALE";
+
 export type Piattaforma = {
     id?: number;
     nome: string;
@@ -19,6 +21,7 @@ export type Piattaforma = {
     richiedibileInCorso: boolean;
     ripetibile: boolean;
     utilizzoModelloAutorizzativo: boolean;
+    abilitazione: TipoAbilitazione;
 };
 
 export type Ruolo = {
@@ -58,7 +61,8 @@ export const emptyPiattaforma: Piattaforma = {
     richiedibileDaCruscotto: false,
     richiedibileInCorso: false,
     ripetibile: false,
-    utilizzoModelloAutorizzativo: false
+    utilizzoModelloAutorizzativo: false,
+    abilitazione: "TICKET"
 };
 
 export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Gruppi", "Abilitazione", "Cruscotto", "Riepilogo"] as const;

@@ -1,4 +1,4 @@
-import type { Ruolo } from "../types";
+import type { Ruolo } from "../types/types";
 
 export async function fetchRuoli(idPiattaforma: number): Promise<Ruolo[]> {
     const response = await fetch(`/api/ruoli?piattaformaId=${idPiattaforma}`);

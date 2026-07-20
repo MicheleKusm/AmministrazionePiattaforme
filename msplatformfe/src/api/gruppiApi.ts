@@ -1,4 +1,4 @@
-import type { Gruppo } from "../types";
+import type { Gruppo } from "../types/types";
 
 export async function fetchGruppi(idPiattaforma: number): Promise<Gruppo[]> {
     const response = await fetch(`/api/gruppi?piattaformaId=${idPiattaforma}`);

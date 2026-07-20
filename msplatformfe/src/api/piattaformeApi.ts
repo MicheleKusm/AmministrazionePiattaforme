@@ -1,4 +1,4 @@
-import type { PageResponse, Piattaforma } from "../types";
+import type { PageResponse, Piattaforma } from "../types/types";
 
 export async function fetchPiattaforme(search: string, page: number, size: number): Promise<PageResponse<Piattaforma>> {
     const response = await fetch(`/api/piattaforme?search=${encodeURIComponent(search)}&page=${page}&size=${size}`);

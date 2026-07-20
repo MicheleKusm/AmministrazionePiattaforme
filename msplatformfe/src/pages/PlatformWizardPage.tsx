@@ -11,7 +11,7 @@ import { PiattaformaStep } from "../components/wizard/PiattaformaStep";
 import { RiepilogoStep } from "../components/wizard/RiepilogoStep";
 import { RuoliStep } from "../components/wizard/RuoliStep";
 import { Stepper } from "../components/wizard/Stepper";
-import { emptyPiattaforma, type Gruppo, type Piattaforma, type Ruolo } from "../types/types";
+import { type Gruppo, type Piattaforma, type Ruolo } from "../types/types";
 
 type PlatformWizardPageProps = {
     initialPiattaforma: Piattaforma;
@@ -38,7 +38,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }, [piattaforma.id]);
 
     function prevStep() {
-        setStep((s) => Math.max(1, s - 1));
+        setStep((s) => Math.max(2, s - 1));
     }
 
     function nextStep() {
@@ -96,7 +96,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             {step === 7 && <RiepilogoStep gruppi={gruppi} piattaforma={piattaforma} ruoli={ruoli} tipoAbilitazione={tipoAbilitazione} />}
 
             <div className="actions">
-                <button className="btn-secondary" onClick={() => (step === 1 ? onCancel() : prevStep())} type="button">
+                <button className="btn-secondary" onClick={() => (step === 2 ? onCancel() : prevStep())} type="button">
                     Indietro
                 </button>
                 {step < 7 ? (
@@ -142,4 +142,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     );
 }
 
-export { emptyPiattaforma };
+export { emptyPiattaforma } from "../types/types";

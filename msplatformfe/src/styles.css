@@ -189,6 +189,23 @@ button {
     gap: 10px;
 }
 
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-ticket {
+    background: #eaf1ff;
+    color: #2f6fed;
+}
+
+.badge-verticale {
+    background: #e8f8f0;
+    color: #0f9d63;
+}
 /* Tabella ruoli */
 
 .ruoli-table {

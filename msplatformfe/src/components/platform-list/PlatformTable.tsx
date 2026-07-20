@@ -1,10 +1,18 @@
-import type { Piattaforma } from "../../types/types";
+import { Constants } from "../../utils/Constants";
+import type { Piattaforma, TipoAbilitazione } from "../../types/types";
 
 type PlatformTableProps = {
     rows: Piattaforma[];
     loading: boolean;
     onEdit: (piattaforma: Piattaforma) => void;
 };
+
+function AbilitazioneBadge({ tipo }: { tipo: TipoAbilitazione }) {
+    if (tipo === "VERTICALE") {
+        return <span className="badge badge-verticale">{Constants.labelAbilitazione.VERTICALE}</span>;
+    }
+    return <span className="badge badge-ticket">{Constants.labelAbilitazione.TICKET}</span>;
+}
 
 export function PlatformTable({ rows, loading, onEdit }: PlatformTableProps) {
     return (
@@ -14,6 +22,7 @@ export function PlatformTable({ rows, loading, onEdit }: PlatformTableProps) {
                     <th>Nome</th>
                     <th>Canale</th>
                     <th>Objclass</th>
+                    <th>Abilitazione</th>
                     <th>In sola lettura</th>
                     <th>Azioni</th>
                 </tr>
@@ -21,7 +30,7 @@ export function PlatformTable({ rows, loading, onEdit }: PlatformTableProps) {
             <tbody>
                 {loading && (
                     <tr>
-                        <td colSpan={5}>Caricamento...</td>
+                        <td colSpan={6}>Caricamento...</td>
                     </tr>
                 )}
                 {!loading &&
@@ -30,10 +39,13 @@ export function PlatformTable({ rows, loading, onEdit }: PlatformTableProps) {
                             <td>{row.nome}</td>
                             <td>{row.canale}</td>
                             <td>{row.objClass}</td>
-                            <td>{row.readOnly ? "Sì" : "No"}</td>
+                            <td>
+                                <AbilitazioneBadge tipo={row.abilitazione} />
+                            </td>
+                            <td>{row.readOnly ? Constants.common.SI : Constants.common.NO}</td>
                             <td>
                                 <button className="btn-secondary" onClick={() => onEdit(row)} type="button">
-                                    Modifica
+                                    {Constants.common.MODIFICA}
                                 </button>
                             </td>
                         </tr>

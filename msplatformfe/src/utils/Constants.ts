@@ -3,6 +3,11 @@ export class Constants {
         TICKET: "TICKET",
         VERTICALE: "VERTICALE",
         CERCA_PIATTAFORMA: "Cerca piattaforma...",
+        AGGIUNGI_PIATTAFORMA: "Aggiungi piattaforma",
+        MODIFICA: "Modifica",
+        SI: "Sì",
+        NO: "No",
+        NESSUNA_PIATTAFORMA: "Nessuna piattaforma trovata",
         ELENCO: "Elenco",
         PIATTAFORMA: "Piattaforma",
         RUOLI: "Ruoli",
@@ -17,9 +22,19 @@ export class Constants {
         UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo"
     } as const
 
+    static readonly labelAbilitazione = {
+        TICKET: "Ticket",
+        VERTICALE: "Verticale"
+    } as const
+
     static readonly api = {
         API_PIATTAFORME: "/api/piattaforme",
-        API_RUOLI: "/api/ruoli",
-        API_RUOLI_ALL: "/api/ruoli/all",
-    } as const;
+        API_RUOLI_ALL: "/api/ruoli/all"
+    } as const
+
+    static readonly storage = {
+        PIATTAFORME: "acrgs.piattaforme"
+    } as const
+
+    static readonly pageSize = 5
 }

@@ -1,7 +1,7 @@
 import type { Ruolo, RuoliStepProps } from "../../types/types"
 import { useEffect, useState } from "react";
 import { Constants } from "../../utils/Constants"
-import { RuoliTable} from "../../components/tables/RuoliTable"
+import { RuoliTable } from "../../components/tables/RuoliTable"
 
 export function RuoliStep({ onAdd, onEdit, onDelete }: RuoliStepProps) {
     const [ruoli, setRuoli] = useState<Ruolo[]>([]);
@@ -29,18 +29,11 @@ export function RuoliStep({ onAdd, onEdit, onDelete }: RuoliStepProps) {
         <section className="card">
             <div className="flex justify-between items-center mb-4">
                 <h3>Ruoli piattaforma</h3>
-                <button
-                    className="btn-primary"
-                    onClick={onAdd}
-                    type="button">
+                <button className="btn-primary" onClick={onAdd} type="button">
                     Aggiungi ruolo
                 </button>
             </div>
-            <RuoliTable
-                ruoli={ruoli}
-                onEdit={onEdit}
-                onDelete={onDelete}
-            />
+            <RuoliTable ruoli={ruoli} onEdit={onEdit} onDelete={onDelete} />
         </section>
     )
 }
