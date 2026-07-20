@@ -1,4 +1,4 @@
-import type { Gruppo, Piattaforma, Ruolo } from "../../types";
+import type { Gruppo, Piattaforma, Ruolo } from "../../types/types"
 
 type RiepilogoStepProps = {
     piattaforma: Piattaforma;

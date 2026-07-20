@@ -1,4 +1,4 @@
-import { WIZARD_STEPS } from "../../types";
+import { WIZARD_STEPS } from "../../types/types";
 
 type StepperProps = {
     currentStep: number;

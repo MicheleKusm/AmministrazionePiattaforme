@@ -1,4 +1,4 @@
-import type { Ruolo } from "../../types";
+import type { Ruolo } from "../../types/types"
 import { useEffect, useState } from "react";
 import { Constants } from "../../utils/Constants"
 import { RuoliTable} from "../../components/tables/RuoliTable"

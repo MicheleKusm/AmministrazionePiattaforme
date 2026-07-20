@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Ruolo } from "../../types";
+import type { Ruolo } from "../../types/types"
 
 type RoleModalProps = {
     role: Ruolo;

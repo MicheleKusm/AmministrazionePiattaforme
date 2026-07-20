@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Gruppo, Ruolo } from "../../types";
+import type { Gruppo, Ruolo } from "../../types/types";
 
 type GroupModalProps = {
     group: Gruppo;
