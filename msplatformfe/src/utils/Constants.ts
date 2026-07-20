@@ -23,6 +23,11 @@ export class Constants {
         NUMERO_RUOLI: 5
     } as const
 
+    static readonly regex = {
+        REGEX_LETTERS_NUMBERS: /^[a-zA-Z0-9\s]+$/,
+        REGEX_NO_SPECIAL_CHARACTERS: /^[a-zA-Z0-9_\-.#]+$/
+    }
+
     static readonly labelAbilitazione = {
         TICKET: "Ticket",
         VERTICALE: "Verticale"

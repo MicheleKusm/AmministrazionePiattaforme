@@ -1,4 +1,4 @@
-import type { RuoliStepProps } from "../../types/types"
+import type { RuoliStepProps } from "../../types/type"
 import { useGetRuoliAllQuery } from "../../api/ruoliApi"
 import { RuoliTable } from "../../components/tables/RuoliTable"
 
