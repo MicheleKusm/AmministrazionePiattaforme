@@ -3,7 +3,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 import { Topbar } from "./components/layout/Topbar";
 import { PlatformListPage } from "./pages/PlatformListPage";
 import { PlatformWizardPage } from "./pages/PlatformWizardPage";
-import { emptyPiattaforma, type Piattaforma } from "./types";
+import { emptyPiattaforma, type Piattaforma } from "./types/types";
 
 export function App() {
     const [activeMenu, setActiveMenu] = useState<"dashboard" | "config">("config");

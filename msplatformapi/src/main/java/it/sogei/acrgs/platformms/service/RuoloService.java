@@ -52,9 +52,13 @@ public class RuoloService {
         return RuoloDTO.builder()
                 .id(entity.getId())
                 .idPiattaforma(entity.getIdPiattaforma())
-                .richiedibile_da_processo(entity.getRichiedibileDaProcesso())
+                .richiedibile_da_processo(convertToBoolean(entity.getRichiedibileDaProcesso()))
                 .nome(entity.getNome())
                 .descrizione(entity.getDescrizione())
                 .build();
+    }
+    // colonna db è un numero, in teoria tiene solo o 1 o 0 ma è nullable e non ha constraint quindi convertiamo
+    private boolean convertToBoolean (Long value) {
+        return value != null && value == 1;
     }
 }

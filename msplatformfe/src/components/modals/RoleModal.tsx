@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Ruolo } from "../../types/types"
 
 type RoleModalProps = {
@@ -11,9 +11,13 @@ export function RoleModal({ role, onSave, onClose }: RoleModalProps) {
     const [draft, setDraft] = useState<Ruolo>(role);
 
     function submit(e: { preventDefault: () => void }) {
-        e.preventDefault();
-        onSave(draft);
+        e.preventDefault()
+        onSave(draft)
     }
+
+    useEffect(() => {
+        setDraft(role)
+    }, [role])
 
     return (
         <div className="modal-backdrop">
