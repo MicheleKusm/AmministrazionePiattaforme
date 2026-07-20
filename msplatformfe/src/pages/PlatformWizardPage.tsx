@@ -143,4 +143,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     );
 }
 
-export { emptyPiattaforma };
+export { emptyPiattaforma }; //test
