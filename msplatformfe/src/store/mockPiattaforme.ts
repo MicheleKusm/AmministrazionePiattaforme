@@ -1,4 +1,4 @@
-import type { Piattaforma } from "../types/types";
+import type { Piattaforma } from "../types/type";
 
 export const mockPiattaforme: Piattaforma[] = [
     {

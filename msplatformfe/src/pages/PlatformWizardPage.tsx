@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { fetchGruppi, saveGruppo } from "../api/gruppiApi";
-import { savePiattaforma } from "../api/piattaformeApi";
-import { fetchRuoli, saveRuolo } from "../api/ruoliApi";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi";
+import { useSavePiattaformaMutation } from "../api/piattaformeApi";
+import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi";
 import { GroupModal } from "../components/modals/GroupModal";
 import { RoleModal } from "../components/modals/RoleModal";
 import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep";
@@ -11,7 +12,7 @@ import { PiattaformaStep } from "../components/wizard/PiattaformaStep";
 import { RiepilogoStep } from "../components/wizard/RiepilogoStep";
 import { RuoliStep } from "../components/wizard/RuoliStep";
 import { Stepper } from "../components/wizard/Stepper";
-import { type Gruppo, type Piattaforma, type Ruolo } from "../types/types";
+import { type Gruppo, type Piattaforma, type Ruolo } from "../types/type";
 
 type PlatformWizardPageProps = {
     initialPiattaforma: Piattaforma;
@@ -30,12 +31,23 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null);
     const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null);
 
+    const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken);
+    const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken);
+    const [savePiattaforma] = useSavePiattaformaMutation();
+    const [saveRuolo] = useSaveRuoloMutation();
+    const [saveGruppo] = useSaveGruppoMutation();
+
     useEffect(() => {
-        if (piattaforma.id) {
-            void fetchRuoli(piattaforma.id).then(setRuoli);
-            void fetchGruppi(piattaforma.id).then(setGruppi);
+        if (ruoliData) {
+            setRuoli(ruoliData);
         }
-    }, [piattaforma.id]);
+    }, [ruoliData]);
+
+    useEffect(() => {
+        if (gruppiData) {
+            setGruppi(gruppiData);
+        }
+    }, [gruppiData]);
 
     function prevStep() {
         setStep((s) => Math.max(2, s - 1));
@@ -46,15 +58,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }
 
     async function saveFinalConfiguration() {
-        const savedPlatform = await savePiattaforma(piattaforma);
+        const savedPlatform = await savePiattaforma(piattaforma).unwrap();
         if (!savedPlatform.id) {
             return;
         }
         for (const ruolo of ruoli) {
-            await saveRuolo(savedPlatform.id, ruolo);
+            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap();
         }
         for (const gruppo of gruppi) {
-            await saveGruppo(savedPlatform.id, gruppo);
+            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap();
         }
         onDone();
     }
@@ -142,4 +154,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     );
 }
 
-export { emptyPiattaforma } from "../types/types";
+export { emptyPiattaforma } from "../types/type";

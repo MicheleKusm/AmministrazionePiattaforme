@@ -1,4 +1,4 @@
-import type { Ruolo } from "../../types/types"
+import type { Ruolo } from "../../types/type"
 
 type RuoliTableProps = {
     ruoli: Ruolo[]

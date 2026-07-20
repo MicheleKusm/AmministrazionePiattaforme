@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { mockPiattaforme } from "./mockPiattaforme";
-import type { Piattaforma } from "../types/types";
+import type { Piattaforma } from "../types/type";
 
 type PiattaformeState = {
     items: Piattaforma[];

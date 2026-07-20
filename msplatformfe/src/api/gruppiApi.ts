@@ -1,25 +1,31 @@
-import type { Gruppo } from "../types/types";
+import { platformApi } from "./rootApi";
+import { GRUPPI } from "./apiConstants";
+import type { Gruppo } from "../types/type";
 
-export async function fetchGruppi(idPiattaforma: number): Promise<Gruppo[]> {
-    const response = await fetch(`/api/gruppi?piattaformaId=${idPiattaforma}`);
-    if (!response.ok) {
-        return [];
-    }
-    return (await response.json()) as Gruppo[];
-}
+const gruppiApi = platformApi.injectEndpoints({
+    endpoints: (build) => ({
+        getGruppi: build.query<Gruppo[], number>({
+            query: (idPiattaforma) => ({
+                url: `${GRUPPI}?piattaformaId=${idPiattaforma}`,
+                method: "GET"
+            }),
+            providesTags: ["Gruppi"]
+        }),
+        saveGruppo: build.mutation<void, { idPiattaforma: number; gruppo: Gruppo }>({
+            query: ({ idPiattaforma, gruppo }) => ({
+                url: gruppo.id ? `${GRUPPI}/${gruppo.id}` : GRUPPI,
+                method: gruppo.id ? "PUT" : "POST",
+                body: {
+                    idPiattaforma,
+                    nome: gruppo.nome,
+                    descrizione: gruppo.descrizione,
+                    ruoliIds: gruppo.ruoliIds
+                }
+            }),
+            invalidatesTags: ["Gruppi"]
+        })
+    }),
+    overrideExisting: false
+});
 
-export async function saveGruppo(idPiattaforma: number, gruppo: Gruppo): Promise<void> {
-    const payload = {
-        idPiattaforma,
-        nome: gruppo.nome,
-        descrizione: gruppo.descrizione,
-        ruoliIds: gruppo.ruoliIds
-    };
-    const url = gruppo.id ? `/api/gruppi/${gruppo.id}` : "/api/gruppi";
-    const method = gruppo.id ? "PUT" : "POST";
-    await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-}
+export const { useGetGruppiQuery, useSaveGruppoMutation } = gruppiApi;

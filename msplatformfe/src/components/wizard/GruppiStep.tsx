@@ -1,4 +1,4 @@
-import type { Gruppo } from "../../types/types"
+import type { Gruppo } from "../../types/type"
 
 type GruppiStepProps = {
     gruppi: Gruppo[];

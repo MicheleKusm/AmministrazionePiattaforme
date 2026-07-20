@@ -1,4 +1,4 @@
-import type { Piattaforma } from "../../types/types"
+import type { Piattaforma } from "../../types/type"
 
 type PiattaformaStepProps = {
     piattaforma: Piattaforma;

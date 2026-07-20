@@ -1,5 +1,5 @@
 import { Constants } from "../../utils/Constants";
-import type { Piattaforma, TipoAbilitazione } from "../../types/types";
+import type { Piattaforma, TipoAbilitazione } from "../../types/type";
 
 type PlatformTableProps = {
     rows: Piattaforma[];

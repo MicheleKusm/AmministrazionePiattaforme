@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { Pagination } from "../components/platform-list/Pagination";
-import { PlatformTable } from "../components/platform-list/PlatformTable";
+import { PlatformTable } from "../components/tables/PlatformTable";
 import { useAppSelector } from "../store/hooks";
 import { Constants } from "../utils/Constants";
-import type { Piattaforma } from "../types/types";
+import type { Piattaforma } from "../types/type";
 
 type PlatformListPageProps = {
     onCreate: () => void;
