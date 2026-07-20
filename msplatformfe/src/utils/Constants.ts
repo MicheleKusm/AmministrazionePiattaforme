@@ -19,7 +19,8 @@ export class Constants {
         READ_ONLY: "In sola lettura",
         RICHIEDIBILE_IN_CORSO: "Richiedibile in corso",
         RIPETIBILE: "Ripetibile",
-        UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo"
+        UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo",
+        NUMERO_RUOLI: 5
     } as const
 
     static readonly labelAbilitazione = {

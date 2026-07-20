@@ -208,6 +208,13 @@ button {
 }
 /* Tabella ruoli */
 
+.ruoli-step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
 .ruoli-table {
     overflow-x: auto;
 }
@@ -261,6 +268,20 @@ button {
     cursor: pointer;
 }
 
+.ruoli-table .btn-primary {
+    background-color: #ff8c42;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.ruoli-table .btn-primary:hover {
+    background-color: #e6762e;
+}
+
 .ruoli-table .btn-danger {
     background-color: #ef4444;
     color: white;
@@ -276,4 +297,22 @@ button {
 
 .ruoli-table .btn-danger:hover {
     background-color: #dc2626;
+}
+
+.ruoli-table .pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 0.5rem;
+}
+
+.ruoli-table .pagination-controls .button-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.ruoli-table .pagination-controls .info-text {
+    font-size: 0.875rem;
+    color: #6b7280;
 }
