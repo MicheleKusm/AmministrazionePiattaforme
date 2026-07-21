@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
 import { useSavePiattaformaMutation } from "../api/piattaformeApi"
@@ -24,6 +24,7 @@ type PlatformWizardPageProps = {
 };
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
+    const initialLoadDone = useRef(false);
     const dispatch = useAppDispatch();
     const [step, setStep] = useState(2);
     const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma);
@@ -37,21 +38,22 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const gruppi = useAppSelector((state) => state.gruppi.items)
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
-    // const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
     const [savePiattaforma] = useSavePiattaformaMutation()
     const [saveRuolo] = useSaveRuoloMutation()
     const [saveGruppo] = useSaveGruppoMutation()
 
     useEffect(() => {
-        if (ruoliData) {
+        if (ruoliData && !initialLoadDone.current) {
             dispatch(setRuoli(ruoliData))
+            initialLoadDone.current = true
         }
     }, [ruoliData, dispatch])
 
     useEffect(() => {
-        if (gruppiData) {
+        if (gruppiData && !initialLoadDone.current) {
             dispatch(setGruppi(gruppiData))
+            initialLoadDone.current = true
         }
     }, [gruppiData, dispatch])
 

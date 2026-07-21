@@ -1,16 +1,11 @@
 import type { RuoliStepProps } from "../../types/type"
 import { RuoliTable } from "../tables/RuoliTable"
 import { Button } from "../common/Button"
-import { useGetRuoliQuery } from "../../api/ruoliApi"
+import { useAppSelector } from "../../store/hooks"
 
 export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId }: RuoliStepProps) {
 
-    const { data: ruoli = [], isLoading, error } = useGetRuoliQuery(piattaformaId!, {
-        skip: piattaformaId === undefined
-    })
-
-    if (isLoading) return <p>Caricamento ruoli...</p>
-    if (error) return <p className="text-red-500">Errore nel caricamento dei ruoli.</p>
+    const ruoli = useAppSelector((state) => state.ruoli.items)
 
     return (
         <div className="mt-2 rounded-xl border border-gray-200 bg-white shadow-sm">
