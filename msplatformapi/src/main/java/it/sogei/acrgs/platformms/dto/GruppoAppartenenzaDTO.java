@@ -19,7 +19,6 @@ public class GruppoAppartenenzaDTO implements Serializable {
     private static final long serialVersionUID = 3356315611293840969L;
 
     private Long id;
-    private Long idPiattaforma;
 
     @Size(max = 255)
     private String nome;

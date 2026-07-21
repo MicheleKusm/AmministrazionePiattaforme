@@ -34,14 +34,14 @@ public class GruppoAppartenenza implements Serializable {
     @Column(name = "ID_GRUPPO_APPARTENENZA")
     private Long id;
 
-    @NotNull
-    @Column(name = "ID_PIATTAFORMA", nullable = false)
-    private Long idPiattaforma;
+//    @NotNull
+//    @Column(name = "ID_PIATTAFORMA", nullable = false)
+//    private Long idPiattaforma;
 
     @NotNull
     @Size(max = 255)
-    @Column(name = "NOME", nullable = false, length = 255)
-    private String nome;
+    @Column(name = "CATEGORIA", nullable = false, length = 255)
+    private String categoria;
 
     @NotNull
     @Size(max = 300)

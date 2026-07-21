@@ -1,14 +1,13 @@
 import type { RuoliStepProps } from "../../types/type"
 import { RuoliTable } from "../tables/RuoliTable"
 import { Button } from "../common/Button"
-import { useGetRuoliAllQuery, useGetRuoliQuery } from "../../api/ruoliApi"
+import { useGetRuoliQuery } from "../../api/ruoliApi"
 
 export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId }: RuoliStepProps) {
 
-    const allQuery = useGetRuoliAllQuery(undefined, { skip: piattaformaId !== undefined })
-    const byIdQuery = useGetRuoliQuery(piattaformaId!, { skip: piattaformaId === undefined })
-
-    const { data: ruoli = [], isLoading, error } = piattaformaId !== undefined ? byIdQuery : allQuery
+    const { data: ruoli = [], isLoading, error } = useGetRuoliQuery(piattaformaId!, {
+        skip: piattaformaId === undefined
+    })
 
     if (isLoading) return <p>Caricamento ruoli...</p>
     if (error) return <p className="text-red-500">Errore nel caricamento dei ruoli.</p>
@@ -28,6 +27,7 @@ export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId }: RuoliStepP
                 ruoli={ruoli}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                piattaformaId={piattaformaId}
             />
             <div className="px-6 py-3 text-sm text-gray-500">Totale {ruoli.length} ruoli</div>
         </div>

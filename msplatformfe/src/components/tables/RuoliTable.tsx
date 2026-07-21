@@ -1,10 +1,10 @@
 import type { RuoliTableProps, Ruolo } from "../../types/type"
 import { Badge } from "../common/Badge"
-import {TableCommon} from "../../components/common/TableCommon";
+import { TableCommon } from "../../components/common/TableCommon"
 
 const ICON_BTN = "inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
 
-export function RuoliTable({ ruoli, onEdit, onDelete }: RuoliTableProps) {
+export function RuoliTable({ ruoli, onEdit, onDelete, piattaformaId }: RuoliTableProps) {
     const sortedRuoli = [...ruoli].sort((a, b) => a.id - b.id)
 
     const columns = [
@@ -67,7 +67,7 @@ export function RuoliTable({ ruoli, onEdit, onDelete }: RuoliTableProps) {
             data={sortedRuoli}
             columns={columns}
             keyExtractor={(ruolo: Ruolo) => ruolo.id}
-            emptyMessage="Nessun ruolo trovato."
+            emptyMessage={piattaformaId !== undefined ? "Nessun ruolo trovato." : ""}
         />
     )
 }

@@ -23,9 +23,9 @@ public class GruppoAppartenenzaController {
 
     private final GruppoAppartenenzaService gruppoService;
 
-    @GetMapping
-    public ResponseEntity<List<GruppoAppartenenzaDTO>> list(@RequestParam Long piattaformaId) {
-        return ResponseEntity.ok(gruppoService.listByPiattaforma(piattaformaId));
+    @GetMapping("/all")
+    public ResponseEntity<List<GruppoAppartenenzaDTO>> list() {
+        return ResponseEntity.ok(gruppoService.list());
     }
 
     @PostMapping

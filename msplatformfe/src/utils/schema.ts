@@ -12,4 +12,11 @@ export const ruoloSchema = yup.object().shape({
     richiedibileDaProcesso: yup.boolean().default(false)
 })
 
+export const gruppoSchema = yup.object().shape({
+    nome: yup.string().required("Il nome è obbligatorio"),
+    descrizione: yup.string().nullable(),
+    ruoliIds: yup.array().of(yup.number()).default([])
+})
+
+
 export type RuoloFormData = yup.InferType<typeof ruoloSchema>

@@ -15,10 +15,24 @@ export type RuoliStepProps = {
     onDelete: (ruolo: Ruolo) => void
 }
 
+export type GroupModalProps = {
+    group: Gruppo
+    ruoli: Ruolo[]
+    onSave: (group: Gruppo) => void
+    onClose: () => void
+}
+
+export type RoleModalProps = {
+    role: Ruolo
+    onSave: (role: Ruolo) => void
+    onClose: () => void
+}
+
 export type RuoliTableProps = {
     ruoli: Ruolo[]
     onEdit: (ruolo: Ruolo) => void
     onDelete: (ruolo: Ruolo) => void
+    piattaformaId?: number
 }
 
 export type Column<T> = {

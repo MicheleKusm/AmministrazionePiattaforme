@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface GruppoAppartenenzaRepository extends JpaRepository<GruppoAppartenenza, Long> {
-    List<GruppoAppartenenza> findByIdPiattaforma(Long idPiattaforma);
 }

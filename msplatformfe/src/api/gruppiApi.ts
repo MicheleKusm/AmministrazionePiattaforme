@@ -11,6 +11,13 @@ const gruppiApi = platformApi.injectEndpoints({
             }),
             providesTags: ["Gruppi"]
         }),
+        getGruppiAll: build.query<Gruppo[], void>({
+            query: () => ({
+                url: `${GRUPPI}/all`,
+                method: "GET"
+            }),
+            providesTags: ["Gruppi"]
+        }),
         saveGruppo: build.mutation<void, { idPiattaforma: number; gruppo: Gruppo }>({
             query: ({ idPiattaforma, gruppo }) => ({
                 url: gruppo.id ? `${GRUPPI}/${gruppo.id}` : GRUPPI,
@@ -28,4 +35,4 @@ const gruppiApi = platformApi.injectEndpoints({
     overrideExisting: false
 });
 
-export const { useGetGruppiQuery, useSaveGruppoMutation } = gruppiApi;
+export const { useGetGruppiQuery, useGetGruppiAllQuery, useSaveGruppoMutation } = gruppiApi;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
-import { useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
+import { useGetGruppiAllQuery, useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
 import { useSavePiattaformaMutation } from "../api/piattaformeApi"
 import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi"
 import { GroupModal } from "../components/modals/GroupModal"
@@ -38,7 +38,8 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const gruppi = useAppSelector((state) => state.gruppi.items)
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
-    const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken)
+    // const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken)
+    const { data: gruppiData } = useGetGruppiAllQuery()
     const [savePiattaforma] = useSavePiattaformaMutation()
     const [saveRuolo] = useSaveRuoloMutation()
     const [saveGruppo] = useSaveGruppoMutation()

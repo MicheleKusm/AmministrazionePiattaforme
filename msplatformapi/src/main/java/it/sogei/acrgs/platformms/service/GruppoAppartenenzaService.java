@@ -20,15 +20,14 @@ public class GruppoAppartenenzaService {
     private final RuoliRefAppartenenzaRepository refRepository;
 
     @Transactional(readOnly = true)
-    public List<GruppoAppartenenzaDTO> listByPiattaforma(Long idPiattaforma) {
-        return gruppoRepository.findByIdPiattaforma(idPiattaforma).stream().map(this::toDto).toList();
+    public List<GruppoAppartenenzaDTO> list() {
+        return gruppoRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @Transactional
     public GruppoAppartenenzaDTO create(GruppoAppartenenzaDTO dto) {
         GruppoAppartenenza gruppo = new GruppoAppartenenza();
-        gruppo.setIdPiattaforma(dto.getIdPiattaforma());
-        gruppo.setNome(dto.getNome());
+        gruppo.setCategoria(dto.getNome());
         gruppo.setDescrizione(dto.getDescrizione());
         GruppoAppartenenza saved = gruppoRepository.save(gruppo);
         saveRefs(saved.getId(), dto.getRuoliIds());
@@ -38,8 +37,7 @@ public class GruppoAppartenenzaService {
     @Transactional
     public GruppoAppartenenzaDTO update(Long id, GruppoAppartenenzaDTO dto) {
         GruppoAppartenenza gruppo = gruppoRepository.findById(id).orElseThrow();
-        gruppo.setIdPiattaforma(dto.getIdPiattaforma());
-        gruppo.setNome(dto.getNome());
+        gruppo.setCategoria(dto.getNome());
         gruppo.setDescrizione(dto.getDescrizione());
         GruppoAppartenenza saved = gruppoRepository.save(gruppo);
         refRepository.deleteByIdIdGruppoAppartenenza(id);
@@ -74,8 +72,7 @@ public class GruppoAppartenenzaService {
                 .toList();
         return GruppoAppartenenzaDTO.builder()
                 .id(entity.getId())
-                .idPiattaforma(entity.getIdPiattaforma())
-                .nome(entity.getNome())
+                .nome(entity.getCategoria())
                 .descrizione(entity.getDescrizione())
                 .ruoliIds(ruoliIds)
                 .build();
