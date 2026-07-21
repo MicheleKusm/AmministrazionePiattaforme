@@ -91,20 +91,20 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             )}
 
             {step === 4 && (
-                <GruppiStep
-                    gruppi={gruppi}
-                    onAdd={() => setGroupDraft({ nome: "", descrizione: "", ruoliIds: [] })}
-                    onDelete={(g) => setGruppi(gruppi.filter((x) => x !== g))}
-                    onEdit={setGroupDraft}
-                />
-            )}
-
-            {step === 5 && (
                 <AbilitazioneStep
                     onChangeProcesso={setProcessoVerticale}
                     onChangeTipo={setTipoAbilitazione}
                     processoVerticale={processoVerticale}
                     tipoAbilitazione={tipoAbilitazione}
+                />
+            )}
+
+            {step === 5 && (
+                <GruppiStep
+                    gruppi={gruppi}
+                    onAdd={() => setGroupDraft({ nome: "", descrizione: "", ruoliIds: [] })}
+                    onDelete={(g) => setGruppi(gruppi.filter((x) => x !== g))}
+                    onEdit={setGroupDraft}
                 />
             )}
 

@@ -61,4 +61,8 @@ public class RuoloService {
     private boolean convertToBoolean (Long value) {
         return value != null && value == 1;
     }
+
+    private Long convertToLong(Boolean value) {
+        return value != null && !value ? 1L : 0L;
+    }
 }

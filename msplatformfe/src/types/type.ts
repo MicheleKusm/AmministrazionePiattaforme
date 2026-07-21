@@ -77,6 +77,6 @@ export const emptyPiattaforma: Piattaforma = {
     ripetibile: false,
     utilizzoModelloAutorizzativo: false,
     abilitazione: "TICKET"
-};
+}
 
-export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Gruppi", "Abilitazione", "Cruscotto", "Riepilogo"] as const;
+export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const;
