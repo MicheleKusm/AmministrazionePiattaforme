@@ -112,7 +112,7 @@ public class PiattaformaService {
             throw new IllegalArgumentException("CONFIG_JSON non valido", ex);
         }
     }
-
+    //TODO solo per oam metadata name e value
     private String readString(Map<String, Object> config, String key) {
         Object value = config.get(key);
         return value instanceof String ? (String) value : null;
