@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
+import it.sogei.acrgs.platformms.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @Slf4j
 @Service
@@ -68,6 +71,7 @@ public class PiattaformaService {
     }
 
     private PiattaformaDTO toDto(Piattaforma entity) {
+        Utility utility = new Utility();
         Map<String, Object> config = parseConfig(entity.getConfigJson());
         return PiattaformaDTO.builder()
                 .id(entity.getId())
@@ -77,13 +81,13 @@ public class PiattaformaService {
                 .canale(entity.getCanale())
                 .objClass(entity.getObjClass())
                 .readOnly(entity.getReadOnly() != null && entity.getReadOnly() == 1)
-                .codiceIct(readString(config, "codiceIct"))
-                .oamMetadataName(readString(config, "oamMetadataName"))
-                .oamMetadataValue(readString(config, "oamMetadataValue"))
-                .richiedibileDaCruscotto(readBoolean(config, "richiedibileDaCruscotto"))
-                .richiedibileInCorso(readBoolean(config, "richiedibileInCorso"))
-                .ripetibile(readBoolean(config, "ripetibile"))
-                .utilizzoModelloAutorizzativo(readBoolean(config, "utilizzoModelloAutorizzativo"))
+                .codiceIct(entity.getCodiceIct())
+                .oamMetadataName(extractOamMetadata(config, OAM_METADATA_NAME))
+                .oamMetadataValue(extractOamMetadata(config, OAM_METADATA_VALUE))
+                .richiedibileDaCruscotto(utility.convertToBoolean(entity.getRichiedibileDaCruscotto()))
+                .richiedibileInCorso(utility.convertToBoolean(entity.getRichiedibileInCorso()))
+                .ripetibile(utility.convertToBoolean(entity.getRipetibile()))
+                .utilizzoModelloAutorizzativo(utility.convertToBoolean(entity.getUtilizzoModelloAutorizzativo()))
                 .build();
     }
 
@@ -114,14 +118,14 @@ public class PiattaformaService {
             return Map.of();
         }
     }
-    //TODO solo per oam metadata name e value
-    private String readString(Map<String, Object> config, String key) {
-        Object value = config.get(key);
-        return value instanceof String ? (String) value : null;
-    }
 
-    private Boolean readBoolean(Map<String, Object> config, String key) {
-        Object value = config.get(key);
-        return value instanceof Boolean ? (Boolean) value : null;
+    private String extractOamMetadata(Map<String, Object> config, String metadataField) {
+        if (null == config) return null;
+        Object oamObj = config.get(OAM_METADATA);
+        if (oamObj instanceof Map<?, ?> oamMap) {
+            Object value = oamMap.get(metadataField);
+            return value instanceof String ? (String) value : null;
+        }
+        return null;
     }
 }

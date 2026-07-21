@@ -55,7 +55,7 @@ public class Piattaforma implements Serializable {
     @NotNull
     @ColumnDefault("0")
     @Column(name = "RIPETIBILE", nullable = false)
-    private Boolean ripetibile;
+    private Integer ripetibile;
 
     @Size(max = 500)
     @Column(name = "CANALE", length = 500)
@@ -70,14 +70,16 @@ public class Piattaforma implements Serializable {
     @Column(name = "CONFIG_JSON", length = 4000)
     private String configJson;
 
+    @ColumnDefault("0")
     @Column(name = "RICHIEDIBILE_DA_CRUSCOTTO")
-    private Long richiedibileDaCruscotto;
+    private Integer richiedibileDaCruscotto;
 
+    @ColumnDefault("0")
     @Column(name = "RICHIEDIBILE_IN_CORSO")
-    private Long richiedibileInCorso;
+    private Integer richiedibileInCorso;
 
     @ColumnDefault("0")
     @Column(name = "UTILIZZO_MODELLO_AUTORIZZATIVO")
-    private Boolean utilizzoModelloAutorizzativo;
+    private Integer utilizzoModelloAutorizzativo;
 
 }
