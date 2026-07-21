@@ -1,56 +1,55 @@
-import { Constants } from "../../utils/Constants";
-import type { Piattaforma, TipoAbilitazione } from "../../types/type";
+import type { Piattaforma } from "../../types/type";
+import { Badge } from "../common/Badge";
 
 type PlatformTableProps = {
     rows: Piattaforma[];
-    loading: boolean;
     onEdit: (piattaforma: Piattaforma) => void;
 };
 
-function AbilitazioneBadge({ tipo }: { tipo: TipoAbilitazione }) {
-    if (tipo === "VERTICALE") {
-        return <span className="badge badge-verticale">{Constants.labelAbilitazione.VERTICALE}</span>;
-    }
-    return <span className="badge badge-ticket">{Constants.labelAbilitazione.TICKET}</span>;
-}
+const TH = "px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500";
+const TD = "px-6 py-4 text-sm text-gray-700";
 
-export function PlatformTable({ rows, loading, onEdit }: PlatformTableProps) {
+export function PlatformTable({ rows, onEdit }: PlatformTableProps) {
     return (
-        <table className="grid">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Canale</th>
-                    <th>Objclass</th>
-                    <th>Abilitazione</th>
-                    <th>In sola lettura</th>
-                    <th>Azioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                {loading && (
-                    <tr>
-                        <td colSpan={6}>Caricamento...</td>
+        <div className="overflow-x-auto">
+            <table className="min-w-full">
+                <thead>
+                    <tr className="border-b border-gray-200">
+                        <th className={TH}>Nome</th>
+                        <th className={TH}>Canale</th>
+                        <th className={TH}>Objclass</th>
+                        <th className={TH}>Abilitazione</th>
+                        <th className={TH}>In sola lettura</th>
+                        <th className={TH}>Azioni</th>
                     </tr>
-                )}
-                {!loading &&
-                    rows.map((row) => (
-                        <tr key={row.id}>
-                            <td>{row.nome}</td>
-                            <td>{row.canale}</td>
-                            <td>{row.objClass}</td>
-                            <td>
-                                <AbilitazioneBadge tipo={row.abilitazione} />
+                </thead>
+                <tbody>
+                    {rows.length === 0 && (
+                        <tr>
+                            <td className={TD} colSpan={6}>Nessuna piattaforma trovata</td>
+                        </tr>
+                    )}
+                    {rows.map((row) => (
+                        <tr key={row.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                            <td className={`${TD} font-semibold text-gray-900`}>{row.nome}</td>
+                            <td className={TD}>{row.canale}</td>
+                            <td className={TD}>{row.objClass}</td>
+                            <td className={TD}>
+                                {row.abilitazione === "VERTICALE" ? <Badge tone="green">Verticale</Badge> : <Badge tone="blue">Ticket</Badge>}
                             </td>
-                            <td>{row.readOnly ? Constants.common.SI : Constants.common.NO}</td>
-                            <td>
-                                <button className="btn-secondary" onClick={() => onEdit(row)} type="button">
-                                    {Constants.common.MODIFICA}
+                            <td className={TD}>{row.readOnly ? <Badge tone="orange">Sì</Badge> : <Badge tone="gray">No</Badge>}</td>
+                            <td className={TD}>
+                                <button
+                                    type="button"
+                                    onClick={() => onEdit(row)}
+                                    className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                                    Modifica
                                 </button>
                             </td>
                         </tr>
                     ))}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     );
 }

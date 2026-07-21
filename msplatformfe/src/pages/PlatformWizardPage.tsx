@@ -75,7 +75,12 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         <>
             <Stepper currentStep={step} />
 
-            {step === 2 && <PiattaformaStep onChange={setPiattaforma} piattaforma={piattaforma} />}
+            {step === 2 && (
+                <PiattaformaStep
+                    onChange={setPiattaforma}
+                    piattaforma={piattaforma}
+                />
+            )}
 
             {step === 3 && (
                 <RuoliStep
@@ -105,18 +110,34 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
             {step === 6 && <CruscottoStep />}
 
-            {step === 7 && <RiepilogoStep gruppi={gruppi} piattaforma={piattaforma} ruoli={ruoli} tipoAbilitazione={tipoAbilitazione} />}
+            {step === 7 && (
+                <RiepilogoStep
+                    gruppi={gruppi}
+                    piattaforma={piattaforma}
+                    ruoli={ruoli}
+                    tipoAbilitazione={tipoAbilitazione}
+                />
+            )}
 
             <div className="actions">
-                <button className="btn-secondary" onClick={() => (step === 2 ? onCancel() : prevStep())} type="button">
+                <button
+                    className="btn-secondary"
+                    onClick={() => (step === 2 ? onCancel() : prevStep())}
+                    type="button">
                     Indietro
                 </button>
                 {step < 7 ? (
-                    <button className="btn-primary" onClick={nextStep} type="button">
+                    <button
+                        className="btn-primary"
+                        onClick={nextStep}
+                        type="button">
                         Avanti
                     </button>
                 ) : (
-                    <button className="btn-primary" onClick={() => void saveFinalConfiguration()} type="button">
+                    <button
+                        className="btn-primary"
+                        onClick={() => void saveFinalConfiguration()}
+                        type="button">
                         Salva configurazione
                     </button>
                 )}
@@ -127,10 +148,10 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onClose={() => setRoleDraft(null)}
                     onSave={(role) => {
                         setRuoli((prev) => {
-                            const found = prev.find((x) => x === roleDraft || (x.id && x.id === roleDraft.id));
-                            return found ? prev.map((x) => (x === found ? role : x)) : [...prev, role];
-                        });
-                        setRoleDraft(null);
+                            const found = prev.find((x) => x === roleDraft || (x.id && x.id === roleDraft.id))
+                            return found ? prev.map((x) => (x === found ? role : x)) : [...prev, role]
+                        })
+                        setRoleDraft(null)
                     }}
                     role={roleDraft}
                 />
@@ -142,16 +163,16 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onClose={() => setGroupDraft(null)}
                     onSave={(group) => {
                         setGruppi((prev) => {
-                            const found = prev.find((x) => x === groupDraft || (x.id && x.id === groupDraft.id));
-                            return found ? prev.map((x) => (x === found ? group : x)) : [...prev, group];
-                        });
-                        setGroupDraft(null);
+                            const found = prev.find((x) => x === groupDraft || (x.id && x.id === groupDraft.id))
+                            return found ? prev.map((x) => (x === found ? group : x)) : [...prev, group]
+                        })
+                        setGroupDraft(null)
                     }}
                     ruoli={ruoli}
                 />
             )}
         </>
-    );
+    )
 }
 
 export { emptyPiattaforma } from "../types/type";

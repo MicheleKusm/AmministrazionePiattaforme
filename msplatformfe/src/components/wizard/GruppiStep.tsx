@@ -1,4 +1,6 @@
-import type { Gruppo } from "../../types/type"
+import type { Gruppo } from "../../types/type";
+import { GruppiTable } from "../tables/GruppiTable";
+import { Button } from "../common/Button";
 
 type GruppiStepProps = {
     gruppi: Gruppo[];
@@ -9,24 +11,16 @@ type GruppiStepProps = {
 
 export function GruppiStep({ gruppi, onAdd, onEdit, onDelete }: GruppiStepProps) {
     return (
-        <section className="card">
-            <h3>Gruppi operativi</h3>
-            <button className="btn-primary" onClick={onAdd} type="button">
-                Aggiungi gruppo
-            </button>
-            <ul>
-                {gruppi.map((g, idx) => (
-                    <li key={g.id ?? idx}>
-                        <strong>{g.nome}</strong> - {g.descrizione}
-                        <button className="btn-secondary" onClick={() => onEdit(g)} type="button">
-                            Modifica
-                        </button>
-                        <button className="btn-danger" onClick={() => onDelete(g)} type="button">
-                            Elimina
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </section>
+        <div className="mt-2 rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                <div>
+                    <h3 className="text-lg font-bold text-gray-900">Gruppi della piattaforma</h3>
+                    <p className="mt-0.5 text-sm text-gray-500">Definisci e gestisci i gruppi disponibili per questa piattaforma.</p>
+                </div>
+                <Button onClick={onAdd}>+ Aggiungi gruppo</Button>
+            </div>
+            <GruppiTable gruppi={gruppi} onEdit={onEdit} onDelete={onDelete} />
+            <div className="px-6 py-3 text-sm text-gray-500">Totale {gruppi.length} gruppi</div>
+        </div>
     );
 }
