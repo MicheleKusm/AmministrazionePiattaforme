@@ -1,95 +1,114 @@
-import { useEffect, useState } from "react";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi";
-import { useSavePiattaformaMutation } from "../api/piattaformeApi";
-import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi";
-import { GroupModal } from "../components/modals/GroupModal";
-import { RoleModal } from "../components/modals/RoleModal";
-import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep";
-import { CruscottoStep } from "../components/wizard/CruscottoStep";
-import { GruppiStep } from "../components/wizard/GruppiStep";
-import { PiattaformaStep } from "../components/wizard/PiattaformaStep";
-import { RiepilogoStep } from "../components/wizard/RiepilogoStep";
-import { RuoliStep } from "../components/wizard/RuoliStep";
-import { Stepper } from "../components/wizard/Stepper";
-import { type Gruppo, type Piattaforma, type Ruolo } from "../types/type";
+import { useEffect, useState } from "react"
+import { skipToken } from "@reduxjs/toolkit/query"
+import { useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
+import { useSavePiattaformaMutation } from "../api/piattaformeApi"
+import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi"
+import { GroupModal } from "../components/modals/GroupModal"
+import { RoleModal } from "../components/modals/RoleModal"
+import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep"
+import { CruscottoStep } from "../components/wizard/CruscottoStep"
+import { GruppiStep } from "../components/wizard/GruppiStep"
+import { PiattaformaStep } from "../components/wizard/PiattaformaStep"
+import { RiepilogoStep } from "../components/wizard/RiepilogoStep"
+import { RuoliStep } from "../components/wizard/RuoliStep"
+import { Stepper } from "../components/wizard/Stepper"
+import { type Gruppo, type Piattaforma, type Ruolo } from "../types/type"
+import { useAppDispatch, useAppSelector } from "../store/hooks"
+import { setRuoli, addRuolo, updateRuolo, removeRuolo } from "../store/ruoliSlice"
+import { setGruppi, addGruppo, updateGruppo, removeGruppo } from "../store/gruppiSlice"
 
 type PlatformWizardPageProps = {
-    initialPiattaforma: Piattaforma;
-    onDone: () => void;
-    onCancel: () => void;
-};
+    initialPiattaforma: Piattaforma
+    onDone: () => void
+    onCancel: () => void
+}
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
-    const [step, setStep] = useState(2);
-    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma);
-    const [ruoli, setRuoli] = useState<Ruolo[]>([]);
-    const [gruppi, setGruppi] = useState<Gruppo[]>([]);
-    const [tipoAbilitazione, setTipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET");
-    const [processoVerticale, setProcessoVerticale] = useState("");
+    const dispatch = useAppDispatch()
 
-    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null);
-    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null);
+    const [step, setStep] = useState(2)
+    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
+    const [tipoAbilitazione, setTipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
+    const [processoVerticale, setProcessoVerticale] = useState("")
 
-    const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken);
-    const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken);
-    const [savePiattaforma] = useSavePiattaformaMutation();
-    const [saveRuolo] = useSaveRuoloMutation();
-    const [saveGruppo] = useSaveGruppoMutation();
+    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
+    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
+
+    const ruoli = useAppSelector((state) => state.ruoli.items)
+    const gruppi = useAppSelector((state) => state.gruppi.items)
+
+    const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
+    const { data: gruppiData } = useGetGruppiQuery(piattaforma.id ?? skipToken)
+    const [savePiattaforma] = useSavePiattaformaMutation()
+    const [saveRuolo] = useSaveRuoloMutation()
+    const [saveGruppo] = useSaveGruppoMutation()
 
     useEffect(() => {
         if (ruoliData) {
-            setRuoli(ruoliData);
+            dispatch(setRuoli(ruoliData))
         }
-    }, [ruoliData]);
+    }, [ruoliData, dispatch])
 
     useEffect(() => {
         if (gruppiData) {
-            setGruppi(gruppiData);
+            dispatch(setGruppi(gruppiData))
         }
-    }, [gruppiData]);
+    }, [gruppiData, dispatch])
 
     function prevStep() {
-        setStep((s) => Math.max(2, s - 1));
+        setStep((s) => Math.max(2, s - 1))
     }
 
     function nextStep() {
-        setStep((s) => Math.min(7, s + 1));
+        setStep((s) => Math.min(7, s + 1))
     }
 
     async function saveFinalConfiguration() {
-        const savedPlatform = await savePiattaforma(piattaforma).unwrap();
+        const savedPlatform = await savePiattaforma(piattaforma).unwrap()
         if (!savedPlatform.id) {
-            return;
+            return
         }
         for (const ruolo of ruoli) {
-            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap();
+            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap()
         }
         for (const gruppo of gruppi) {
-            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap();
+            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap()
         }
-        onDone();
+        onDone()
     }
+
+    const handleAddRuolo = (ruolo: Ruolo) => dispatch(addRuolo(ruolo))
+    const handleUpdateRuolo = (ruolo: Ruolo) => dispatch(updateRuolo(ruolo))
+    const handleDeleteRuolo = (ruolo: Ruolo) => dispatch(removeRuolo(ruolo))
+
+    const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
+    const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
+    const handleDeleteGruppo = (gruppo: Gruppo) => dispatch(removeGruppo(gruppo))
 
     return (
         <>
             <Stepper currentStep={step} />
-
             {step === 2 && (
                 <PiattaformaStep
                     onChange={setPiattaforma}
                     piattaforma={piattaforma}
                 />
             )}
-
             {step === 3 && (
                 <RuoliStep
-                    onAdd={() => setRoleDraft({ id: 0, nome: "", descrizione: "", richiedibileDaProcesso: false })}
-                    onDelete={(r) => setRuoli(ruoli.filter((x) => x !== r))}
+                    piattaformaId={piattaforma.id}
+                    onAdd={() =>
+                        setRoleDraft({
+                            id: 0,
+                            nome: "",
+                            descrizione: "",
+                            richiedibileDaProcesso: false
+                        })
+                    }
+                    onDelete={handleDeleteRuolo}
                     onEdit={setRoleDraft}
                 />
             )}
-
             {step === 4 && (
                 <AbilitazioneStep
                     onChangeProcesso={setProcessoVerticale}
@@ -98,18 +117,21 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     tipoAbilitazione={tipoAbilitazione}
                 />
             )}
-
             {step === 5 && (
                 <GruppiStep
                     gruppi={gruppi}
-                    onAdd={() => setGroupDraft({ nome: "", descrizione: "", ruoliIds: [] })}
-                    onDelete={(g) => setGruppi(gruppi.filter((x) => x !== g))}
+                    onAdd={() =>
+                        setGroupDraft({
+                            nome: "",
+                            descrizione: "",
+                            ruoliIds: []
+                        })
+                    }
+                    onDelete={handleDeleteGruppo}
                     onEdit={setGroupDraft}
                 />
             )}
-
             {step === 6 && <CruscottoStep />}
-
             {step === 7 && (
                 <RiepilogoStep
                     gruppi={gruppi}
@@ -118,7 +140,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     tipoAbilitazione={tipoAbilitazione}
                 />
             )}
-
             <div className="actions">
                 <button
                     className="btn-secondary"
@@ -142,30 +163,32 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     </button>
                 )}
             </div>
-
             {roleDraft && (
                 <RoleModal
                     onClose={() => setRoleDraft(null)}
                     onSave={(role) => {
-                        setRuoli((prev) => {
-                            const found = prev.find((x) => x === roleDraft || (x.id && x.id === roleDraft.id))
-                            return found ? prev.map((x) => (x === found ? role : x)) : [...prev, role]
-                        })
+                        const isExisting = ruoli.some((r) => r.id === role.id && role.id !== 0)
+                        if (isExisting) {
+                            handleUpdateRuolo(role)
+                        } else {
+                            handleAddRuolo(role)
+                        }
                         setRoleDraft(null)
                     }}
                     role={roleDraft}
                 />
             )}
-
             {groupDraft && (
                 <GroupModal
                     group={groupDraft}
                     onClose={() => setGroupDraft(null)}
                     onSave={(group) => {
-                        setGruppi((prev) => {
-                            const found = prev.find((x) => x === groupDraft || (x.id && x.id === groupDraft.id))
-                            return found ? prev.map((x) => (x === found ? group : x)) : [...prev, group]
-                        })
+                        const isExisting = gruppi.some((g) => g.id === group.id && group.id !== 0)
+                        if (isExisting) {
+                            handleUpdateGruppo(group)
+                        } else {
+                            handleAddGruppo(group)
+                        }
                         setGroupDraft(null)
                     }}
                     ruoli={ruoli}
@@ -175,4 +198,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     )
 }
 
-export { emptyPiattaforma } from "../types/type";
+export { emptyPiattaforma } from "../types/type"

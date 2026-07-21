@@ -12,19 +12,16 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
     const [search, setSearch] = useState("")
     const [page, setPage] = useState(0)
 
-    // Fetch data from the backend (paginated + search)
     const { data, isLoading, error } = useGetPiattaformeQuery({
         search,
         page,
         size: PAGE_SIZE
     })
 
-    // Extract data from the response
     const rows = data?.content ?? []
     const totalElements = data?.totalElements ?? 0
     const totalPages = data?.totalPages ?? 1
 
-    // Handle loading and error states
     if (isLoading) {
         return <p className="p-6 text-gray-500">Caricamento piattaforme...</p>
     }
@@ -48,7 +45,7 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
                     <input
                         value={search}
                         onChange={(e) => {
-                            setPage(0) // reset to first page when searching
+                            setPage(0)
                             setSearch(e.target.value)
                         }}
                         placeholder="Cerca piattaforme..."

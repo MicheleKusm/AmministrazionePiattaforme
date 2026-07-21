@@ -93,13 +93,13 @@ public class PiattaformaService {
 
     private String toConfigJson(PiattaformaDTO dto) {
         Map<String, Object> config = new LinkedHashMap<>();
-        config.put("codiceIct", dto.getCodiceIct());
-        config.put("oamMetadataName", dto.getOamMetadataName());
-        config.put("oamMetadataValue", dto.getOamMetadataValue());
-        config.put("richiedibileDaCruscotto", dto.getRichiedibileDaCruscotto());
-        config.put("richiedibileInCorso", dto.getRichiedibileInCorso());
-        config.put("ripetibile", dto.getRipetibile());
-        config.put("utilizzoModelloAutorizzativo", dto.getUtilizzoModelloAutorizzativo());
+        config.put(CODICE_ICT, dto.getCodiceIct());
+        config.put(OAMMETADATANAME, dto.getOamMetadataName());
+        config.put(OAMMETADATAVALUE, dto.getOamMetadataValue());
+        config.put(RICHIEDIBILE_DA_CRUSCOTTO, dto.getRichiedibileDaCruscotto());
+        config.put(RICHIEDIBILE_IN_CORSO, dto.getRichiedibileInCorso());
+        config.put(RIPETIBILE, dto.getRipetibile());
+        config.put(UTILIZZO_MODELLO_AUTORIZZATIVO, dto.getUtilizzoModelloAutorizzativo());
         try {
             return objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException ex) {
