@@ -7,6 +7,7 @@ import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PiattaformaService {
@@ -102,14 +104,14 @@ public class PiattaformaService {
     }
 
     private Map<String, Object> parseConfig(String configJson) {
-        if (configJson == null || configJson.isBlank()) {
+        if (null == configJson || configJson.isBlank()) {
             return Map.of();
         }
         try {
-            return objectMapper.readValue(configJson, new TypeReference<>() {
-            });
+            return objectMapper.readValue(configJson, new TypeReference<>() {});
         } catch (JsonProcessingException ex) {
-            throw new IllegalArgumentException("CONFIG_JSON non valido", ex);
+            log.error("CONFIG_JSON non valido: {}", configJson, ex);
+            return Map.of();
         }
     }
     //TODO solo per oam metadata name e value

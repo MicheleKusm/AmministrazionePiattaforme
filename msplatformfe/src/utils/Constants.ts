@@ -20,7 +20,8 @@ export class Constants {
         RICHIEDIBILE_IN_CORSO: "Richiedibile in corso",
         RIPETIBILE: "Ripetibile",
         UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo",
-        NUMERO_RUOLI: 5
+        NUMERO_RUOLI: 5,
+        PAGE_SIZE: 5
     } as const
 
     static readonly regex = {

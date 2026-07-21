@@ -1,9 +1,4 @@
-import type { Piattaforma } from "../../types/type"
-
-type PiattaformaStepProps = {
-    piattaforma: Piattaforma;
-    onChange: (piattaforma: Piattaforma) => void;
-};
+import type { Piattaforma, PiattaformaStepProps } from "../../types/type"
 
 const TOGGLES: [string, keyof Piattaforma][] = [
     ["Richiedibile da cruscotto", "richiedibileDaCruscotto"],

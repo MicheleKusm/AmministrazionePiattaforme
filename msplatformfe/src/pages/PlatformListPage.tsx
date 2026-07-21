@@ -1,34 +1,36 @@
-import { useMemo, useState } from "react";
-import { useAppSelector } from "../store/hooks";
-import { PlatformTable } from "../components/tables/PlatformTable";
-import { Pagination } from "../components/platform-list/Pagination";
-import { Button } from "../components/common/Button";
-import type { Piattaforma } from "../types/type";
+import { useState } from "react"
+import { useGetPiattaformeQuery } from "../api/piattaformeApi"
+import { PlatformTable } from "../components/tables/PlatformTable"
+import { Pagination } from "../components/platform-list/Pagination"
+import { Button } from "../components/common/Button"
+import type { PlatformListPageProps } from "../types/type"
+import { Constants } from "../utils/Constants"
 
-type PlatformListPageProps = {
-    onCreate: () => void;
-    onEdit: (piattaforma: Piattaforma) => void;
-};
-
-const PAGE_SIZE = 5;
+const PAGE_SIZE = Constants.common.PAGE_SIZE
 
 export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
-    const items = useAppSelector((state) => state.piattaforme.items);
-    const [search, setSearch] = useState("");
-    const [page, setPage] = useState(0);
+    const [search, setSearch] = useState("")
+    const [page, setPage] = useState(0)
 
-    const filtered = useMemo(() => {
-        const term = search.trim().toLowerCase();
-        if (!term) {
-            return items;
-        }
-        return items.filter((p) => p.nome.toLowerCase().includes(term) || p.objClass.toLowerCase().includes(term));
-    }, [items, search]);
+    // Fetch data from the backend (paginated + search)
+    const { data, isLoading, error } = useGetPiattaformeQuery({
+        search,
+        page,
+        size: PAGE_SIZE
+    })
 
-    const totalPages = Math.max(Math.ceil(filtered.length / PAGE_SIZE), 1);
-    const currentPage = Math.min(page, totalPages - 1);
-    const start = currentPage * PAGE_SIZE;
-    const rows = filtered.slice(start, start + PAGE_SIZE);
+    // Extract data from the response
+    const rows = data?.content ?? []
+    const totalElements = data?.totalElements ?? 0
+    const totalPages = data?.totalPages ?? 1
+
+    // Handle loading and error states
+    if (isLoading) {
+        return <p className="p-6 text-gray-500">Caricamento piattaforme...</p>
+    }
+    if (error) {
+        return <p className="p-6 text-red-500">Errore nel caricamento delle piattaforme.</p>
+    }
 
     return (
         <div>
@@ -46,26 +48,32 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
                     <input
                         value={search}
                         onChange={(e) => {
-                            setPage(0);
-                            setSearch(e.target.value);
+                            setPage(0) // reset to first page when searching
+                            setSearch(e.target.value)
                         }}
                         placeholder="Cerca piattaforme..."
                         className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
                     />
                 </div>
 
-                <PlatformTable rows={rows} onEdit={onEdit} />
+                <PlatformTable
+                    rows={rows}
+                    onEdit={onEdit}
+                />
 
                 <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-500">
-                    <span>Mostra {filtered.length === 0 ? 0 : start + 1}-{start + rows.length} di {filtered.length} risultati</span>
+                    <span>
+                        Mostra {totalElements === 0 ? 0 : page * PAGE_SIZE + 1} – {Math.min((page + 1) * PAGE_SIZE, totalElements)} di {totalElements}{" "}
+                        risultati
+                    </span>
                     <Pagination
-                        currentPage={currentPage}
+                        currentPage={page}
                         totalPages={totalPages}
-                        onPrev={() => setPage((p) => p - 1)}
-                        onNext={() => setPage((p) => p + 1)}
+                        onPrev={() => setPage((p) => Math.max(0, p - 1))}
+                        onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                     />
                 </div>
             </div>
         </div>
-    );
+    )
 }

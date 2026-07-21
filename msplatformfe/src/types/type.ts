@@ -1,3 +1,13 @@
+export type PlatformListPageProps = {
+    onCreate: () => void
+    onEdit: (piattaforma: Piattaforma) => void
+}
+
+export type PiattaformaStepProps = {
+    piattaforma: Piattaforma
+    onChange: (piattaforma: Piattaforma) => void
+}
+
 export type RuoliStepProps = {
     piattaformaId?: number
     onAdd: () => void
