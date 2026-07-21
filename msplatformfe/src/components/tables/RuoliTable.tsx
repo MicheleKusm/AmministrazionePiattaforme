@@ -5,7 +5,8 @@ import { TableCommon } from "../../components/common/TableCommon"
 const ICON_BTN = "inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
 
 export function RuoliTable({ ruoli, onEdit, onDelete, piattaformaId }: RuoliTableProps) {
-    const sortedRuoli = [...ruoli].sort((a, b) => a.id - b.id)
+    const visibleRuoli = ruoli.filter((r) => !r.daEliminare)
+    const sortedRuoli = [...visibleRuoli].sort((a, b) => a.id - b.id)
 
     const columns = [
         {

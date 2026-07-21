@@ -3,6 +3,7 @@ package it.sogei.acrgs.platformms.service;
 import it.sogei.acrgs.platformms.dto.RuoloDTO;
 import it.sogei.acrgs.platformms.entity.Ruolo;
 import it.sogei.acrgs.platformms.repository.RuoloRepository;
+import it.sogei.acrgs.platformms.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,17 +53,9 @@ public class RuoloService {
         return RuoloDTO.builder()
                 .id(entity.getId())
                 .idPiattaforma(entity.getIdPiattaforma())
-                .richiedibile_da_processo(convertToBoolean(entity.getRichiedibileDaProcesso()))
+                .richiedibile_da_processo(new Utility().convertToBoolean(entity.getRichiedibileDaProcesso()))
                 .nome(entity.getNome())
                 .descrizione(entity.getDescrizione())
                 .build();
-    }
-    // colonna db è un numero, in teoria tiene solo o 1 o 0 ma è nullable e non ha constraint quindi convertiamo
-    private boolean convertToBoolean (Long value) {
-        return value != null && value == 1;
-    }
-
-    private Long convertToLong(Boolean value) {
-        return value != null && !value ? 1L : 0L;
     }
 }

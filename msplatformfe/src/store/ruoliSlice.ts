@@ -26,7 +26,16 @@ const ruoliSlice = createSlice({
             }
         },
         removeRuolo(state, action: PayloadAction<Ruolo>) {
-            state.items = state.items.filter((r) => r !== action.payload)
+            const ruolo = action.payload;
+            if (ruolo.id > 0) {
+                // se id > 0 (esistente a db) marca per eliminazione a db, altrimenti elimina direttamente dallo store
+                const existing = state.items.find(r => r.id === ruolo.id);
+                if (existing) {
+                    existing.daEliminare = true;
+                }
+            } else {
+                state.items = state.items.filter(r => r.id !== ruolo.id);
+            }
         }
     }
 })

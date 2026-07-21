@@ -3,6 +3,16 @@ export type PlatformListPageProps = {
     onEdit: (piattaforma: Piattaforma) => void
 }
 
+export type DeleteConfirmationModalProps = {
+    isOpen: boolean
+    onClose: () => void
+    onConfirm: () => void
+    title?: string
+    message?: string
+    confirmLabel?: string
+    cancelLabel?: string
+}
+
 export type PiattaformaStepProps = {
     piattaforma: Piattaforma
     onChange: (piattaforma: Piattaforma) => void
@@ -52,29 +62,29 @@ export type TableProps<T> = {
 export type TipoAbilitazione = "TICKET" | "VERTICALE";
 
 export type Piattaforma = {
-    id?: number;
-    nome: string;
-    descrizione: string;
-    url: string;
-    canale: string;
-    objClass: string;
-    readOnly: boolean;
-    codiceIct: string;
-    oamMetadataName: string;
-    oamMetadataValue: string;
-    richiedibileDaCruscotto: boolean;
-    richiedibileInCorso: boolean;
-    ripetibile: boolean;
-    utilizzoModelloAutorizzativo: boolean;
-    abilitazione: TipoAbilitazione;
-};
+    id?: number
+    nome: string
+    descrizione: string
+    url: string
+    canale: string
+    objClass: string
+    readOnly: boolean
+    codiceIct: string
+    oamMetadataName: string
+    oamMetadataValue: string
+    richiedibileDaCruscotto: boolean
+    richiedibileInCorso: boolean
+    ripetibile: boolean
+    utilizzoModelloAutorizzativo: boolean
+    abilitazione: TipoAbilitazione
+}
 
 export type Ruolo = {
-    id: number;
-    idPiattaforma?: number;
-    nome: string;
-    descrizione: string;
-    richiedibileDaProcesso: boolean;
+    id: number
+    nome: string
+    descrizione: string
+    richiedibileDaProcesso: boolean
+    daEliminare?: boolean
 };
 
 export type Gruppo = {

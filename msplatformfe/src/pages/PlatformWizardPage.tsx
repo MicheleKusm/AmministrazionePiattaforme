@@ -3,7 +3,7 @@ import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
 import { useSavePiattaformaMutation } from "../api/piattaformeApi"
 import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi"
-import { GroupModal } from "../components/modals/GroupModal"
+import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
 import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep"
 import { CruscottoStep } from "../components/wizard/CruscottoStep"
@@ -24,15 +24,18 @@ type PlatformWizardPageProps = {
 };
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
-    const initialLoadDone = useRef(false);
-    const dispatch = useAppDispatch();
-    const [step, setStep] = useState(2);
-    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma);
-    const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET");
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+    const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
+    const initialLoadDone = useRef(false)
+    const ruoliTempIdCounter = useRef(-1)
+    const tempIdCounter = useRef(-1)
+    const dispatch = useAppDispatch()
+    const [step, setStep] = useState(2)
+    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
+    const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
 
-
-    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null);
-    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null);
+    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
+    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
 
     const ruoli = useAppSelector((state) => state.ruoli.items)
     const gruppi = useAppSelector((state) => state.gruppi.items)
@@ -58,31 +61,40 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }, [gruppiData, dispatch])
 
     function prevStep() {
-        setStep((s) => Math.max(2, s - 1));
+        setStep((s) => Math.max(2, s - 1))
     }
 
     function nextStep() {
-        setStep((s) => Math.min(7, s + 1));
+        setStep((s) => Math.min(7, s + 1))
     }
 
     async function saveFinalConfiguration() {
-        const savedPlatform = await savePiattaforma(piattaforma).unwrap();
+        const savedPlatform = await savePiattaforma(piattaforma).unwrap()
         if (!savedPlatform.id) {
-            return;
+            return
         }
         for (const ruolo of ruoli) {
-            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap();
+            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap()
         }
         for (const gruppo of gruppi) {
-            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap();
+            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap()
         }
-        onDone();
+        onDone()
     }
 
     const handleAddRuolo = (ruolo: Ruolo) => dispatch(addRuolo(ruolo))
     const handleUpdateRuolo = (ruolo: Ruolo) => dispatch(updateRuolo(ruolo))
-    const handleDeleteRuolo = (ruolo: Ruolo) => dispatch(removeRuolo(ruolo))
-
+    const handleDeleteRuolo = (ruolo: Ruolo) => {
+        setRuoloToDelete(ruolo)
+        setDeleteModalOpen(true)
+    }
+    const confirmDeleteRuolo = () => {
+        if (ruoloToDelete) {
+            dispatch(removeRuolo(ruoloToDelete))
+            setRuoloToDelete(null)
+            setDeleteModalOpen(false)
+        }
+    }
     const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
     const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
     const handleDeleteGruppo = (gruppo: Gruppo) => dispatch(removeGruppo(gruppo))
@@ -101,14 +113,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             {step === 3 && (
                 <RuoliStep
                     piattaformaId={piattaforma.id}
-                    onAdd={() =>
+                    onAdd={() => {
+                        const tempId = ruoliTempIdCounter.current--
                         setRoleDraft({
-                            id: 0,
+                            id: tempId,
                             nome: "",
                             descrizione: "",
                             richiedibileDaProcesso: false
                         })
-                    }
+                    }}
                     onDelete={handleDeleteRuolo}
                     onEdit={setRoleDraft}
                 />
@@ -164,38 +177,32 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 )}
             </div>
 
-            {roleDraft && (
-                <RoleModal
-                    onClose={() => setRoleDraft(null)}
-                    onSave={(role) => {
-                        const isExisting = ruoli.some((r) => r.id === role.id && role.id !== 0)
-                        if (isExisting) {
-                            handleUpdateRuolo(role)
-                        } else {
-                            handleAddRuolo(role)
-                        }
-                        setRoleDraft(null)
-                    }}
-                    role={roleDraft}
-                />
-            )}
-
-            {groupDraft && (
-                <GroupModal
-                    group={groupDraft}
-                    onClose={() => setGroupDraft(null)}
-                    onSave={(group) => {
-                        const isExisting = gruppi.some((g) => g.id === group.id && group.id !== 0)
-                        if (isExisting) {
-                            handleUpdateGruppo(group)
-                        } else {
-                            handleAddGruppo(group)
-                        }
-                        setGroupDraft(null)
-                    }}
-                    ruoli={ruoli}
-                />
-            )}
+            {
+                roleDraft && (
+                    <RoleModal
+                        onClose={() => setRoleDraft(null)}
+                        onSave={(role) => {
+                            const exists = ruoli.some((r) => r.id === role.id)
+                            if (exists) {
+                                handleUpdateRuolo(role)
+                            } else {
+                                handleAddRuolo(role)
+                            }
+                            setRoleDraft(null)
+                        }}
+                        role={roleDraft}
+                    />
+                )
+            }
+            <DeleteConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => {
+                    setDeleteModalOpen(false)
+                    setRuoloToDelete(null)
+                }}
+                onConfirm={confirmDeleteRuolo}
+                message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
+            />
         </>
     )
 }
