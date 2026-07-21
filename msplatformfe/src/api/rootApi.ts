@@ -9,6 +9,6 @@ export const platformApi = createApi({
             return headers;
         }
     }),
-    tagTypes: ["Piattaforme", "Ruoli", "Gruppi"],
+    tagTypes: ["Piattaforme", "Ruoli", "Gruppi", "Abilitazioni"],
     endpoints: () => ({})
 });

@@ -111,3 +111,97 @@ export const emptyPiattaforma: Piattaforma = {
 }
 
 export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const;
+
+//  Abilitazione associata
+
+export type StatoAbilitazione = "Attiva" | "Disattiva";
+
+export type CanaleComunicazione = "Email" | "SMS" | "In-app" | "Push" | "Webhook" | "WhatsApp";
+
+export type TipologicaCampoDinamico = {
+    tipoDati: string;
+    type: string;
+    regex: string | null;
+    idTipoDati: number;
+};
+
+export type CampoTicket = {
+    id: number;
+    label: string;
+    descrizione: string;
+    campo: string;
+    tipoValore: string;
+    obbligatoria: boolean;
+    regex: string;
+};
+
+export type ComunicazioneOnboarding = {
+    id: number;
+    canale: CanaleComunicazione;
+    descrizione: string;
+    obbligatoria: boolean;
+};
+
+export type Abilitazione = {
+    id: number;
+    nome: string;
+    tipo: TipoAbilitazione;
+    riferimento: string;
+    stato: StatoAbilitazione;
+    processKey: string;
+    codiceScim: string;
+    processoVerticale: string;
+    campi: CampoTicket[];
+    comunicazioni: ComunicazioneOnboarding[];
+};
+
+export type AbilitazioniTableProps = {
+    abilitazioni: Abilitazione[];
+    onDetail: (abilitazione: Abilitazione) => void;
+    onEdit: (abilitazione: Abilitazione) => void;
+    onDelete: (abilitazione: Abilitazione) => void;
+};
+
+export type CampiTicketTableProps = {
+    campi: CampoTicket[];
+    onEdit: (campo: CampoTicket) => void;
+    onDelete: (campo: CampoTicket) => void;
+};
+
+export type ComunicazioniTableProps = {
+    comunicazioni: ComunicazioneOnboarding[];
+    onEdit: (comunicazione: ComunicazioneOnboarding) => void;
+    onDelete: (comunicazione: ComunicazioneOnboarding) => void;
+};
+
+export const emptyCampoTicket: CampoTicket = {
+    id: 0,
+    label: "",
+    descrizione: "",
+    campo: "",
+    tipoValore: "",
+    obbligatoria: true,
+    regex: ""
+};
+
+export const emptyComunicazione: ComunicazioneOnboarding = {
+    id: 0,
+    canale: "Email",
+    descrizione: "",
+    obbligatoria: true
+};
+
+export function makeEmptyAbilitazione(): Abilitazione {
+    return {
+        id: 0,
+        nome: "",
+        tipo: "TICKET",
+        riferimento: "",
+        stato: "Attiva",
+        processKey: "",
+        codiceScim: "",
+        processoVerticale: "",
+        campi: [],
+        comunicazioni: []
+    };
+}

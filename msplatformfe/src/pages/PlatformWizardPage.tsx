@@ -18,21 +18,20 @@ import { setRuoli, addRuolo, updateRuolo, removeRuolo } from "../store/ruoliSlic
 import { setGruppi, addGruppo, updateGruppo, removeGruppo } from "../store/gruppiSlice"
 
 type PlatformWizardPageProps = {
-    initialPiattaforma: Piattaforma
-    onDone: () => void
-    onCancel: () => void
-}
+    initialPiattaforma: Piattaforma;
+    onDone: () => void;
+    onCancel: () => void;
+};
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
-    const dispatch = useAppDispatch()
+    const dispatch = useAppDispatch();
+    const [step, setStep] = useState(2);
+    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma);
+    const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET");
 
-    const [step, setStep] = useState(2)
-    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
-    const [tipoAbilitazione, setTipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
-    const [processoVerticale, setProcessoVerticale] = useState("")
 
-    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
-    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
+    const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null);
+    const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null);
 
     const ruoli = useAppSelector((state) => state.ruoli.items)
     const gruppi = useAppSelector((state) => state.gruppi.items)
@@ -57,25 +56,25 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }, [gruppiData, dispatch])
 
     function prevStep() {
-        setStep((s) => Math.max(2, s - 1))
+        setStep((s) => Math.max(2, s - 1));
     }
 
     function nextStep() {
-        setStep((s) => Math.min(7, s + 1))
+        setStep((s) => Math.min(7, s + 1));
     }
 
     async function saveFinalConfiguration() {
-        const savedPlatform = await savePiattaforma(piattaforma).unwrap()
+        const savedPlatform = await savePiattaforma(piattaforma).unwrap();
         if (!savedPlatform.id) {
-            return
+            return;
         }
         for (const ruolo of ruoli) {
-            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap()
+            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap();
         }
         for (const gruppo of gruppi) {
-            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap()
+            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap();
         }
-        onDone()
+        onDone();
     }
 
     const handleAddRuolo = (ruolo: Ruolo) => dispatch(addRuolo(ruolo))
@@ -89,12 +88,14 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     return (
         <>
             <Stepper currentStep={step} />
+
             {step === 2 && (
                 <PiattaformaStep
                     onChange={setPiattaforma}
                     piattaforma={piattaforma}
                 />
             )}
+
             {step === 3 && (
                 <RuoliStep
                     piattaformaId={piattaforma.id}
@@ -110,14 +111,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onEdit={setRoleDraft}
                 />
             )}
-            {step === 4 && (
-                <AbilitazioneStep
-                    onChangeProcesso={setProcessoVerticale}
-                    onChangeTipo={setTipoAbilitazione}
-                    processoVerticale={processoVerticale}
-                    tipoAbilitazione={tipoAbilitazione}
-                />
-            )}
+            {step === 4 && <AbilitazioneStep piattaforma={piattaforma} />}
             {step === 5 && (
                 <GruppiStep
                     gruppi={gruppi}
@@ -132,7 +126,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onEdit={setGroupDraft}
                 />
             )}
+
             {step === 6 && <CruscottoStep />}
+
             {step === 7 && (
                 <RiepilogoStep
                     gruppi={gruppi}
@@ -141,6 +137,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     tipoAbilitazione={tipoAbilitazione}
                 />
             )}
+
             <div className="actions">
                 <button
                     className="btn-secondary"
@@ -164,6 +161,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     </button>
                 )}
             </div>
+
             {roleDraft && (
                 <RoleModal
                     onClose={() => setRoleDraft(null)}
@@ -179,6 +177,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     role={roleDraft}
                 />
             )}
+
             {groupDraft && (
                 <GroupModal
                     group={groupDraft}
@@ -199,4 +198,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     )
 }
 
-export { emptyPiattaforma } from "../types/type"
+export { emptyPiattaforma } from "../types/type";
