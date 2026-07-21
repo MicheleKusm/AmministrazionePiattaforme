@@ -1,5 +1,12 @@
 export type RuoliStepProps = {
+    piattaformaId?: number
     onAdd: () => void
+    onEdit: (ruolo: Ruolo) => void
+    onDelete: (ruolo: Ruolo) => void
+}
+
+export type RuoliTableProps = {
+    ruoli: Ruolo[]
     onEdit: (ruolo: Ruolo) => void
     onDelete: (ruolo: Ruolo) => void
 }
