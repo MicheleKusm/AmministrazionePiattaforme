@@ -24,7 +24,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "GRUPPO_APPARTENENZA_RUOLI")
 public class GruppoAppartenenza implements Serializable {
-
+    //TODO aggiungere relazioni many2many con ruoli passando per ref_appartenenza
     @Serial
     private static final long serialVersionUID = -5705767017724854640L;
 

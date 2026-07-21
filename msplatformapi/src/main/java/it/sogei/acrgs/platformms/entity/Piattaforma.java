@@ -63,4 +63,6 @@ public class Piattaforma implements Serializable {
     @Size(max = 4000)
     @Column(name = "CONFIG_JSON", length = 4000)
     private String configJson;
+
+    //TODO aggiungere nuova colona utilizzoModelloAutorizzativo integer
 }
