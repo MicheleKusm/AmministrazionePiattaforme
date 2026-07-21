@@ -4,6 +4,20 @@ export type RuoliStepProps = {
     onDelete: (ruolo: Ruolo) => void
 }
 
+export type Column<T> = {
+    header: string
+    render: (item: T) => React.ReactNode
+}
+
+export type TableProps<T> = {
+    data: T[]
+    columns: Column<T>[]
+    keyExtractor: (item: T) => React.Key
+    emptyMessage?: React.ReactNode
+    className?: string // container esterno
+    tableClassName?: string // per elemento <table>
+}
+
 export type TipoAbilitazione = "TICKET" | "VERTICALE";
 
 export type Piattaforma = {
