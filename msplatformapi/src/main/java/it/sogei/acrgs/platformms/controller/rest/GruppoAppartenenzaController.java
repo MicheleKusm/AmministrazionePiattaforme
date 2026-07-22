@@ -17,14 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static it.sogei.acrgs.platformms.utils.Constants.*;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/gruppi")
+@RequestMapping(GRUPPI_API)
 public class GruppoAppartenenzaController {
 
     private final GruppoAppartenenzaService gruppoService;
 
-    @GetMapping("/all")
+    @GetMapping(ALL_API)
     public ResponseEntity<List<GruppoAppartenenzaDTO>> list() {
         return ResponseEntity.ok(gruppoService.list());
     }
@@ -34,17 +36,17 @@ public class GruppoAppartenenzaController {
         return ResponseEntity.ok(gruppoService.create(dto));
     }
 
-    @GetMapping("/{id}/dependencies")
+    @GetMapping(ID_API + DEPENDENCIES_API)
     public ResponseEntity<GruppoDependenciesDTO> getDependencies(@PathVariable Long id) {
         return ResponseEntity.ok(gruppoService.getDependencies(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(ID_API)
     public ResponseEntity<GruppoAppartenenzaDTO> update(@PathVariable Long id, @RequestBody GruppoAppartenenzaDTO dto) {
         return ResponseEntity.ok(gruppoService.update(id, dto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ID_API)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         gruppoService.delete(id);
         return ResponseEntity.noContent().build();

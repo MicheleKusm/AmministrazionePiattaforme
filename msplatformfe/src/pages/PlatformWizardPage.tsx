@@ -17,6 +17,8 @@ import { type Gruppo, type Piattaforma, type Ruolo } from "../types/type"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { setRuoli, addRuolo, updateRuolo, removeRuolo } from "../store/ruoliSlice"
 import { setGruppi, addGruppo, updateGruppo, removeGruppo } from "../store/gruppiSlice"
+import {piattaformaSchema} from "../utils/schema";
+import * as yup from "yup";
 
 type PlatformWizardPageProps = {
     initialPiattaforma: Piattaforma;
@@ -34,6 +36,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
     const dispatch = useAppDispatch()
+    const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
     const [step, setStep] = useState(2)
     const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
     const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
@@ -70,6 +73,25 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }
 
     function nextStep() {
+        if (step === 2) {
+            try {
+                piattaformaSchema.validateSync(piattaforma, {
+                    abortEarly: false,
+                    context: { currentId: piattaforma.id }
+                })
+                setPiattaformaErrors({})
+                setStep(3)
+            } catch (err) {
+                if (err instanceof yup.ValidationError) {
+                    const newErrors: Record<string, string> = {}
+                    err.inner.forEach((e) => {
+                        if (e.path) newErrors[e.path] = e.message
+                    })
+                    setPiattaformaErrors(newErrors)
+                }
+            }
+            return
+        }
         setStep((s) => Math.min(7, s + 1))
     }
 
@@ -120,8 +142,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
             {step === 2 && (
                 <PiattaformaStep
-                    onChange={setPiattaforma}
                     piattaforma={piattaforma}
+                    onChange={setPiattaforma}
+                    errors={piattaformaErrors}
                 />
             )}
 
@@ -246,7 +269,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     depsLoading
                         ? "Verifica dipendenze in corso..."
                         : dependenciesData?.dependencies?.length
-                          ? `Attenzione: il gruppo è utilizzato da:\n${dependenciesData.dependencies.map((d) => `${d.type}: ${d.name}`).join("\n")}\nContinuare?`
+                          ? `Attenzione, il gruppo è utilizzato da:\n${dependenciesData.dependencies.map((d) => `${d.type}: ${d.name}`).join("\n")}\nContinuare?`
                           : "Sei sicuro di voler eliminare questo gruppo? L'operazione non è reversibile."
                 }
                 confirmLabel={depsLoading ? "Attendi..." : "Elimina"}

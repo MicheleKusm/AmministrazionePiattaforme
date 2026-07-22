@@ -11,4 +11,12 @@ public class Constants {
     public static final String RICHIEDIBILE_IN_CORSO = "richiedibileInCorso";
     public static final String RIPETIBILE = "ripetibile";
     public static final String UTILIZZO_MODELLO_AUTORIZZATIVO = "utilizzoModelloAutorizzativo";
+    public static final String ROLE_GROUPS = "role_groups";
+    public static final String CRUSCOTTO_PIATTAFORMA = "CRUSCOTTO PER PIATTAFORMA";
+    public static final String NA = "N/A";
+    public static final String RUOLO = "RUOLO";
+    public static final String GRUPPI_API = "/api/gruppi";
+    public static final String ALL_API = "/all";
+    public static final String ID_API = "/{id}";
+    public static final String DEPENDENCIES_API = "/dependencies";
 }

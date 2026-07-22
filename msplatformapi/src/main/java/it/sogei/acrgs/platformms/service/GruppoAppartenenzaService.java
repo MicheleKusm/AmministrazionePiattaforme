@@ -1,7 +1,6 @@
 package it.sogei.acrgs.platformms.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
@@ -11,6 +10,7 @@ import it.sogei.acrgs.platformms.repository.GruppoAppartenenzaRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
 import it.sogei.acrgs.platformms.repository.RuoloRepository;
+import it.sogei.acrgs.platformms.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @Slf4j
 @Service
@@ -62,6 +64,14 @@ public class GruppoAppartenenzaService {
         gruppoRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public GruppoDependenciesDTO getDependencies(Long gruppoId) {
+        List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
+        deps.addAll(extractPiattaformeDependencies(gruppoId));
+        deps.addAll(extractRuoliDependencies(gruppoId));
+        return GruppoDependenciesDTO.builder().dependencies(deps).build();
+    }
+
     private void saveRefs(Long gruppoId, List<Long> ruoliIds) {
         if (ruoliIds == null) {
             return;
@@ -89,41 +99,54 @@ public class GruppoAppartenenzaService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    public GruppoDependenciesDTO getDependencies(Long gruppoId) {
+    private List<GruppoDependenciesDTO.Dependency> extractPiattaformeDependencies(Long gruppoId) {
         List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
-
         List<Piattaforma> allPiattaforme = piattaformaRepository.findAll();
-        for (Piattaforma p : allPiattaforme) {
-            String configJson = p.getConfigJson();
-            if (configJson != null && !configJson.isBlank()) {
+
+        for (Piattaforma piattaforma : allPiattaforme) {
+            String configJson = piattaforma.getConfigJson();
+            if (null != configJson && !configJson.isBlank()) {
                 try {
                     JsonNode root = objectMapper.readTree(configJson);
                     List<Long> referencedGroupIds = extractRoleGroups(root);
                     if (referencedGroupIds.contains(gruppoId)) {
                         deps.add(GruppoDependenciesDTO.Dependency.builder()
-                                .type("PIATTAFORMA")
-                                .name(p.getNome())
-                                .id(p.getId())
+                                .type(Constants.CRUSCOTTO_PIATTAFORMA)
+                                .name(piattaforma.getNome())
+                                .id(piattaforma.getId())
                                 .build());
                     }
-                } catch (JsonProcessingException e) {
-                    log.error("Error parsing config_json for piattaforma {}: {}", p.getId(), e.getMessage());
+                } catch (JsonProcessingException exception) {
+                    log.error("Errore nel parse del json della piattaforma {}: {}", piattaforma.getId(), exception.getMessage());
                 }
             }
         }
-        List<Ruolo> ruoli = ruoloRepository.findByGruppoAppartenenzaId(gruppoId);
-        for (Ruolo r : ruoli) {
-            deps.add(GruppoDependenciesDTO.Dependency.builder()
-                    .type("RUOLO")
-                    .name(r.getNome())
-                    .id(r.getId())
-                    .build());
-        }
-
-        return GruppoDependenciesDTO.builder().dependencies(deps).build();
+        return deps;
     }
 
+    /**
+     * Estrae i ruoli associati al gruppo e alle piattaforme che li utilizzano
+     */
+    private List<GruppoDependenciesDTO.Dependency> extractRuoliDependencies(Long gruppoId) {
+        List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
+        List<Ruolo> ruoli = ruoloRepository.findByGruppoAppartenenzaId(gruppoId);
+
+        for (Ruolo ruolo : ruoli) {
+            String piattaformaNome = piattaformaRepository.findById(ruolo.getIdPiattaforma())
+                    .map(Piattaforma::getNome)
+                    .orElse(NA);
+            deps.add(GruppoDependenciesDTO.Dependency.builder()
+                    .type(Constants.RUOLO)
+                    .name(ruolo.getNome() + " (" + piattaformaNome + ")")
+                    .id(ruolo.getId())
+                    .build());
+        }
+        return deps;
+    }
+
+    /**
+     * estrae tutti i role_groups dal config_json di una piattaforma in maniera ricorsiva
+     */
     private List<Long> extractRoleGroups(JsonNode node) {
         List<Long> result = new ArrayList<>();
         if (node.isArray()) {
@@ -131,8 +154,8 @@ public class GruppoAppartenenzaService {
                 result.addAll(extractRoleGroups(item));
             }
         } else if (node.isObject()) {
-            if (node.has("role_groups") && node.get("role_groups").isArray()) {
-                for (JsonNode groupIdNode : node.get("role_groups")) {
+            if (node.has(Constants.ROLE_GROUPS) && node.get(Constants.ROLE_GROUPS).isArray()) {
+                for (JsonNode groupIdNode : node.get(Constants.ROLE_GROUPS)) {
                     if (groupIdNode.isNumber()) {
                         result.add(groupIdNode.longValue());
                     }

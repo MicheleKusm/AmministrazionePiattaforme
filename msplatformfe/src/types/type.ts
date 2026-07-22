@@ -1,3 +1,5 @@
+import type { ReactNode, SyntheticEvent } from "react"
+
 export type PlatformListPageProps = {
     onCreate: () => void
     onEdit: (piattaforma: Piattaforma) => void
@@ -13,9 +15,26 @@ export type DeleteConfirmationModalProps = {
     cancelLabel?: string
 }
 
+export type FormProps = {
+    onSubmit: (e: SyntheticEvent<HTMLFormElement>) => void
+    onCancel?: () => void
+    children: ReactNode
+    submitLabel?: string
+    cancelLabel?: string
+    isSubmitting?: boolean
+    className?: string
+}
+
+export type FormFieldProps = {
+    children: ReactNode
+    error?: string
+    className?: string
+}
+
 export type PiattaformaStepProps = {
     piattaforma: Piattaforma
     onChange: (piattaforma: Piattaforma) => void
+    errors?: Record<string, string>
 }
 
 export type RuoliStepProps = {
