@@ -17,7 +17,7 @@ public class ComunicazioneOnboardingDTO implements Serializable {
     private static final long serialVersionUID = 4440117733455980043L;
 
     private Long id;
-    private String canale;
-    private String descrizione;
+    private String icona;
+    private String testo;
     private boolean obbligatoria;
 }

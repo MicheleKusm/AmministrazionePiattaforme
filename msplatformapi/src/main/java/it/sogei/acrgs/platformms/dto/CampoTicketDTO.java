@@ -19,8 +19,11 @@ public class CampoTicketDTO implements Serializable {
     private Long id;
     private String label;
     private String descrizione;
-    private String campo;
-    private String tipoValore;
-    private boolean obbligatoria;
+    private String key;
+    private String inputType;
+    private boolean required;
     private String regex;
+    private String cssClass;
+    private Long idTipoDato;
+    private Integer order;
 }
