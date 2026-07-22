@@ -2,10 +2,12 @@ package it.sogei.acrgs.platformms.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.sogei.acrgs.platformms.dto.*;
+import it.sogei.acrgs.platformms.dto.AbilitazioneDTO;
+import it.sogei.acrgs.platformms.dto.ProcessVarDTO;
+import it.sogei.acrgs.platformms.dto.TipologicaCampoDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.entity.PiattaformaRefProcess;
-import it.sogei.acrgs.platformms.entity.TipologicaCampoDinamico;
+import it.sogei.acrgs.platformms.entity.Ruolo;
 import it.sogei.acrgs.platformms.repository.PiattaformaRefProcessRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.TipologicaCampoDinamicoRepository;
@@ -15,9 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,7 +25,7 @@ public class AbilitazioneService {
 
     private static final String TIPO_TICKET = "TICKET";
     private static final String TIPO_VERTICALE = "VERTICALE";
-    private static final String PROCESS_KEY_TICKET = "ALTRI";
+    private static final String PROCESS_KEY_TICKET = "altri";
     private static final String STATO_ATTIVA = "Attiva";
 
     private final PiattaformaRefProcessRepository refProcessRepository;
@@ -37,9 +36,8 @@ public class AbilitazioneService {
     @Transactional(readOnly = true)
     public List<AbilitazioneDTO> listByPiattaforma(Long idPiattaforma) {
         Piattaforma piattaforma = piattaformaRepository.findById(idPiattaforma).orElseThrow();
-        Map<Long, TipologicaCampoDinamico> tipologicheById = tipologicheById();
         return refProcessRepository.findByIdPiattaforma_Id(idPiattaforma).stream()
-                .map(ref -> toDto(ref, piattaforma, tipologicheById))
+                .map(ref -> toDto(ref, piattaforma))
                 .toList();
     }
 
@@ -67,7 +65,7 @@ public class AbilitazioneService {
         ref.setIdPiattaforma(piattaforma);
         applyDto(ref, piattaforma, dto);
         ref = refProcessRepository.save(ref);
-        return toDto(ref, piattaforma, tipologicheById());
+        return toDto(ref, piattaforma);
     }
 
     @Transactional
@@ -76,7 +74,7 @@ public class AbilitazioneService {
         Piattaforma piattaforma = ref.getIdPiattaforma();
         applyDto(ref, piattaforma, dto);
         ref = refProcessRepository.save(ref);
-        return toDto(ref, piattaforma, tipologicheById());
+        return toDto(ref, piattaforma);
     }
 
     @Transactional
@@ -84,7 +82,7 @@ public class AbilitazioneService {
         PiattaformaRefProcess ref = refProcessRepository.findById(id).orElseThrow();
         refProcessRepository.delete(ref);
     }/*
-*/
+     */
     // ---------- scrittura ----------
 
     private void applyDto(PiattaformaRefProcess ref, Piattaforma piattaforma, AbilitazioneDTO dto) {
@@ -94,7 +92,10 @@ public class AbilitazioneService {
         ref.setProcessKey(processKey);
         ref.setScimCode(ticket ? nullToEmpty(dto.getCodiceScim()) : null);
         ref.setProcessVars(buildProcessVars(dto));
-}
+        Ruolo ruolo = new Ruolo();
+        ruolo.setId(dto.getIdRuolo());
+        ref.setIdRuolo(dto.getIdRuolo() != null ? ruolo : null);
+    }
 
     private String buildProcessVars(AbilitazioneDTO dto) {
         ProcessVarDTO processVarDTO = new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni());
@@ -107,7 +108,7 @@ public class AbilitazioneService {
 
     // ---------- lettura ----------
 
-    private AbilitazioneDTO toDto(PiattaformaRefProcess ref, Piattaforma piattaforma, Map<Long, TipologicaCampoDinamico> tipologicheById) {
+    private AbilitazioneDTO toDto(PiattaformaRefProcess ref, Piattaforma piattaforma) {
         boolean ticket = PROCESS_KEY_TICKET.equalsIgnoreCase(ref.getProcessKey());
         String tipo = ticket ? TIPO_TICKET : TIPO_VERTICALE;
         ProcessVarDTO processVarDTO = readProcessVars(ref.getProcessVars());
@@ -125,6 +126,7 @@ public class AbilitazioneService {
                 .processoVerticale(ticket ? "" : nullToEmpty(ref.getProcessKey()))
                 .campi(processVarDTO.getInputs())
                 .comunicazioni(processVarDTO.getOnboarding())
+                .idRuolo(ref.getIdRuolo() != null ? ref.getIdRuolo().getId() : null)
                 .build();
     }
 
@@ -140,14 +142,7 @@ public class AbilitazioneService {
         }
     }
 
-
     // ---------- utils ----------
-
-    private Map<Long, TipologicaCampoDinamico> tipologicheById() {
-        return tipologicaRepository.findAll().stream()
-                .filter(t -> t.getIdTipoDati() != null)
-                .collect(Collectors.toMap(TipologicaCampoDinamico::getIdTipoDati, Function.identity(), (a, b) -> a));
-    }
 
     private String buildNome(boolean ticket, String nomePiattaforma, String processKey) {
         if (ticket) {
