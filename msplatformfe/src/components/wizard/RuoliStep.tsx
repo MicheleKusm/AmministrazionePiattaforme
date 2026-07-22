@@ -1,11 +1,10 @@
 import type { RuoliStepProps } from "../../types/type"
 import { RuoliTable } from "../tables/RuoliTable"
 import { Button } from "../common/Button"
-import { useAppSelector } from "../../store/hooks"
 
-export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId }: RuoliStepProps) {
+export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId, ruoli }: RuoliStepProps) {
 
-    const ruoli = useAppSelector((state) => state.ruoli.items)
+    const visibleRuoli = ruoli.filter((r) => !r.daEliminare)
 
     return (
         <div className="mt-2 rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -24,7 +23,7 @@ export function RuoliStep({ onAdd, onEdit, onDelete, piattaformaId }: RuoliStepP
                 onDelete={onDelete}
                 piattaformaId={piattaformaId}
             />
-            <div className="px-6 py-3 text-sm text-gray-500">Totale {ruoli.length} ruoli</div>
+            <div className="px-6 py-3 text-sm text-gray-500">Totale {visibleRuoli.length} ruoli</div>
         </div>
     )
 }

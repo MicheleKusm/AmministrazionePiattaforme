@@ -1,91 +1,6 @@
 import type { ReactNode, SyntheticEvent } from "react"
 
-export type PlatformListPageProps = {
-    onCreate: () => void
-    onEdit: (piattaforma: Piattaforma) => void
-}
-
-export type PlatformWizardPageProps = {
-    initialPiattaforma: Piattaforma
-    onDone: () => void
-    onCancel: () => void
-}
-
-export type DeleteConfirmationModalProps = {
-    isOpen: boolean
-    onClose: () => void
-    onConfirm: () => void
-    title?: string
-    message?: string
-    confirmLabel?: string
-    cancelLabel?: string
-}
-
-export type FormProps = {
-    onSubmit: (e: SyntheticEvent<HTMLFormElement>) => void
-    onCancel?: () => void
-    children: ReactNode
-    submitLabel?: string
-    cancelLabel?: string
-    isSubmitting?: boolean
-    className?: string
-}
-
-export type FormFieldProps = {
-    children: ReactNode
-    error?: string
-    className?: string
-}
-
-export type PiattaformaStepProps = {
-    piattaforma: Piattaforma
-    onChange: (piattaforma: Piattaforma) => void
-    errors?: Record<string, string>
-}
-
-export type RuoliStepProps = {
-    piattaformaId?: number
-    onAdd: () => void
-    onEdit: (ruolo: Ruolo) => void
-    onDelete: (ruolo: Ruolo) => void
-}
-
-export type GroupModalProps = {
-    group: Gruppo
-    ruoli: Ruolo[]
-    onSave: (group: Gruppo) => void
-    onClose: () => void
-}
-
-export type RoleModalProps = {
-    role: Ruolo
-    onSave: (role: Ruolo) => void
-    onClose: () => void
-}
-
-export type RuoliTableProps = {
-    ruoli: Ruolo[]
-    onEdit: (ruolo: Ruolo) => void
-    onDelete: (ruolo: Ruolo) => void
-    piattaformaId?: number
-}
-
-export type Column<T> = {
-    header: string
-    render: (item: T) => React.ReactNode
-}
-
-export type TableProps<T> = {
-    data: T[]
-    columns: Column<T>[]
-    keyExtractor: (item: T) => React.Key
-    emptyMessage?: React.ReactNode
-    className?: string // container esterno
-    tableClassName?: string // per elemento <table>
-}
-
-export type TipoAbilitazione = "TICKET" | "VERTICALE";
-
+// piattaforme
 export type Piattaforma = {
     id?: number
     nome: string
@@ -104,31 +19,6 @@ export type Piattaforma = {
     abilitazione: TipoAbilitazione
 }
 
-export type Ruolo = {
-    id: number
-    nome: string
-    descrizione: string
-    richiedibileDaProcesso: boolean
-    daEliminare?: boolean
-};
-
-export type Gruppo = {
-    id?: number;
-    idPiattaforma?: number;
-    nome: string;
-    descrizione: string;
-    ruoliIds: number[];
-    daEliminare?: boolean;
-};
-
-export type PageResponse<T> = {
-    content: T[];
-    number: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-};
-
 export const emptyPiattaforma: Piattaforma = {
     nome: "",
     descrizione: "",
@@ -146,9 +36,75 @@ export const emptyPiattaforma: Piattaforma = {
     abilitazione: "TICKET"
 }
 
-export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const;
+export type PlatformListPageProps = {
+    onCreate: () => void
+    onEdit: (piattaforma: Piattaforma) => void
+}
+
+export type PlatformWizardPageProps = {
+    initialPiattaforma: Piattaforma
+    onDone: () => void
+    onCancel: () => void
+}
+
+export type PiattaformaStepProps = {
+    piattaforma: Piattaforma
+    onChange: (piattaforma: Piattaforma) => void
+    errors?: Record<string, string>
+}
+
+// ruoli
+export type Ruolo = {
+    id: number
+    nome: string
+    descrizione: string
+    richiedibileDaProcesso: boolean
+    daEliminare?: boolean
+}
+
+export type RuoliStepProps = {
+    piattaformaId?: number
+    ruoli: Ruolo[]
+    onAdd: () => void
+    onEdit: (ruolo: Ruolo) => void
+    onDelete: (ruolo: Ruolo) => void
+}
+
+export type RoleModalProps = {
+    role: Ruolo
+    onSave: (role: Ruolo) => void
+    onClose: () => void
+}
+
+export type RuoliTableProps = {
+    ruoli: Ruolo[]
+    onEdit: (ruolo: Ruolo) => void
+    onDelete: (ruolo: Ruolo) => void
+    piattaformaId?: number
+}
+
+// gruppi
+export type Gruppo = {
+    id?: number
+    idPiattaforma?: number
+    nome: string
+    descrizione: string
+    ruoliIds: number[]
+    daEliminare?: boolean
+}
+
+export type GroupModalProps = {
+    group: Gruppo
+    ruoli: Ruolo[]
+    onSave: (group: Gruppo) => void
+    onClose: () => void
+}
+
+// wizard
+export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const
 
 //  Abilitazione associata
+export type TipoAbilitazione = "TICKET" | "VERTICALE";
 
 export type StatoAbilitazione = "Attiva" | "Disattiva";
 
@@ -239,5 +195,55 @@ export function makeEmptyAbilitazione(): Abilitazione {
         processoVerticale: "",
         campi: [],
         comunicazioni: []
-    };
+    }
 }
+
+// componenti
+export type DeleteConfirmationModalProps = {
+    isOpen: boolean
+    onClose: () => void
+    onConfirm: () => void
+    title?: string
+    message?: string
+    confirmLabel?: string
+    cancelLabel?: string
+}
+
+export type FormProps = {
+    onSubmit: (e: SyntheticEvent<HTMLFormElement>) => void
+    onCancel?: () => void
+    children: ReactNode
+    submitLabel?: string
+    cancelLabel?: string
+    isSubmitting?: boolean
+    className?: string
+}
+
+export type FormFieldProps = {
+    children: ReactNode
+    error?: string
+    className?: string
+}
+export type Column<T> = {
+    header: string
+    render: (item: T) => React.ReactNode
+}
+
+export type TableProps<T> = {
+    data: T[]
+    columns: Column<T>[]
+    keyExtractor: (item: T) => React.Key
+    emptyMessage?: React.ReactNode
+    className?: string // container esterno
+    tableClassName?: string // per elemento <table>
+}
+
+export type PageResponse<T> = {
+    content: T[];
+    number: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+};
+
+

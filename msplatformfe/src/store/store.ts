@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { piattaformeReducer } from "./piattaformeSlice";
 import { ruoliReducer } from "./ruoliSlice"
 import { gruppiReducer } from "./gruppiSlice"
+import { riepilogoReducer } from "./riepilogoSlice"
 import { platformApi } from "../api/rootApi";
 import { loadState, saveState } from "./storage"
 
@@ -9,6 +10,7 @@ const rootReducer = combineReducers({
     piattaforme: piattaformeReducer,
     ruoli: ruoliReducer,
     gruppi: gruppiReducer,
+    riepilogo: riepilogoReducer,
     [platformApi.reducerPath]: platformApi.reducer
 })
 

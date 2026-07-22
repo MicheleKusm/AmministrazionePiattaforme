@@ -15,36 +15,53 @@ import { Stepper } from "../components/wizard/Stepper"
 import { type Gruppo, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
 import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
-import { setRuoli, addRuolo, updateRuolo, removeRuolo } from "../store/ruoliSlice"
-import { setGruppi, addGruppo, updateGruppo, removeGruppo } from "../store/gruppiSlice"
-import {piattaformaSchema} from "../utils/schema";
-import * as yup from "yup";
+import {
+    setPiattaforma as setRiepilogoPiattaforma,
+    updatePiattaforma as updateRiepilogoPiattaforma,
+    setRuoli,
+    addRuolo,
+    updateRuolo,
+    removeRuolo,
+    setGruppi,
+    addGruppo,
+    updateGruppo,
+    removeGruppo,
+    resetRiepilogo
+} from "../store/riepilogoSlice"
+import { piattaformaSchema } from "../utils/schema"
+import * as yup from "yup"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
+    const dispatch = useAppDispatch()
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
     const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
-    const initialLoadDone = useRef(false)
     const [deleteGruppoModalOpen, setDeleteGruppoModalOpen] = useState(false)
     const [gruppoToDelete, setGruppoToDelete] = useState<Gruppo | null>(null)
-    const ruoliTempIdCounter = useRef(-1)
-    const gruppiTempIdCounter = useRef(-1)
-    const piattaformaTempIdCounter = useRef(-1)
-    const dispatch = useAppDispatch()
-    const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
     const [step, setStep] = useState(2)
-    const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
-    const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
-
+    const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
     const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
     const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
+    const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
+    // Temporary ID counters (only for new ruoli/gruppi in the wizard)
+    const ruoliTempIdCounter = useRef(-1)
+    const gruppiTempIdCounter = useRef(-1)
+    const initialLoadDone = useRef(false)
 
-    const ruoli = useAppSelector((state) => state.ruoli.items)
-    const gruppi = useAppSelector((state) => state.gruppi.items)
+    const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
+    const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
+    const gruppi = useAppSelector((state) => state.riepilogo.gruppi)
 
-    const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
+    const { data: ruoliData } = useGetRuoliQuery(piattaforma?.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
     const { data: dependenciesData, isLoading: depsLoading } = useGetGruppoDependenciesQuery(gruppoToDelete?.id ?? skipToken)
+
+    useEffect(() => {
+        if (initialPiattaforma) {
+            dispatch(setRiepilogoPiattaforma(initialPiattaforma))
+        }
+        setPiattaformaErrors({})
+    }, [initialPiattaforma, dispatch])
 
     useEffect(() => {
         if (ruoliData && !initialLoadDone.current) {
@@ -56,9 +73,14 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     useEffect(() => {
         if (gruppiData && !initialLoadDone.current) {
             dispatch(setGruppi(gruppiData))
-            initialLoadDone.current = true
         }
     }, [gruppiData, dispatch])
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetRiepilogo())
+        }
+    }, [dispatch])
 
     function prevStep() {
         setStep((s) => Math.max(2, s - 1))
@@ -67,20 +89,11 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     function nextStep() {
         if (step === 2) {
             try {
-                piattaformaSchema.validateSync(piattaforma, {
+                piattaformaSchema.validateSync(piattaforma!, {
                     abortEarly: false,
-                    context: { currentId: piattaforma.id }
+                    context: { currentId: piattaforma?.id }
                 })
                 setPiattaformaErrors({})
-
-                if (piattaforma.id) {
-                    dispatch(updatePiattaforma(piattaforma))
-                } else {
-                    const tempId = piattaformaTempIdCounter.current--
-                    const newPlatform = { ...piattaforma, id: tempId }
-                    dispatch(addPiattaforma(newPlatform))
-                    setPiattaforma(newPlatform)
-                }
                 setStep(3)
             } catch (err) {
                 if (err instanceof yup.ValidationError) {
@@ -98,14 +111,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
     async function saveFinalConfiguration() {
         try {
-            if (piattaforma.id) {
+            if (piattaforma?.id) {
                 dispatch(updatePiattaforma(piattaforma))
             } else {
-                const tempId = piattaformaTempIdCounter.current--
-                const newPlatform = { ...piattaforma, id: tempId }
+                const tempId = Math.floor(Math.random() * -1000) - 1
+                const newPlatform = { ...piattaforma!, id: tempId }
                 dispatch(addPiattaforma(newPlatform))
-                setPiattaforma(newPlatform)
             }
+
+            dispatch(resetRiepilogo())
             onDone()
         } catch (error) {
             console.error("Salvataggio fallito: ", error)
@@ -125,6 +139,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             setDeleteModalOpen(false)
         }
     }
+
     const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
     const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
     const handleDeleteGruppo = (gruppo: Gruppo) => {
@@ -139,21 +154,26 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         }
     }
 
+    const handlePiattaformaChange = (updated: Piattaforma) => {
+        dispatch(updateRiepilogoPiattaforma(updated))
+    }
+
     return (
         <>
             <Stepper currentStep={step} />
 
             {step === 2 && (
                 <PiattaformaStep
-                    piattaforma={piattaforma}
-                    onChange={setPiattaforma}
+                    piattaforma={piattaforma ?? initialPiattaforma}
+                    onChange={handlePiattaformaChange}
                     errors={piattaformaErrors}
                 />
             )}
 
             {step === 3 && (
                 <RuoliStep
-                    piattaformaId={piattaforma.id}
+                    piattaformaId={piattaforma?.id}
+                    ruoli={ruoli}
                     onAdd={() => {
                         const tempId = ruoliTempIdCounter.current--
                         setRoleDraft({
@@ -167,7 +187,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onEdit={setRoleDraft}
                 />
             )}
-            {step === 4 && <AbilitazioneStep piattaforma={piattaforma} />}
+
+            {step === 4 && <AbilitazioneStep piattaforma={piattaforma ?? initialPiattaforma} />}
+
             {step === 5 && (
                 <GruppiStep
                     gruppi={gruppi}
@@ -190,7 +212,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             {step === 7 && (
                 <RiepilogoStep
                     gruppi={gruppi}
-                    piattaforma={piattaforma}
+                    piattaforma={piattaforma ?? initialPiattaforma}
                     ruoli={ruoli}
                     tipoAbilitazione={tipoAbilitazione}
                 />
@@ -235,6 +257,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     role={roleDraft}
                 />
             )}
+
             {groupDraft && (
                 <GroupModal
                     group={groupDraft}
@@ -251,6 +274,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     ruoli={ruoli}
                 />
             )}
+
             <DeleteConfirmationModal
                 isOpen={deleteModalOpen}
                 onClose={() => {
@@ -260,6 +284,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 onConfirm={confirmDeleteRuolo}
                 message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
             />
+
             <DeleteConfirmationModal
                 isOpen={deleteGruppoModalOpen}
                 onClose={() => {
@@ -282,4 +307,4 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     )
 }
 
-export { emptyPiattaforma } from "../types/type";
+export { emptyPiattaforma } from "../types/type"
