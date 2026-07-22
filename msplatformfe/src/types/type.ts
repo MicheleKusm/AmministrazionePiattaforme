@@ -93,6 +93,7 @@ export type Gruppo = {
     nome: string;
     descrizione: string;
     ruoliIds: number[];
+    daEliminare?: boolean;
 };
 
 export type PageResponse<T> = {

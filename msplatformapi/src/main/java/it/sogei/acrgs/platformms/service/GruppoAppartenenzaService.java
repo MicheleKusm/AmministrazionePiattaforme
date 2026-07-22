@@ -1,23 +1,34 @@
 package it.sogei.acrgs.platformms.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
-import it.sogei.acrgs.platformms.entity.GruppoAppartenenza;
-import it.sogei.acrgs.platformms.entity.RuoliRefAppartenenza;
-import it.sogei.acrgs.platformms.entity.RuoliRefAppartenenzaId;
+import it.sogei.acrgs.platformms.dto.GruppoDependenciesDTO;
+import it.sogei.acrgs.platformms.entity.*;
 import it.sogei.acrgs.platformms.repository.GruppoAppartenenzaRepository;
+import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
+import it.sogei.acrgs.platformms.repository.RuoloRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GruppoAppartenenzaService {
 
     private final GruppoAppartenenzaRepository gruppoRepository;
     private final RuoliRefAppartenenzaRepository refRepository;
+    private final PiattaformaRepository piattaformaRepository;
+    private final RuoloRepository ruoloRepository;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public List<GruppoAppartenenzaDTO> list() {
@@ -76,5 +87,61 @@ public class GruppoAppartenenzaService {
                 .descrizione(entity.getDescrizione())
                 .ruoliIds(ruoliIds)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public GruppoDependenciesDTO getDependencies(Long gruppoId) {
+        List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
+
+        List<Piattaforma> allPiattaforme = piattaformaRepository.findAll();
+        for (Piattaforma p : allPiattaforme) {
+            String configJson = p.getConfigJson();
+            if (configJson != null && !configJson.isBlank()) {
+                try {
+                    JsonNode root = objectMapper.readTree(configJson);
+                    List<Long> referencedGroupIds = extractRoleGroups(root);
+                    if (referencedGroupIds.contains(gruppoId)) {
+                        deps.add(GruppoDependenciesDTO.Dependency.builder()
+                                .type("PIATTAFORMA")
+                                .name(p.getNome())
+                                .id(p.getId())
+                                .build());
+                    }
+                } catch (JsonProcessingException e) {
+                    log.error("Error parsing config_json for piattaforma {}: {}", p.getId(), e.getMessage());
+                }
+            }
+        }
+        List<Ruolo> ruoli = ruoloRepository.findByGruppoAppartenenzaId(gruppoId);
+        for (Ruolo r : ruoli) {
+            deps.add(GruppoDependenciesDTO.Dependency.builder()
+                    .type("RUOLO")
+                    .name(r.getNome())
+                    .id(r.getId())
+                    .build());
+        }
+
+        return GruppoDependenciesDTO.builder().dependencies(deps).build();
+    }
+
+    private List<Long> extractRoleGroups(JsonNode node) {
+        List<Long> result = new ArrayList<>();
+        if (node.isArray()) {
+            for (JsonNode item : node) {
+                result.addAll(extractRoleGroups(item));
+            }
+        } else if (node.isObject()) {
+            if (node.has("role_groups") && node.get("role_groups").isArray()) {
+                for (JsonNode groupIdNode : node.get("role_groups")) {
+                    if (groupIdNode.isNumber()) {
+                        result.add(groupIdNode.longValue());
+                    }
+                }
+            }
+            node.fields().forEachRemaining(entry -> {
+                result.addAll(extractRoleGroups(entry.getValue()));
+            });
+        }
+        return result;
     }
 }

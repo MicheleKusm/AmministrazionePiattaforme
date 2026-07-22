@@ -31,7 +31,7 @@ export function DeleteConfirmationModal({
                     </Button>
                 </>
             }>
-            <p className="text-sm text-gray-700">{message}</p>
+            <p className="text-sm text-gray-700 whitespace-pre-line">{message}</p>
         </Modal>
     )
 }
