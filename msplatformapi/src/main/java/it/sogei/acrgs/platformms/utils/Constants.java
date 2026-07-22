@@ -1,9 +1,11 @@
 package it.sogei.acrgs.platformms.utils;
 
+import java.util.List;
+
 public class Constants {
     public static final String OAM_METADATA_NAME = "msso_metadata_name";
     public static final String OAM_METADATA_VALUE = "msso_metadata_value";
-    public static final String OAM_METADATA= "oamMetadata";
+    public static final String OAM_METADATA = "oamMetadata";
     public static final String CODICE_ICT = "codiceIct";
     public static final String OAMMETADATANAME = "oamMetadataName";
     public static final String OAMMETADATAVALUE = "oamMetadataValue";
@@ -19,4 +21,5 @@ public class Constants {
     public static final String ALL_API = "/all";
     public static final String ID_API = "/{id}";
     public static final String DEPENDENCIES_API = "/dependencies";
+    public static final List<String> ICONE = List.of("business_center", "description", "files", "mail", "summarize");
 }

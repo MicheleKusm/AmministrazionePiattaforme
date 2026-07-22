@@ -11,6 +11,7 @@ import it.sogei.acrgs.platformms.entity.Ruolo;
 import it.sogei.acrgs.platformms.repository.PiattaformaRefProcessRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.TipologicaCampoDinamicoRepository;
+import it.sogei.acrgs.platformms.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,11 @@ public class AbilitazioneService {
                         .idTipoDati(t.getIdTipoDati())
                         .build())
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> listIcone() {
+        return Constants.ICONE;
     }
 
     @Transactional(readOnly = true)

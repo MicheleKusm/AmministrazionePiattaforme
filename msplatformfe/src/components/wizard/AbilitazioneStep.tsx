@@ -1,33 +1,43 @@
-import { useState } from "react";
-import type { Abilitazione, Piattaforma } from "../../types/type";
-import { makeEmptyAbilitazione } from "../../types/type";
-import { Button } from "../common/Button";
-import { AbilitazioniTable } from "../tables/AbilitazioniTable";
-import { AbilitazioneForm } from "./AbilitazioneForm";
-import { mockAbilitazioni, mockProcessiVerticali, mockTipologicheCampi } from "../../store/mockAbilitazione";
-import { Constants } from "../../utils/Constants";
+import { useState } from "react"
+import { skipToken } from "@reduxjs/toolkit/query"
+import type { Abilitazione, Piattaforma } from "../../types/type"
+import { makeEmptyAbilitazione } from "../../types/type"
+import { Button } from "../common/Button"
+import { AbilitazioniTable } from "../tables/AbilitazioniTable"
+import { AbilitazioneForm } from "./AbilitazioneForm"
+import {
+    useDeleteAbilitazioneMutation,
+    useGetAbilitazioniQuery,
+    useGetProcessiVerticaliQuery,
+    useGetTipologicheQuery,
+    useSaveAbilitazioneMutation
+} from "../../api/abilitazioniApi"
+import { Constants } from "../../utils/Constants"
 
 type AbilitazioneStepProps = {
-    piattaforma?: Piattaforma;
-};
-
-function nextId(items: Abilitazione[]): number {
-    return items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+    piattaforma?: Piattaforma
 }
 
 export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
-    const [abilitazioni, setAbilitazioni] = useState<Abilitazione[]>(mockAbilitazioni);
-    const [draft, setDraft] = useState<Abilitazione | null>(null);
+    const [draft, setDraft] = useState<Abilitazione | null>(null)
 
-    function salva(abilitazione: Abilitazione) {
-        setAbilitazioni((prev) => {
-            const esiste = prev.some((a) => a.id === abilitazione.id && abilitazione.id !== 0);
-            if (esiste) {
-                return prev.map((a) => (a.id === abilitazione.id ? abilitazione : a));
-            }
-            return [...prev, { ...abilitazione, id: nextId(prev) }];
-        });
-        setDraft(null);
+    const { data: abilitazioni = [] } = useGetAbilitazioniQuery(piattaforma?.id ?? skipToken)
+    const { data: tipologiche = [] } = useGetTipologicheQuery()
+    const { data: processi = [] } = useGetProcessiVerticaliQuery()
+    const [saveAbilitazione] = useSaveAbilitazioneMutation()
+    const [deleteAbilitazione] = useDeleteAbilitazioneMutation()
+
+    async function salva(abilitazione: Abilitazione) {
+        if (piattaforma?.id) {
+            await saveAbilitazione({ idPiattaforma: piattaforma.id, abilitazione }).unwrap()
+        }
+        setDraft(null)
+    }
+
+    async function elimina(abilitazione: Abilitazione) {
+        if (abilitazione.id) {
+            await deleteAbilitazione(abilitazione.id).unwrap()
+        }
     }
 
     if (draft) {
@@ -35,13 +45,13 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
             <AbilitazioneForm
                 piattaforma={piattaforma}
                 initial={draft}
-                tipologiche={mockTipologicheCampi}
-                processi={mockProcessiVerticali}
+                tipologiche={tipologiche}
+                processi={processi}
                 onCancel={() => setDraft(null)}
                 onNew={() => setDraft(makeEmptyAbilitazione())}
                 onSave={salva}
             />
-        );
+        )
     }
 
     return (
@@ -57,11 +67,11 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
                 abilitazioni={abilitazioni}
                 onDetail={setDraft}
                 onEdit={setDraft}
-                onDelete={(a) => setAbilitazioni((prev) => prev.filter((x) => x.id !== a.id))}
+                onDelete={(a) => void elimina(a)}
             />
             <div className="px-6 py-3 text-sm text-gray-500">
                 {Constants.abilitazione.TOTALE} {abilitazioni.length} {Constants.abilitazione.ABILITAZIONI_ASSOCIATE}
             </div>
         </div>
-    );
+    )
 }
