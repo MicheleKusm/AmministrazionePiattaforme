@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static it.sogei.acrgs.platformms.utils.Constants.*;
@@ -27,6 +28,10 @@ public class PiattaformaService {
 
     private final PiattaformaRepository piattaformaRepository;
     private final ObjectMapper objectMapper;
+
+    public List<PiattaformaDTO> listAll() {
+        return piattaformaRepository.findAll().stream().map(this::toDto).toList();
+    }
 
     public Page<PiattaformaDTO> list(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

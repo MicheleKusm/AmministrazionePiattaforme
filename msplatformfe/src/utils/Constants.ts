@@ -24,6 +24,15 @@ export class Constants {
         PAGE_SIZE: 5
     } as const
 
+    static readonly validation = {
+        MAX_50: 50,
+        MAX_100: 100,
+        MAX_255: 255,
+        MAX_300: 300,
+        MAX_500: 500,
+        MAX_4000: 4000
+    } as const
+
     static readonly regex = {
         REGEX_LETTERS_NUMBERS: /^[a-zA-Z0-9\s]+$/,
         REGEX_NO_SPECIAL_CHARACTERS: /^[a-zA-Z0-9_\-.#]+$/

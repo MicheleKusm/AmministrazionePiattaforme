@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
-import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery, useSaveGruppoMutation } from "../api/gruppiApi"
-import { useSavePiattaformaMutation } from "../api/piattaformeApi"
-import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi"
+import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery } from "../api/gruppiApi"
+import { useGetRuoliQuery } from "../api/ruoliApi"
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
 import { GroupModal } from "../components/modals/GroupModal"
@@ -13,18 +12,13 @@ import { PiattaformaStep } from "../components/wizard/PiattaformaStep"
 import { RiepilogoStep } from "../components/wizard/RiepilogoStep"
 import { RuoliStep } from "../components/wizard/RuoliStep"
 import { Stepper } from "../components/wizard/Stepper"
-import { type Gruppo, type Piattaforma, type Ruolo } from "../types/type"
+import { type Gruppo, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
+import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { setRuoli, addRuolo, updateRuolo, removeRuolo } from "../store/ruoliSlice"
 import { setGruppi, addGruppo, updateGruppo, removeGruppo } from "../store/gruppiSlice"
 import {piattaformaSchema} from "../utils/schema";
 import * as yup from "yup";
-
-type PlatformWizardPageProps = {
-    initialPiattaforma: Piattaforma;
-    onDone: () => void;
-    onCancel: () => void;
-};
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
 
@@ -35,6 +29,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [gruppoToDelete, setGruppoToDelete] = useState<Gruppo | null>(null)
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
+    const piattaformaTempIdCounter = useRef(-1)
     const dispatch = useAppDispatch()
     const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
     const [step, setStep] = useState(2)
@@ -50,9 +45,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
     const { data: dependenciesData, isLoading: depsLoading } = useGetGruppoDependenciesQuery(gruppoToDelete?.id ?? skipToken)
-    const [savePiattaforma] = useSavePiattaformaMutation()
-    const [saveRuolo] = useSaveRuoloMutation()
-    const [saveGruppo] = useSaveGruppoMutation()
 
     useEffect(() => {
         if (ruoliData && !initialLoadDone.current) {
@@ -80,6 +72,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     context: { currentId: piattaforma.id }
                 })
                 setPiattaformaErrors({})
+
+                if (piattaforma.id) {
+                    dispatch(updatePiattaforma(piattaforma))
+                } else {
+                    const tempId = piattaformaTempIdCounter.current--
+                    const newPlatform = { ...piattaforma, id: tempId }
+                    dispatch(addPiattaforma(newPlatform))
+                    setPiattaforma(newPlatform)
+                }
                 setStep(3)
             } catch (err) {
                 if (err instanceof yup.ValidationError) {
@@ -96,17 +97,19 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }
 
     async function saveFinalConfiguration() {
-        const savedPlatform = await savePiattaforma(piattaforma).unwrap()
-        if (!savedPlatform.id) {
-            return
+        try {
+            if (piattaforma.id) {
+                dispatch(updatePiattaforma(piattaforma))
+            } else {
+                const tempId = piattaformaTempIdCounter.current--
+                const newPlatform = { ...piattaforma, id: tempId }
+                dispatch(addPiattaforma(newPlatform))
+                setPiattaforma(newPlatform)
+            }
+            onDone()
+        } catch (error) {
+            console.error("Salvataggio fallito: ", error)
         }
-        for (const ruolo of ruoli) {
-            await saveRuolo({ idPiattaforma: savedPlatform.id, ruolo }).unwrap()
-        }
-        for (const gruppo of gruppi) {
-            await saveGruppo({ idPiattaforma: savedPlatform.id, gruppo }).unwrap()
-        }
-        onDone()
     }
 
     const handleAddRuolo = (ruolo: Ruolo) => dispatch(addRuolo(ruolo))

@@ -11,6 +11,13 @@ const piattaformeApi = platformApi.injectEndpoints({
             }),
             providesTags: ["Piattaforme"]
         }),
+        getAllPiattaforme: build.query<Piattaforma[], void>({
+            query: () => ({
+                url: `${PIATTAFORME}/all`,
+                method: "GET"
+            }),
+            providesTags: ["Piattaforme"]
+        }),
         savePiattaforma: build.mutation<Piattaforma, Piattaforma>({
             query: (piattaforma) => ({
                 url: piattaforma.id ? `${PIATTAFORME}/${piattaforma.id}` : PIATTAFORME,
@@ -21,6 +28,6 @@ const piattaformeApi = platformApi.injectEndpoints({
         })
     }),
     overrideExisting: false
-});
+})
 
-export const { useGetPiattaformeQuery, useSavePiattaformaMutation } = piattaformeApi;
+export const { useGetPiattaformeQuery, useGetAllPiattaformeQuery, useSavePiattaformaMutation } = piattaformeApi;

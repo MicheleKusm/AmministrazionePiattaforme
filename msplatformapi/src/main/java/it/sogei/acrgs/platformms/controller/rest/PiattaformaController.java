@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+import static it.sogei.acrgs.platformms.utils.Constants.ALL_API;
+import static it.sogei.acrgs.platformms.utils.Constants.ID_API;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/piattaforme")
@@ -31,7 +36,12 @@ public class PiattaformaController {
         return ResponseEntity.ok(piattaformaService.list(search, page, size));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(ALL_API)
+    public ResponseEntity<List<PiattaformaDTO>> listAll() {
+        return ResponseEntity.ok(piattaformaService.listAll());
+    }
+
+    @GetMapping(ID_API)
     public ResponseEntity<PiattaformaDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(piattaformaService.get(id));
     }
@@ -41,12 +51,12 @@ public class PiattaformaController {
         return ResponseEntity.ok(piattaformaService.create(dto));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(ID_API)
     public ResponseEntity<PiattaformaDTO> update(@PathVariable Long id, @RequestBody PiattaformaDTO dto) {
         return ResponseEntity.ok(piattaformaService.update(id, dto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ID_API)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         piattaformaService.delete(id);
         return ResponseEntity.noContent().build();

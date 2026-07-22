@@ -5,6 +5,12 @@ export type PlatformListPageProps = {
     onEdit: (piattaforma: Piattaforma) => void
 }
 
+export type PlatformWizardPageProps = {
+    initialPiattaforma: Piattaforma
+    onDone: () => void
+    onCancel: () => void
+}
+
 export type DeleteConfirmationModalProps = {
     isOpen: boolean
     onClose: () => void
