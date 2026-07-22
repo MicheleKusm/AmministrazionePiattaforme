@@ -17,6 +17,5 @@ export const gruppoSchema = yup.object().shape({
     descrizione: yup.string().nullable(),
     ruoliIds: yup.array().of(yup.number()).default([])
 })
-
-
+// ruoli univoci per piattaforma, piattaforma nome e obj class devono essre univoci
 export type RuoloFormData = yup.InferType<typeof ruoloSchema>

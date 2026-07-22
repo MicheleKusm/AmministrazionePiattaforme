@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
-import { useGetGruppiAllQuery, useGetGruppiQuery, useSaveGruppoMutation } from "../api/gruppiApi"
+import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery, useSaveGruppoMutation } from "../api/gruppiApi"
 import { useSavePiattaformaMutation } from "../api/piattaformeApi"
 import { useGetRuoliQuery, useSaveRuoloMutation } from "../api/ruoliApi"
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
+import { GroupModal } from "../components/modals/GroupModal"
 import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep"
 import { CruscottoStep } from "../components/wizard/CruscottoStep"
 import { GruppiStep } from "../components/wizard/GruppiStep"
@@ -24,11 +25,14 @@ type PlatformWizardPageProps = {
 };
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
+
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
     const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
     const initialLoadDone = useRef(false)
+    const [deleteGruppoModalOpen, setDeleteGruppoModalOpen] = useState(false)
+    const [gruppoToDelete, setGruppoToDelete] = useState<Gruppo | null>(null)
     const ruoliTempIdCounter = useRef(-1)
-    const tempIdCounter = useRef(-1)
+    const gruppiTempIdCounter = useRef(-1)
     const dispatch = useAppDispatch()
     const [step, setStep] = useState(2)
     const [piattaforma, setPiattaforma] = useState<Piattaforma>(initialPiattaforma)
@@ -42,6 +46,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
+    const { data: dependenciesData, isLoading: depsLoading } = useGetGruppoDependenciesQuery(gruppoToDelete?.id ?? skipToken)
     const [savePiattaforma] = useSavePiattaformaMutation()
     const [saveRuolo] = useSaveRuoloMutation()
     const [saveGruppo] = useSaveGruppoMutation()
@@ -97,7 +102,17 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }
     const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
     const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
-    const handleDeleteGruppo = (gruppo: Gruppo) => dispatch(removeGruppo(gruppo))
+    const handleDeleteGruppo = (gruppo: Gruppo) => {
+        setGruppoToDelete(gruppo)
+        setDeleteGruppoModalOpen(true)
+    }
+    const confirmDeleteGruppo = () => {
+        if (gruppoToDelete) {
+            dispatch(removeGruppo(gruppoToDelete))
+            setGruppoToDelete(null)
+            setDeleteGruppoModalOpen(false)
+        }
+    }
 
     return (
         <>
@@ -130,13 +145,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             {step === 5 && (
                 <GruppiStep
                     gruppi={gruppi}
-                    onAdd={() =>
+                    onAdd={() => {
+                        const tempId = gruppiTempIdCounter.current--
                         setGroupDraft({
+                            id: tempId,
                             nome: "",
                             descrizione: "",
                             ruoliIds: []
                         })
-                    }
+                    }}
                     onDelete={handleDeleteGruppo}
                     onEdit={setGroupDraft}
                 />
@@ -177,23 +194,37 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 )}
             </div>
 
-            {
-                roleDraft && (
-                    <RoleModal
-                        onClose={() => setRoleDraft(null)}
-                        onSave={(role) => {
-                            const exists = ruoli.some((r) => r.id === role.id)
-                            if (exists) {
-                                handleUpdateRuolo(role)
-                            } else {
-                                handleAddRuolo(role)
-                            }
-                            setRoleDraft(null)
-                        }}
-                        role={roleDraft}
-                    />
-                )
-            }
+            {roleDraft && (
+                <RoleModal
+                    onClose={() => setRoleDraft(null)}
+                    onSave={(role) => {
+                        const exists = ruoli.some((r) => r.id === role.id)
+                        if (exists) {
+                            handleUpdateRuolo(role)
+                        } else {
+                            handleAddRuolo(role)
+                        }
+                        setRoleDraft(null)
+                    }}
+                    role={roleDraft}
+                />
+            )}
+            {groupDraft && (
+                <GroupModal
+                    group={groupDraft}
+                    onClose={() => setGroupDraft(null)}
+                    onSave={(group) => {
+                        const exists = gruppi.some((g) => g.id === group.id)
+                        if (exists) {
+                            handleUpdateGruppo(group)
+                        } else {
+                            handleAddGruppo(group)
+                        }
+                        setGroupDraft(null)
+                    }}
+                    ruoli={ruoli}
+                />
+            )}
             <DeleteConfirmationModal
                 isOpen={deleteModalOpen}
                 onClose={() => {
@@ -202,6 +233,24 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 }}
                 onConfirm={confirmDeleteRuolo}
                 message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
+            />
+            <DeleteConfirmationModal
+                isOpen={deleteGruppoModalOpen}
+                onClose={() => {
+                    setDeleteGruppoModalOpen(false)
+                    setGruppoToDelete(null)
+                }}
+                onConfirm={confirmDeleteGruppo}
+                title="Elimina gruppo"
+                message={
+                    depsLoading
+                        ? "Verifica dipendenze in corso..."
+                        : dependenciesData?.dependencies?.length
+                          ? `Attenzione: il gruppo è utilizzato da:\n${dependenciesData.dependencies.map((d) => `${d.type}: ${d.name}`).join("\n")}\nContinuare?`
+                          : "Sei sicuro di voler eliminare questo gruppo? L'operazione non è reversibile."
+                }
+                confirmLabel={depsLoading ? "Attendi..." : "Elimina"}
+                cancelLabel="Annulla"
             />
         </>
     )

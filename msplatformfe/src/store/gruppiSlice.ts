@@ -26,7 +26,15 @@ const gruppiSlice = createSlice({
             }
         },
         removeGruppo(state, action: PayloadAction<Gruppo>) {
-            state.items = state.items.filter((g) => g !== action.payload)
+            const gruppo = action.payload;
+            if (gruppo.id && gruppo.id > 0) {
+                const existing = state.items.find(g => g.id === gruppo.id);
+                if (existing) {
+                    existing.daEliminare = true;
+                }
+            } else {
+                state.items = state.items.filter(g => g.id !== gruppo.id);
+            }
         }
     }
 })

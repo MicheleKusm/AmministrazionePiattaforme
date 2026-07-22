@@ -1,6 +1,7 @@
 package it.sogei.acrgs.platformms.controller.rest;
 
 import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
+import it.sogei.acrgs.platformms.dto.GruppoDependenciesDTO;
 import it.sogei.acrgs.platformms.service.GruppoAppartenenzaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,11 @@ public class GruppoAppartenenzaController {
     @PostMapping
     public ResponseEntity<GruppoAppartenenzaDTO> create(@RequestBody GruppoAppartenenzaDTO dto) {
         return ResponseEntity.ok(gruppoService.create(dto));
+    }
+
+    @GetMapping("/{id}/dependencies")
+    public ResponseEntity<GruppoDependenciesDTO> getDependencies(@PathVariable Long id) {
+        return ResponseEntity.ok(gruppoService.getDependencies(id));
     }
 
     @PutMapping("/{id}")
