@@ -32,6 +32,14 @@ public class GruppoAppartenenzaService {
     private final RuoloRepository ruoloRepository;
     private final ObjectMapper objectMapper;
 
+    public boolean existsByNomeExcludingId(String nome, Long excludeId) {
+        return gruppoRepository.countByCategoriaAndIdNot(nome, excludeId) > 0;
+    }
+
+    public boolean existsBridgeByRuoloAndGruppo(Long idRuolo, Long idGruppo) {
+        return gruppoRepository.countByRuoloAndGruppo(idRuolo, idGruppo) > 0;
+    }
+
     @Transactional(readOnly = true)
     public List<GruppoAppartenenzaDTO> list() {
         return gruppoRepository.findAll().stream().map(this::toDto).toList();
