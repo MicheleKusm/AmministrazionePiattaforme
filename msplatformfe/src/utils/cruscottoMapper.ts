@@ -1,12 +1,5 @@
-import type {
-    CruscottoFieldConfig,
-    CruscottoSezioneConfig,
-    CruscottoStepConfig,
-    CruscottoStepKey
-} from "../types/type"
+import type { CruscottoFieldConfig, CruscottoSezioneConfig, CruscottoStepConfig, CruscottoStepKey } from "../types/type" // Struttura CONFIG_JSON v2 (allineata a anag-commons ConfigFormDTO). Il cruscotto della
 
-// Struttura CONFIG_JSON v2 (allineata a anag-commons ConfigFormDTO). Il cruscotto della
-// piattaforma vive in PIATTAFORMA.CONFIG_JSON sotto la chiave "formSteps".
 export type FieldDTO = {
     order?: number
     name?: string
@@ -45,7 +38,6 @@ function isCruscottoKey(step: string): step is CruscottoStepKey {
     return (STEP_KEYS as string[]).includes(step)
 }
 
-// ---- fields ----
 function fieldDtoToConfig(f: FieldDTO): CruscottoFieldConfig {
     return {
         order: f.order ?? 1,
@@ -69,7 +61,6 @@ function configToFieldDto(f: CruscottoFieldConfig): FieldDTO {
     return dto
 }
 
-// ---- sections ----
 function sectionDtoToConfig(s: SectionDTO): CruscottoSezioneConfig {
     return {
         header: s.header ?? "",
@@ -94,8 +85,6 @@ function configToSectionDto(s: CruscottoSezioneConfig): SectionDTO {
     }
 }
 
-// ---- steps ----
-// backend (formSteps) -> stato UI del builder
 export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepConfig[] {
     return (formSteps ?? [])
         .filter((s) => isCruscottoKey(s.step))
@@ -108,7 +97,6 @@ export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepCon
         }))
 }
 
-// stato UI del builder -> backend (solo gli step abilitati entrano in formSteps)
 export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStepDTO[] {
     return cruscotto
         .filter((c) => c.abilitato)
@@ -118,7 +106,6 @@ export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStep
                 descrizione: c.descrizione,
                 role_groups: c.gruppiIds
             }
-            // STEP_RUOLO non ha sezioni; per gli altri step si serializzano le sezioni configurate
             if (c.chiave !== "STEP_RUOLO" && c.sezioni.length > 0) {
                 step.sections = c.sezioni.map(configToSectionDto)
             }

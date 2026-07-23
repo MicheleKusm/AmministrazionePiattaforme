@@ -27,9 +27,6 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
     const cruscottoLoaded = useRef(false)
 
     const cruscotto = useAppSelector((state) => state.riepilogo.cruscotto)
-    // La lista dei gruppi mostrata nel cruscotto deve essere quella completa (come lo step Gruppi):
-    // i gruppi caricati da DB (state.gruppi.items) fusi con quelli creati/modificati nel wizard
-    // (state.riepilogo.gruppi). Prima si leggeva solo il secondo, vuoto finché non si salvava un gruppo.
     const allGruppi = useAppSelector((state) => state.gruppi.items)
     const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi)
     const gruppi = useMemo(() => {
@@ -61,10 +58,33 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                 <h3 className="text-lg font-bold text-gray-900">{Constants.cruscotto.TITOLO}</h3>
                 <p className="mt-0.5 text-sm text-gray-500">{Constants.cruscotto.SOTTOTITOLO}</p>
                 <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-5 text-amber-800">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" x2="12" y1="8" y2="12" />
-                        <line x1="12" x2="12" y1="16" y2="16" />
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mt-0.5 shrink-0">
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                        />
+                        <line
+                            x1="12"
+                            x2="12"
+                            y1="8"
+                            y2="12"
+                        />
+                        <line
+                            x1="12"
+                            x2="12"
+                            y1="16"
+                            y2="16"
+                        />
                     </svg>
                     <div>
                         <p className="font-semibold">{Constants.cruscotto.NON_ABILITATA_TITOLO}</p>
@@ -93,9 +113,7 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                             type="button"
                             onClick={() => setActive(key)}
                             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
-                                isActive
-                                    ? "bg-primary-600 text-white"
-                                    : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                                isActive ? "bg-primary-600 text-white" : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                             }`}>
                             {key} ({stato})
                         </button>
@@ -113,7 +131,7 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                     {active === "STEP_DATI" && (
                         <CruscottoSezioniManager
                             sezioni={activeConfig.sezioni}
-                            gruppi={gruppi}
+                            gruppi={gruppi.filter((g) => g.id != null && activeConfig.gruppiIds.includes(g.id))}
                             onChange={(sezioni) => dispatch(updateCruscottoStep({ ...activeConfig, sezioni }))}
                         />
                     )}
