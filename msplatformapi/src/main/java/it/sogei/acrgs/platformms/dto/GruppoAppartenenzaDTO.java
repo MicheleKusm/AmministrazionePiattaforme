@@ -27,4 +27,5 @@ public class GruppoAppartenenzaDTO implements Serializable {
     private String descrizione;
 
     private List<Long> ruoliIds;
+    private boolean daEliminare;
 }

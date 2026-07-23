@@ -1,6 +1,7 @@
 package it.sogei.acrgs.platformms.controller.rest;
 
 import it.sogei.acrgs.platformms.dto.PersistenceObjectDTO;
+import it.sogei.acrgs.platformms.service.PersistenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,8 +16,10 @@ import static it.sogei.acrgs.platformms.utils.Constants.PERSISTENCE_API;
 @RequestMapping(PERSISTENCE_API)
 public class PersistenceController {
 
-     @PostMapping(PERSIST)
+    private final PersistenceService persistenceService;
+
+    @PostMapping(PERSIST)
      public ResponseEntity persist(PersistenceObjectDTO dto) {
-         return ResponseEntity.ok().build();
+         return ResponseEntity.ok(persistenceService.persist(dto));
      }
 }
