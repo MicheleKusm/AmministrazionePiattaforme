@@ -45,7 +45,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
-    const initialLoadDone = useRef(false)
+    // const initialLoadDone = useRef(false)
+    const ruoliLoaded = useRef(false)
+    const gruppiLoaded = useRef(false)
 
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
@@ -63,15 +65,16 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }, [initialPiattaforma, dispatch])
 
     useEffect(() => {
-        if (ruoliData && !initialLoadDone.current) {
+        if (ruoliData && !ruoliLoaded.current) {
             dispatch(setRuoli(ruoliData))
-            initialLoadDone.current = true
+            ruoliLoaded.current = true
         }
     }, [ruoliData, dispatch])
 
     useEffect(() => {
-        if (gruppiData && !initialLoadDone.current) {
+        if (gruppiData && !gruppiLoaded.current) {
             dispatch(setGruppi(gruppiData))
+            gruppiLoaded.current = true
         }
     }, [gruppiData, dispatch])
 
@@ -80,6 +83,11 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             dispatch(resetRiepilogo())
         }
     }, [dispatch])
+
+    useEffect(() => {
+        ruoliLoaded.current = false
+        gruppiLoaded.current = false
+    }, [piattaforma?.id])
 
     function prevStep() {
         setStep((s) => Math.max(2, s - 1))

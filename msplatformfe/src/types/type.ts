@@ -204,6 +204,22 @@ export function makeEmptyAbilitazione(): Abilitazione {
     }
 }
 
+// riepilogo
+export type RiepilogoStepProps = {
+    piattaforma: Piattaforma;
+    ruoli: Ruolo[];
+    gruppi: Gruppo[];
+    tipoAbilitazione: "TICKET" | "VERTICALE";
+};
+
+// slices
+export type RiepilogoState = {
+    piattaforma: Piattaforma | null
+    ruoli: Ruolo[]
+    gruppi: Gruppo[]
+    tipoAbilitazione: "TICKET" | "VERTICALE"
+}
+
 // componenti
 export type DeleteConfirmationModalProps = {
     isOpen: boolean

@@ -1,13 +1,6 @@
 // store/riepilogoSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import type { Piattaforma, Ruolo, Gruppo } from "../types/type"
-
-type RiepilogoState = {
-    piattaforma: Piattaforma | null
-    ruoli: Ruolo[]
-    gruppi: Gruppo[]
-    tipoAbilitazione: "TICKET" | "VERTICALE"
-}
+import type { Piattaforma, Ruolo, Gruppo, RiepilogoState } from "../types/type"
 
 const initialState: RiepilogoState = {
     piattaforma: null,
