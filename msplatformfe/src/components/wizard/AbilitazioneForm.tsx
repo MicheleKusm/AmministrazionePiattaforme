@@ -12,6 +12,7 @@ import { Constants } from "../../utils/Constants";
 type AbilitazioneFormProps = {
     piattaforma?: Piattaforma;
     initial: Abilitazione;
+    tipoBloccato?: TipoAbilitazione;
     tipologiche: TipologicaCampoDinamico[];
     processi: string[];
     onCancel: () => void;
@@ -40,16 +41,20 @@ type ChoiceCardProps = {
     selezionato: boolean;
     onClick: () => void;
     icona: React.ReactNode;
+    disabilitato?: boolean;
 };
 
-function ChoiceCard({ titolo, descrizione, selezionato, onClick, icona }: ChoiceCardProps) {
+function ChoiceCard({ titolo, descrizione, selezionato, onClick, icona, disabilitato = false }: ChoiceCardProps) {
     return (
         <button
             type="button"
             onClick={onClick}
+            disabled={disabilitato}
+            aria-disabled={disabilitato}
+            title={disabilitato ? Constants.abilitazione.TIPO_BLOCCATO_TITLE : undefined}
             className={`relative flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-colors ${
                 selezionato ? "border-primary-500 bg-primary-50" : "border-gray-200 bg-white hover:bg-gray-50"
-            }`}>
+            } ${disabilitato ? "cursor-not-allowed opacity-50 hover:bg-white" : ""}`}>
             {selezionato && (
                 <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary-600 px-2.5 py-0.5 text-xs font-semibold text-white">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -85,10 +90,10 @@ const IconaTicket = (
     </svg>
 );
 
-export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, onCancel, onNew, onSave }: AbilitazioneFormProps) {
+export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologiche, processi, onCancel, onNew, onSave }: AbilitazioneFormProps) {
     const isNew = initial.id === 0;
 
-    const [tipo, setTipo] = useState<TipoAbilitazione | "">(isNew ? "" : initial.tipo);
+    const [tipo, setTipo] = useState<TipoAbilitazione | "">(isNew ? (tipoBloccato ?? "") : initial.tipo);
     const [codiceScim, setCodiceScim] = useState(initial.codiceScim);
     const [processoVerticale, setProcessoVerticale] = useState(initial.processoVerticale);
     const [campi, setCampi] = useState<CampoTicket[]>(initial.campi);
@@ -99,6 +104,7 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
 
     function selezionaTipo(nuovo: TipoAbilitazione) {
         if (nuovo === tipo) return;
+        if (tipoBloccato && nuovo !== tipoBloccato) return;
         setTipo(nuovo);
         setCodiceScim("");
         setProcessoVerticale("");
@@ -130,6 +136,9 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
 
     function salvaAbilitazione() {
         if (tipo === "") {
+            return;
+        }
+        if (tipoBloccato && tipo !== tipoBloccato) {
             return;
         }
         const nome =
@@ -169,12 +178,27 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-gray-900">{Constants.abilitazione.TITOLO_AGGIUNGI}</h3>
                 <p className="mt-0.5 text-sm text-gray-500">{Constants.abilitazione.SOTTOTITOLO_AGGIUNGI}</p>
+                {tipoBloccato && (
+                    <div className="mt-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" x2="12" y1="8" y2="12" />
+                            <line x1="12" x2="12" y1="16" y2="16" />
+                        </svg>
+                        <span>
+                            {tipoBloccato === "TICKET"
+                                ? Constants.abilitazione.TIPO_BLOCCATO_TICKET
+                                : Constants.abilitazione.TIPO_BLOCCATO_VERTICALE}
+                        </span>
+                    </div>
+                )}
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <ChoiceCard
                         titolo={Constants.abilitazione.VERTICALE_TITOLO}
                         descrizione={Constants.abilitazione.VERTICALE_DESC}
                         selezionato={tipo === "VERTICALE"}
                         onClick={() => selezionaTipo("VERTICALE")}
+                        disabilitato={tipoBloccato === "TICKET"}
                         icona={IconaVerticale}
                     />
                     <ChoiceCard
@@ -182,6 +206,7 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
                         descrizione={Constants.abilitazione.TICKET_DESC}
                         selezionato={tipo === "TICKET"}
                         onClick={() => selezionaTipo("TICKET")}
+                        disabilitato={tipoBloccato === "VERTICALE"}
                         icona={IconaTicket}
                     />
                 </div>

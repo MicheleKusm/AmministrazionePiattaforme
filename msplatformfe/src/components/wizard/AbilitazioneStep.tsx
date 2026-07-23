@@ -41,6 +41,7 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
     }, [abilitazioniData, abilitazioni.length, dispatch])
 
     const visibili = abilitazioni.filter((a) => !a.daEliminare)
+    const tipoBloccato = visibili.find((a) => a.id !== draft?.id)?.tipo
 
     function salva(abilitazione: Abilitazione) {
         if (abilitazione.id === 0) {
@@ -60,6 +61,7 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
             <AbilitazioneForm
                 piattaforma={piattaforma}
                 initial={draft}
+                tipoBloccato={tipoBloccato}
                 tipologiche={tipologiche}
                 processi={processi}
                 onCancel={() => setDraft(null)}

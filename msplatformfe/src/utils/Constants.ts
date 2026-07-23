@@ -80,7 +80,12 @@ export class Constants {
         NESSUNA_COMUNICAZIONE: "Nessuna comunicazione configurata.",
         CARICAMENTO: "Caricamento abilitazioni...",
         ERRORE: "Errore nel caricamento delle abilitazioni.",
-        PROCESS_KEY_TICKET: "ALTRI"
+        PROCESS_KEY_TICKET: "altri",
+        TIPO_BLOCCATO_TICKET:
+            "Questa piattaforma ha già abilitazioni ticket: puoi aggiungere solo abilitazioni ticket (non è possibile combinare ticket e verticale).",
+        TIPO_BLOCCATO_VERTICALE:
+            "Questa piattaforma ha già abilitazioni verticali: puoi aggiungere solo abilitazioni verticali (non è possibile combinare ticket e verticale).",
+        TIPO_BLOCCATO_TITLE: "Tipo non disponibile: la piattaforma ha già abilitazioni dell'altro tipo."
     } as const
 
     static readonly abilitazioneTable = {
@@ -142,7 +147,10 @@ export class Constants {
         SUBHEADER_PH: "Es. Inserisci il ruolo",
         GRUPPI_TITOLO: "Associa Gruppi di Appartenenza a questo Step",
         GRUPPI_VUOTI: "Nessun gruppo di appartenenza configurato nello step Gruppi.",
-        STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO)."
+        STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO).",
+        NON_ABILITATA_TITOLO: "Piattaforma non abilitata al cruscotto",
+        NON_ABILITATA_MSG:
+            "Questa piattaforma non è abilitata per il cruscotto dinamico. Per abilitarla, torna allo step Piattaforma e attiva l'opzione «Richiedibile da cruscotto»."
     } as const
 
     static readonly api = {

@@ -41,6 +41,26 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
         }
     }, [piattaforma?.id, cruscottoData, cruscotto.length, dispatch])
 
+    if (!piattaforma?.richiedibileDaCruscotto) {
+        return (
+            <div className="mt-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-gray-900">{Constants.cruscotto.TITOLO}</h3>
+                <p className="mt-0.5 text-sm text-gray-500">{Constants.cruscotto.SOTTOTITOLO}</p>
+                <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-5 text-amber-800">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" x2="12" y1="8" y2="12" />
+                        <line x1="12" x2="12" y1="16" y2="16" />
+                    </svg>
+                    <div>
+                        <p className="font-semibold">{Constants.cruscotto.NON_ABILITATA_TITOLO}</p>
+                        <p className="mt-1 text-sm">{Constants.cruscotto.NON_ABILITATA_MSG}</p>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     const activeConfig = cruscotto.find((c) => c.chiave === active)
 
     return (
