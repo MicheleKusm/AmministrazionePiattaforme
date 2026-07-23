@@ -27,25 +27,25 @@ export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepCon
         .map((s) => ({
             chiave: s.step as CruscottoStepKey,
             abilitato: true,
-            header: s.sections?.[0]?.header ?? "",
-            subheader: s.descrizione ?? s.sections?.[0]?.subheader ?? "",
-            gruppiIds: s.role_groups ?? s.sections?.[0]?.role_groups ?? []
+            descrizione: s.descrizione ?? "",
+            gruppiIds: s.role_groups ?? [],
+            sezioni: s.sections
         }))
 }
 
 export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStepDTO[] {
     return cruscotto
         .filter((c) => c.abilitato)
-        .map((c) => ({
-            step: c.chiave,
-            descrizione: c.subheader,
-            role_groups: c.gruppiIds,
-            sections: [
-                {
-                    header: c.header,
-                    subheader: c.subheader,
-                    role_groups: c.gruppiIds
-                }
-            ]
-        }))
+        .map((c) => {
+            const step: FormStepDTO = {
+                step: c.chiave,
+                descrizione: c.descrizione,
+                role_groups: c.gruppiIds
+            }
+            // STEP_RUOLO non ha sezioni; per STEP_DATI / STEP_METADATI si preservano quelle esistenti
+            if (c.chiave !== "STEP_RUOLO" && c.sezioni && c.sezioni.length > 0) {
+                step.sections = c.sezioni as SectionDTO[]
+            }
+            return step
+        })
 }

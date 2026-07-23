@@ -211,16 +211,16 @@ export type CruscottoStepKey = "STEP_RUOLO" | "STEP_DATI" | "STEP_METADATI"
 export type CruscottoStepConfig = {
     chiave: CruscottoStepKey
     abilitato: boolean
-    header: string
-    subheader: string
+    descrizione: string
     gruppiIds: number[]
+    sezioni?: unknown[]
 }
 
 export function makeDefaultCruscotto(): CruscottoStepConfig[] {
     return [
-        { chiave: "STEP_RUOLO", abilitato: true, header: "", subheader: "", gruppiIds: [] },
-        { chiave: "STEP_DATI", abilitato: true, header: "", subheader: "", gruppiIds: [] },
-        { chiave: "STEP_METADATI", abilitato: true, header: "", subheader: "", gruppiIds: [] }
+        { chiave: "STEP_RUOLO", abilitato: true, descrizione: "", gruppiIds: [] },
+        { chiave: "STEP_DATI", abilitato: true, descrizione: "", gruppiIds: [] },
+        { chiave: "STEP_METADATI", abilitato: true, descrizione: "", gruppiIds: [] }
     ]
 }
 

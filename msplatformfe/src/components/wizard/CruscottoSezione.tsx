@@ -72,27 +72,15 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                 />
             </div>
 
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                    <label className="mb-1 block text-sm font-semibold text-gray-900">{Constants.cruscotto.HEADER}</label>
-                    <input
-                        type="text"
-                        value={config.header}
-                        placeholder={Constants.cruscotto.HEADER_PH}
-                        onChange={(e) => onChange({ ...config, header: e.target.value })}
-                        className={INPUT}
-                    />
-                </div>
-                <div>
-                    <label className="mb-1 block text-sm font-semibold text-gray-900">{Constants.cruscotto.SUBHEADER}</label>
-                    <input
-                        type="text"
-                        value={config.subheader}
-                        placeholder={Constants.cruscotto.SUBHEADER_PH}
-                        onChange={(e) => onChange({ ...config, subheader: e.target.value })}
-                        className={INPUT}
-                    />
-                </div>
+            <div className="mt-5">
+                <label className="mb-1 block text-sm font-semibold text-gray-900">{Constants.cruscotto.DESCRIZIONE}</label>
+                <input
+                    type="text"
+                    value={config.descrizione}
+                    placeholder={Constants.cruscotto.DESCRIZIONE_PH}
+                    onChange={(e) => onChange({ ...config, descrizione: e.target.value })}
+                    className={INPUT}
+                />
             </div>
 
             <div className="mt-6">

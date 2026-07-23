@@ -145,6 +145,8 @@ export class Constants {
         HEADER_PH: "Es. Seleziona Ruolo",
         SUBHEADER: "Subheader Step",
         SUBHEADER_PH: "Es. Inserisci il ruolo",
+        DESCRIZIONE: "Descrizione",
+        DESCRIZIONE_PH: "Es. Inserisci il ruolo",
         GRUPPI_TITOLO: "Associa Gruppi di Appartenenza a questo Step",
         GRUPPI_VUOTI: "Nessun gruppo di appartenenza configurato nello step Gruppi.",
         STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO).",
