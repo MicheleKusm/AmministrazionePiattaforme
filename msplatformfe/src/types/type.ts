@@ -135,7 +135,7 @@ export type CampoTicket = {
 
 export type ComunicazioneOnboarding = {
     id: number
-    canale: CanaleComunicazione
+    icona: string
     descrizione: string
     obbligatoria: boolean
 }
@@ -185,7 +185,7 @@ export const emptyCampoTicket: CampoTicket = {
 
 export const emptyComunicazione: ComunicazioneOnboarding = {
     id: 0,
-    canale: "Email",
+    icona: "",
     descrizione: "",
     obbligatoria: true
 }

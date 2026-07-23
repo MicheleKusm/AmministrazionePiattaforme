@@ -1,6 +1,7 @@
 import type { Column, ComunicazioneOnboarding, ComunicazioniTableProps } from "../../types/type";
 import { TableCommon } from "../common/TableCommon";
 import { IconActions, RequiredMark } from "./RowActions";
+import { IconaComunicazioneGlyph } from "../common/IconaComunicazione";
 import { Constants } from "../../utils/Constants";
 
 export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: ComunicazioniTableProps) {
@@ -14,8 +15,13 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
             render: (c) => <span className="text-gray-800">{c.descrizione}</span>
         },
         {
-            header: Constants.abilitazioneTable.CANALE,
-            render: (c) => <span className="text-gray-700">{c.canale}</span>
+            header: Constants.comunicazioneModal.ICONA_LABEL,
+            render: (c) => (
+                <span className="inline-flex items-center gap-2 text-gray-700">
+                    {c.icona ? <IconaComunicazioneGlyph nome={c.icona} /> : null}
+                    {c.icona}
+                </span>
+            )
         },
         {
             header: Constants.abilitazioneTable.OBBLIGATORIA,

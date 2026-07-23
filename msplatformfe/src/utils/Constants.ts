@@ -119,6 +119,7 @@ export class Constants {
     static readonly comunicazioneModal = {
         TITOLO: "Aggiungi comunicazione",
         ICONA: "Scegli icona",
+        ICONA_LABEL: "Icona",
         DESCRIZIONE: "Descrizione",
         DESCRIZIONE_PH: "Es. Benvenuto sulla piattaforma e prime indicazioni",
         HINT: "Descrivi brevemente il contenuto e lo scopo della comunicazione.",

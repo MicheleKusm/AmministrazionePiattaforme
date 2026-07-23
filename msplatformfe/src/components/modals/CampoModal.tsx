@@ -30,8 +30,7 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
             ...draft,
             campo: tip.tipoDati,
             tipoValore: tip.type,
-            regex: tip.regex ?? "",
-            label: draft.label || tip.tipoDati
+            regex: tip.regex ?? ""
         });
     }
 
