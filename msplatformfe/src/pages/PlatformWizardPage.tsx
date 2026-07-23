@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery } from "../api/gruppiApi"
+import { useValidatePiattaformaInitMutation } from "../api/piattaformeApi"
 import { useGetRuoliQuery } from "../api/ruoliApi"
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
@@ -35,6 +36,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const dispatch = useAppDispatch()
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+    const [validatePiattaforma, { isLoading: isValidating }] = useValidatePiattaformaInitMutation()
     const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
     const [deleteGruppoModalOpen, setDeleteGruppoModalOpen] = useState(false)
     const [gruppoToDelete, setGruppoToDelete] = useState<Gruppo | null>(null)
@@ -99,8 +101,22 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     abortEarly: false,
                     context: { currentId: piattaforma?.id }
                 })
-                setPiattaformaErrors({})
-                setStep(3)
+                validatePiattaforma(piattaforma!)
+                    .unwrap()
+                    .then((errors) => {
+                        if (errors.length > 0) {
+                            const errorMap: Record<string, string> = {}
+                            errorMap._general = errors.join(", ")
+                            setPiattaformaErrors(errorMap)
+                        } else {
+                            setPiattaformaErrors({})
+                            setStep(3)
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Errore di validazione:", err)
+                        setPiattaformaErrors({ _general: "Errore durante la validazione." })
+                    })
             } catch (err) {
                 if (err instanceof yup.ValidationError) {
                     const newErrors: Record<string, string> = {}
@@ -114,7 +130,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         }
         setStep((s) => Math.min(7, s + 1))
     }
-
     async function saveFinalConfiguration() {
         try {
             if (piattaforma?.id) {
@@ -227,6 +242,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 <button
                     className="btn-secondary"
                     onClick={() => (step === 2 ? onCancel() : prevStep())}
+                    disabled={isValidating}
                     type="button">
                     Indietro
                 </button>

@@ -11,12 +11,12 @@ const piattaformeApi = platformApi.injectEndpoints({
             }),
             providesTags: ["Piattaforme"]
         }),
-        getAllPiattaforme: build.query<Piattaforma[], void>({
-            query: () => ({
-                url: `${PIATTAFORME}/all`,
-                method: "GET"
+        validatePiattaformaInit: build.mutation<string[], Piattaforma>({
+            query: (piattaforma) => ({
+                url: `${PIATTAFORME}/validazioneInitPiattaforma`,
+                method: "POST",
+                body: piattaforma
             }),
-            providesTags: ["Piattaforme"]
         }),
         savePiattaforma: build.mutation<Piattaforma, Piattaforma>({
             query: (piattaforma) => ({
@@ -30,4 +30,4 @@ const piattaformeApi = platformApi.injectEndpoints({
     overrideExisting: false
 })
 
-export const { useGetPiattaformeQuery, useGetAllPiattaformeQuery, useSavePiattaformaMutation } = piattaformeApi;
+export const { useGetPiattaformeQuery, useValidatePiattaformaInitMutation, useSavePiattaformaMutation } = piattaformeApi;

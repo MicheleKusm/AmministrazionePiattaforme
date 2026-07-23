@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,12 @@ public class PiattaformaService {
                 ? piattaformaRepository.findAll(pageable)
                 : piattaformaRepository.findByNomeContainingIgnoreCase(search.trim(), pageable);
         return piattaforme.map(this::toDto);
+    }
+
+    public List<String> validaPiattaformaNomeAndObjclass(PiattaformaDTO dto) {
+        List<String> errors = new ArrayList<>();
+        validazioneNomeDescObjclass(dto, errors);
+        return errors;
     }
 
     @Transactional(readOnly = true)
@@ -132,5 +139,35 @@ public class PiattaformaService {
             return value instanceof String ? (String) value : null;
         }
         return null;
+    }
+
+    private void validazioneNomeDescObjclass (PiattaformaDTO dto, List<String> errors) {
+        try {
+            log.info("validazioneNomeDescObjclass, INIZIO");
+            if (null == dto.getNome() || dto.getNome().isBlank()) {
+                log.debug("Validazione piattaforma fallita: il nome della piattaforma è obbligatorio");
+                errors.add("Il nome della piattaforma è obbligatorio");
+            }
+            if (null == dto.getObjClass() || dto.getObjClass().isBlank()) {
+                log.debug("Validazione piattaforma fallita: Obj_class piattaforma è obbligatorio");
+                errors.add("Obj_class piattaforma è obbligatorio");
+            }
+            if (null == dto.getDescrizione() || dto.getDescrizione().isBlank()) {
+                log.debug("Validazione piattaforma fallita: la descrizione è obbligatoria");
+                errors.add("La descrizione della piattafoma è obbligatoria");
+            }
+            if (null != dto.getNome() && null != dto.getObjClass() && piattaformaRepository.countByNomeOrObjClassExcludeId(dto.getNome(), dto.getObjClass(), dto.getId()) > 0) {
+                log.debug("Validazione piattaforma fallita: Nome e Obj_class devono essere univoci");
+                errors.add("Nome e Obj_class devono essere univoci");
+            }
+            if (errors.size() > 0) {
+                log.debug("Validazione nome, descrizione e objclass piattaforma fallita: {}", errors);
+            } else {
+                log.debug("Validazione nome, descrizione e objclass piattaforma completata");
+            }
+        } catch (Exception exception) {
+            log.error("Errore durante la validazione della piattaforma: {}", exception.getMessage());
+            errors.add("Errore generico durante la validazione della piattaforma");
+        }
     }
 }

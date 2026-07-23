@@ -19,7 +19,7 @@ public class RuoloDTO implements Serializable {
 
     private Long id;
     private Long idPiattaforma;
-    private boolean richiedibile_da_processo;
+    private boolean richiedibileDaProcesso;
 
     @Size(max = 255)
     private String nome;

@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static it.sogei.acrgs.platformms.utils.Constants.ALL_API;
-import static it.sogei.acrgs.platformms.utils.Constants.ID_API;
+import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,9 +35,9 @@ public class PiattaformaController {
         return ResponseEntity.ok(piattaformaService.list(search, page, size));
     }
 
-    @GetMapping(ALL_API)
-    public ResponseEntity<List<PiattaformaDTO>> listAll() {
-        return ResponseEntity.ok(piattaformaService.listAll());
+    @PostMapping(VALIDAZIONE_INIZIALE_PIATTAFORMA)
+    public ResponseEntity<List<String>> validate(@RequestBody PiattaformaDTO dto) {
+        return ResponseEntity.ok(piattaformaService.validaPiattaformaNomeAndObjclass(dto));
     }
 
     @GetMapping(ID_API)

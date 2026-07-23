@@ -19,6 +19,7 @@ public class Constants {
     public static final String RUOLO = "RUOLO";
     public static final String GRUPPI_API = "/api/gruppi";
     public static final String ALL_API = "/all";
+    public static final String VALIDAZIONE_INIZIALE_PIATTAFORMA = "/validazioneInitPiattaforma";
     public static final String ID_API = "/{id}";
     public static final String DEPENDENCIES_API = "/dependencies";
     public static final List<String> ICONE = List.of("business_center", "description", "files", "mail", "summarize");

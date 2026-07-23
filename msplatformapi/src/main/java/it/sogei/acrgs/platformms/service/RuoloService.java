@@ -53,7 +53,7 @@ public class RuoloService {
         return RuoloDTO.builder()
                 .id(entity.getId())
                 .idPiattaforma(entity.getIdPiattaforma())
-                .richiedibile_da_processo(new Utility().convertToBoolean(entity.getRichiedibileDaProcesso()))
+                .richiedibileDaProcesso(new Utility().convertToBoolean(entity.getRichiedibileDaProcesso()))
                 .nome(entity.getNome())
                 .descrizione(entity.getDescrizione())
                 .build();
