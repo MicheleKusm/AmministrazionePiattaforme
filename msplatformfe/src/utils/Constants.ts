@@ -129,6 +129,22 @@ export class Constants {
 
     static readonly canali = ["Email", "SMS", "In-app", "Push", "Webhook", "WhatsApp"] as const
 
+    static readonly cruscotto = {
+        TITOLO: "Struttura Cruscotto Dinamico",
+        SOTTOTITOLO: "Configura gli step di inserimento e le sezioni del form visualizzati nel cruscotto dinamico (CONFIG JSON v2).",
+        ATTIVO: "Attivo",
+        NON_ATTIVO: "Non attivo",
+        CONFIGURA_SEZIONE: "Configura la sezione",
+        ABILITA_STEP: "Abilita questo Step",
+        HEADER: "Header Step",
+        HEADER_PH: "Es. Seleziona Ruolo",
+        SUBHEADER: "Subheader Step",
+        SUBHEADER_PH: "Es. Inserisci il ruolo",
+        GRUPPI_TITOLO: "Associa Gruppi di Appartenenza a questo Step",
+        GRUPPI_VUOTI: "Nessun gruppo di appartenenza configurato nello step Gruppi.",
+        STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO)."
+    } as const
+
     static readonly api = {
         API_PIATTAFORME: "/api/piattaforme",
         API_RUOLI_ALL: "/api/ruoli/all"

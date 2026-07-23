@@ -205,6 +205,25 @@ export function makeEmptyAbilitazione(): Abilitazione {
     }
 }
 
+// cruscotto
+export type CruscottoStepKey = "STEP_RUOLO" | "STEP_DATI" | "STEP_METADATI"
+
+export type CruscottoStepConfig = {
+    chiave: CruscottoStepKey
+    abilitato: boolean
+    header: string
+    subheader: string
+    gruppiIds: number[]
+}
+
+export function makeDefaultCruscotto(): CruscottoStepConfig[] {
+    return [
+        { chiave: "STEP_RUOLO", abilitato: true, header: "", subheader: "", gruppiIds: [] },
+        { chiave: "STEP_DATI", abilitato: true, header: "", subheader: "", gruppiIds: [] },
+        { chiave: "STEP_METADATI", abilitato: true, header: "", subheader: "", gruppiIds: [] }
+    ]
+}
+
 // riepilogo
 export type RiepilogoStepProps = {
     piattaforma: Piattaforma
@@ -219,6 +238,7 @@ export type RiepilogoState = {
     ruoli: Ruolo[]
     gruppi: Gruppo[]
     abilitazioni: Abilitazione[]
+    cruscotto: CruscottoStepConfig[]
 }
 
 // componenti

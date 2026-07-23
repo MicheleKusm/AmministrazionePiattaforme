@@ -227,7 +227,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 />
             )}
 
-            {step === 6 && <CruscottoStep />}
+            {step === 6 && <CruscottoStep piattaforma={piattaforma ?? initialPiattaforma} />}
 
             {step === 7 && (
                 <RiepilogoStep

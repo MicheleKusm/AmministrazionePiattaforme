@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder
@@ -49,4 +50,6 @@ public class PiattaformaDTO implements Serializable {
     private Boolean richiedibileInCorso;
     private Boolean ripetibile;
     private Boolean utilizzoModelloAutorizzativo;
+
+    private List<FormStepDTO> formSteps;
 }

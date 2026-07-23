@@ -3,6 +3,7 @@ package it.sogei.acrgs.platformms.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.sogei.acrgs.platformms.dto.FormStepDTO;
 import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
@@ -100,6 +101,7 @@ public class PiattaformaService {
                 .richiedibileInCorso(utility.convertToBoolean(entity.getRichiedibileInCorso()))
                 .ripetibile(utility.convertToBoolean(entity.getRipetibile()))
                 .utilizzoModelloAutorizzativo(utility.convertToBoolean(entity.getUtilizzoModelloAutorizzativo()))
+                .formSteps(extractFormSteps(config))
                 .build();
     }
 
@@ -112,6 +114,9 @@ public class PiattaformaService {
         config.put(RICHIEDIBILE_IN_CORSO, dto.getRichiedibileInCorso());
         config.put(RIPETIBILE, dto.getRipetibile());
         config.put(UTILIZZO_MODELLO_AUTORIZZATIVO, dto.getUtilizzoModelloAutorizzativo());
+        if (dto.getFormSteps() != null) {
+            config.put(FORM_STEPS, dto.getFormSteps());
+        }
         try {
             return objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException ex) {
@@ -129,6 +134,23 @@ public class PiattaformaService {
             log.error("CONFIG_JSON non valido: {}", configJson, ex);
             return Map.of();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<FormStepDTO> getCruscotto(Long id) {
+        Piattaforma entity = piattaformaRepository.findById(id).orElseThrow();
+        return extractFormSteps(parseConfig(entity.getConfigJson()));
+    }
+
+    private List<FormStepDTO> extractFormSteps(Map<String, Object> config) {
+        if (null == config) {
+            return List.of();
+        }
+        Object formStepsObj = config.get(FORM_STEPS);
+        if (formStepsObj == null) {
+            return List.of();
+        }
+        return objectMapper.convertValue(formStepsObj, new TypeReference<List<FormStepDTO>>() {});
     }
 
     private String extractOamMetadata(Map<String, Object> config, String metadataField) {

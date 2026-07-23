@@ -15,6 +15,8 @@ public class Constants {
     public static final String UTILIZZO_MODELLO_AUTORIZZATIVO = "utilizzoModelloAutorizzativo";
     public static final String ROLE_GROUPS = "role_groups";
     public static final String CRUSCOTTO_PIATTAFORMA = "CRUSCOTTO PER PIATTAFORMA";
+    public static final String FORM_STEPS = "formSteps";
+    public static final String CRUSCOTTO_API = "/cruscotto";
     public static final String NA = "N/A";
     public static final String RUOLO = "RUOLO";
     public static final String GRUPPI_API = "/api/gruppi";

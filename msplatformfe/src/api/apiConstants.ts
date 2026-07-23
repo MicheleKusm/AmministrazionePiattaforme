@@ -8,3 +8,4 @@ export const ABILITAZIONI = "/abilitazioni";
 export const ABILITAZIONI_TIPOLOGICHE = "/abilitazioni/tipologiche";
 export const ABILITAZIONI_PROCESSI = "/abilitazioni/processi";
 export const ABILITAZIONI_ICONE = "/abilitazioni/icone";
+export const CRUSCOTTO = "/cruscotto";

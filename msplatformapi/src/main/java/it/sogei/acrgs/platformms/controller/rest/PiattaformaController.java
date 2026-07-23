@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static it.sogei.acrgs.platformms.utils.Constants.*;
+import it.sogei.acrgs.platformms.dto.FormStepDTO;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +44,11 @@ public class PiattaformaController {
     @GetMapping(ID_API)
     public ResponseEntity<PiattaformaDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(piattaformaService.get(id));
+    }
+
+    @GetMapping(ID_API + CRUSCOTTO_API)
+    public ResponseEntity<List<FormStepDTO>> getCruscotto(@PathVariable Long id) {
+        return ResponseEntity.ok(piattaformaService.getCruscotto(id));
     }
 
     @PostMapping
