@@ -27,7 +27,7 @@ public class Validation {
                 log.debug("Validazione piattaforma fallita: la descrizione è obbligatoria");
                 errors.add("La descrizione della piattafoma è obbligatoria");
             }
-            if (errors.size() > 0) {
+            if (!errors.isEmpty()) {
                 log.debug("Validazione nome, descrizione e objclass piattaforma fallita: {}", errors);
             } else {
                 log.debug("Validazione nome, descrizione e objclass piattaforma completata");
@@ -39,6 +39,7 @@ public class Validation {
     }
 
     public void validazionePersistenceObject (PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
+        log.debug("validazionePersistenceObject, INIZIO");
         if (null == persistenceObjectDTO) {
             log.error("Errore nella ricezione dei dati, persistenceDTO nullo");
             errors.add("Errore nella ricezione dei dati, persistenceDTO nullo");
@@ -47,12 +48,12 @@ public class Validation {
         validazionePiattaforma(persistenceObjectDTO.getPiattaforma(), errors);
         validazioneRuoli(persistenceObjectDTO.getRuoli(), errors);
         validazioneGruppoAppartenenza(persistenceObjectDTO.getGruppiAppartenenza(), errors);
-
+        log.debug("validazionePersistenceObject, FINE");
     }
 
     private void validazionePiattaforma (PiattaformaDTO dto, List<String> errors) {
         try {
-            Integer initialSize = errors.size();
+            int initialSize = errors.size();
             boolean skipName = false;
             boolean skipDescription = false;
             boolean skipObjClass = false;
@@ -70,7 +71,7 @@ public class Validation {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
             }
-            if (! skipName && dto.getNome().matches(REGEX_PLACEHOLDER1)) {
+            if (!skipName && dto.getNome().matches(REGEX_PLACEHOLDER1)) {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma non valido");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma non valido");
             }
@@ -113,7 +114,7 @@ public class Validation {
 
     private void validazioneRuoli (List<RuoloDTO> ruoli, List<String> errors) {
         try {
-            Integer initialSize = errors.size();
+            int initialSize = errors.size();
             boolean skipName = false;
             boolean skipDescription = false;
             if (null == ruoli || ruoli.isEmpty()) {
@@ -163,7 +164,7 @@ public class Validation {
 
     private void validazioneGruppoAppartenenza (List<GruppoAppartenenzaDTO> gruppi, List<String> errors) {
         try {
-            Integer initialSize = errors.size();
+            int initialSize = errors.size();
             boolean skipName = false;
             boolean skipDescription = false;
             if (null == gruppi || gruppi.isEmpty()) {
@@ -213,7 +214,7 @@ public class Validation {
 
     private void validazioneAbilitazioni (List<AbilitazioneDTO> abilitazioni, List<String> errors) {
         try {
-            Integer initialSize = errors.size();
+            int initialSize = errors.size();
             boolean skipNome = false; //ecc
             if (null == abilitazioni || abilitazioni.isEmpty()) {
                 log.debug("Nessuna abilitazione presente, validazione non necessaria");

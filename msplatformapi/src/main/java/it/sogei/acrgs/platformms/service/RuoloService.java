@@ -16,6 +16,10 @@ public class RuoloService {
 
     private final RuoloRepository ruoloRepository;
 
+    public boolean existsByNomeAndPiattaformaExcludingId(String nome, Long idPiattaforma, Long excludeId) {
+        return ruoloRepository.countByNomeAndIdPiattaformaAndIdNot(nome, idPiattaforma, excludeId) > 0;
+    }
+
     @Transactional(readOnly = true)
     public List<RuoloDTO> listByPiattaforma(Long idPiattaforma) {
         return ruoloRepository.findByIdPiattaforma(idPiattaforma).stream().map(this::toDto).toList();
