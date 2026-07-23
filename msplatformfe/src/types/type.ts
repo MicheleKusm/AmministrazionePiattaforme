@@ -92,6 +92,12 @@ export type Gruppo = {
     ruoliIds: number[]
     daEliminare?: boolean
 }
+export type GruppiStepProps = {
+    gruppi: Gruppo[];
+    onAdd: () => void;
+    onEdit: (gruppo: Gruppo) => void;
+    onDelete: (gruppo: Gruppo) => void;
+};
 
 export type GroupModalProps = {
     group: Gruppo

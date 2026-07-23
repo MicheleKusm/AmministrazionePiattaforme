@@ -43,7 +43,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
     const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
     const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
-    // Temporary ID counters (only for new ruoli/gruppi in the wizard)
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
     const initialLoadDone = useRef(false)
@@ -139,7 +138,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             setDeleteModalOpen(false)
         }
     }
-
     const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
     const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
     const handleDeleteGruppo = (gruppo: Gruppo) => {

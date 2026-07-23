@@ -1,13 +1,6 @@
-import type { Gruppo } from "../../types/type";
+import type { GruppiStepProps } from "../../types/type"
 import { GruppiTable } from "../tables/GruppiTable";
 import { Button } from "../common/Button";
-
-type GruppiStepProps = {
-    gruppi: Gruppo[];
-    onAdd: () => void;
-    onEdit: (gruppo: Gruppo) => void;
-    onDelete: (gruppo: Gruppo) => void;
-};
 
 export function GruppiStep({ gruppi, onAdd, onEdit, onDelete }: GruppiStepProps) {
     return (
