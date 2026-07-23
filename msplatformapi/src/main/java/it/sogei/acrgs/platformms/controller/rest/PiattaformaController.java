@@ -41,12 +41,12 @@ public class PiattaformaController {
         return ResponseEntity.ok(piattaformaService.validaPiattaformaNomeAndObjclass(dto));
     }
 
-    @GetMapping(ID_API)
+    @GetMapping(ID)
     public ResponseEntity<PiattaformaDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(piattaformaService.get(id));
     }
 
-    @GetMapping(ID_API + CRUSCOTTO_API)
+    @GetMapping(ID + CRUSCOTTO)
     public ResponseEntity<List<FormStepDTO>> getCruscotto(@PathVariable Long id) {
         return ResponseEntity.ok(piattaformaService.getCruscotto(id));
     }
@@ -56,12 +56,12 @@ public class PiattaformaController {
         return ResponseEntity.ok(piattaformaService.create(dto));
     }
 
-    @PutMapping(ID_API)
+    @PutMapping(ID)
     public ResponseEntity<PiattaformaDTO> update(@PathVariable Long id, @RequestBody PiattaformaDTO dto) {
         return ResponseEntity.ok(piattaformaService.update(id, dto));
     }
 
-    @DeleteMapping(ID_API)
+    @DeleteMapping(ID)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         piattaformaService.delete(id);
         return ResponseEntity.noContent().build();

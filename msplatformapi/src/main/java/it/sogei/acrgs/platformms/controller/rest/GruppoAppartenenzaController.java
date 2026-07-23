@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class GruppoAppartenenzaController {
 
     private final GruppoAppartenenzaService gruppoService;
 
-    @GetMapping(ALL_API)
+    @GetMapping(ALL)
     public ResponseEntity<List<GruppoAppartenenzaDTO>> list() {
         return ResponseEntity.ok(gruppoService.list());
     }
@@ -36,17 +35,17 @@ public class GruppoAppartenenzaController {
         return ResponseEntity.ok(gruppoService.create(dto));
     }
 
-    @GetMapping(ID_API + DEPENDENCIES_API)
+    @GetMapping(ID + DEPENDENCIES)
     public ResponseEntity<GruppoDependenciesDTO> getDependencies(@PathVariable Long id) {
         return ResponseEntity.ok(gruppoService.getDependencies(id));
     }
 
-    @PutMapping(ID_API)
+    @PutMapping(ID)
     public ResponseEntity<GruppoAppartenenzaDTO> update(@PathVariable Long id, @RequestBody GruppoAppartenenzaDTO dto) {
         return ResponseEntity.ok(gruppoService.update(id, dto));
     }
 
-    @DeleteMapping(ID_API)
+    @DeleteMapping(ID)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         gruppoService.delete(id);
         return ResponseEntity.noContent().build();

@@ -8,6 +8,7 @@ import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.utils.Utility;
+import it.sogei.acrgs.platformms.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,7 +46,8 @@ public class PiattaformaService {
 
     public List<String> validaPiattaformaNomeAndObjclass(PiattaformaDTO dto) {
         List<String> errors = new ArrayList<>();
-        validazioneNomeDescObjclass(dto, errors);
+        new Validation().validazioneNomeDescObjclass(dto, errors);
+        validazioneNomeObjClassUnique(dto, errors);
         return errors;
     }
 
@@ -163,33 +165,17 @@ public class PiattaformaService {
         return null;
     }
 
-    private void validazioneNomeDescObjclass (PiattaformaDTO dto, List<String> errors) {
+    private void validazioneNomeObjClassUnique (PiattaformaDTO dto, List<String> errors) {
         try {
-            log.info("validazioneNomeDescObjclass, INIZIO");
-            if (null == dto.getNome() || dto.getNome().isBlank()) {
-                log.debug("Validazione piattaforma fallita: il nome della piattaforma è obbligatorio");
-                errors.add("Il nome della piattaforma è obbligatorio");
-            }
-            if (null == dto.getObjClass() || dto.getObjClass().isBlank()) {
-                log.debug("Validazione piattaforma fallita: Obj_class piattaforma è obbligatorio");
-                errors.add("Obj_class piattaforma è obbligatorio");
-            }
-            if (null == dto.getDescrizione() || dto.getDescrizione().isBlank()) {
-                log.debug("Validazione piattaforma fallita: la descrizione è obbligatoria");
-                errors.add("La descrizione della piattafoma è obbligatoria");
-            }
             if (null != dto.getNome() && null != dto.getObjClass() && piattaformaRepository.countByNomeOrObjClassExcludeId(dto.getNome(), dto.getObjClass(), dto.getId()) > 0) {
                 log.debug("Validazione piattaforma fallita: Nome e Obj_class devono essere univoci");
                 errors.add("Nome e Obj_class devono essere univoci");
-            }
-            if (errors.size() > 0) {
-                log.debug("Validazione nome, descrizione e objclass piattaforma fallita: {}", errors);
             } else {
-                log.debug("Validazione nome, descrizione e objclass piattaforma completata");
+                log.debug("Validazione unicità campi piattaforma completata");
             }
         } catch (Exception exception) {
-            log.error("Errore durante la validazione della piattaforma: {}", exception.getMessage());
-            errors.add("Errore generico durante la validazione della piattaforma");
+            log.error("Errore durante la validazione unicità campi della piattaforma: {}", exception.getMessage());
+            errors.add("Errore generico durante la validazione unicità campi della piattaforma");
         }
     }
 }
