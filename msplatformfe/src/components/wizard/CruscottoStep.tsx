@@ -6,8 +6,8 @@ import { useGetCruscottoQuery } from "../../api/cruscottoApi"
 import { useAppDispatch, useAppSelector } from "../../store/hooks"
 import { setCruscotto, updateCruscottoStep } from "../../store/riepilogoSlice"
 import { Constants } from "../../utils/Constants"
-import { CruscottoSezione } from "./CruscottoSezione"
-import { CruscottoSezioniManager } from "./CruscottoSezioniManager"
+import { CruscottoSezione } from "../cruscotto/CruscottoSezione"
+import { CruscottoSezioniManager } from "../cruscotto/CruscottoSezioniManager"
 
 type CruscottoStepProps = {
     piattaforma?: Piattaforma

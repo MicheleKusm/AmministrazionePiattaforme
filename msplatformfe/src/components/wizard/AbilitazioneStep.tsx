@@ -4,7 +4,7 @@ import type { Abilitazione, Piattaforma } from "../../types/type"
 import { makeEmptyAbilitazione } from "../../types/type"
 import { Button } from "../common/Button"
 import { AbilitazioniTable } from "../tables/AbilitazioniTable"
-import { AbilitazioneForm } from "./AbilitazioneForm"
+import { AbilitazioneForm } from "../forms/AbilitazioneForm"
 import {
     useGetAbilitazioniQuery,
     useGetProcessiVerticaliQuery,
