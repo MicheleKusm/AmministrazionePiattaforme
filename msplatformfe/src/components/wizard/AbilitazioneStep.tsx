@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import type { Abilitazione, Piattaforma } from "../../types/type"
 import { makeEmptyAbilitazione } from "../../types/type"
@@ -6,38 +6,53 @@ import { Button } from "../common/Button"
 import { AbilitazioniTable } from "../tables/AbilitazioniTable"
 import { AbilitazioneForm } from "./AbilitazioneForm"
 import {
-    useDeleteAbilitazioneMutation,
     useGetAbilitazioniQuery,
     useGetProcessiVerticaliQuery,
-    useGetTipologicheQuery,
-    useSaveAbilitazioneMutation
+    useGetTipologicheQuery
 } from "../../api/abilitazioniApi"
+import { useAppDispatch, useAppSelector } from "../../store/hooks"
+import { addAbilitazione, removeAbilitazione, setAbilitazioni, updateAbilitazione } from "../../store/riepilogoSlice"
 import { Constants } from "../../utils/Constants"
 
 type AbilitazioneStepProps = {
     piattaforma?: Piattaforma
 }
 
-export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
-    const [draft, setDraft] = useState<Abilitazione | null>(null)
+function nextTempId(items: Abilitazione[]): number {
+    return Math.min(0, ...items.map((a) => a.id)) - 1
+}
 
-    const { data: abilitazioni = [] } = useGetAbilitazioniQuery(piattaforma?.id ?? skipToken)
+export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
+    const dispatch = useAppDispatch()
+    const [draft, setDraft] = useState<Abilitazione | null>(null)
+    const abilitazioniLoaded = useRef(false)
+
+    const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
+
+    const { data: abilitazioniData } = useGetAbilitazioniQuery(piattaforma?.id ?? skipToken)
     const { data: tipologiche = [] } = useGetTipologicheQuery()
     const { data: processi = [] } = useGetProcessiVerticaliQuery()
-    const [saveAbilitazione] = useSaveAbilitazioneMutation()
-    const [deleteAbilitazione] = useDeleteAbilitazioneMutation()
 
-    async function salva(abilitazione: Abilitazione) {
-        if (piattaforma?.id) {
-            await saveAbilitazione({ idPiattaforma: piattaforma.id, abilitazione }).unwrap()
+    useEffect(() => {
+        if (abilitazioniData && !abilitazioniLoaded.current && abilitazioni.length === 0) {
+            dispatch(setAbilitazioni(abilitazioniData))
+            abilitazioniLoaded.current = true
+        }
+    }, [abilitazioniData, abilitazioni.length, dispatch])
+
+    const visibili = abilitazioni.filter((a) => !a.daEliminare)
+
+    function salva(abilitazione: Abilitazione) {
+        if (abilitazione.id === 0) {
+            dispatch(addAbilitazione({ ...abilitazione, id: nextTempId(abilitazioni) }))
+        } else {
+            dispatch(updateAbilitazione(abilitazione))
         }
         setDraft(null)
     }
 
-    async function elimina(abilitazione: Abilitazione) {
-        if (abilitazione.id) {
-            await deleteAbilitazione(abilitazione.id).unwrap()
-        }
+    function elimina(abilitazione: Abilitazione) {
+        dispatch(removeAbilitazione(abilitazione))
     }
 
     if (draft) {
@@ -64,13 +79,13 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
                 <Button onClick={() => setDraft(makeEmptyAbilitazione())}>{Constants.abilitazione.AGGIUNGI}</Button>
             </div>
             <AbilitazioniTable
-                abilitazioni={abilitazioni}
+                abilitazioni={visibili}
                 onDetail={setDraft}
                 onEdit={setDraft}
-                onDelete={(a) => void elimina(a)}
+                onDelete={(a) => elimina(a)}
             />
             <div className="px-6 py-3 text-sm text-gray-500">
-                {Constants.abilitazione.TOTALE} {abilitazioni.length} {Constants.abilitazione.ABILITAZIONI_ASSOCIATE}
+                {Constants.abilitazione.TOTALE} {visibili.length} {Constants.abilitazione.ABILITAZIONI_ASSOCIATE}
             </div>
         </div>
     )

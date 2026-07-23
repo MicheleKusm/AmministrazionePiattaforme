@@ -1,12 +1,12 @@
 // store/riepilogoSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import type { Piattaforma, Ruolo, Gruppo, RiepilogoState } from "../types/type"
+import type { Abilitazione, Gruppo, Piattaforma, RiepilogoState, Ruolo } from "../types/type"
 
 const initialState: RiepilogoState = {
     piattaforma: null,
     ruoli: [],
     gruppi: [],
-    tipoAbilitazione: "TICKET"
+    abilitazioni: []
 }
 
 const riepilogoSlice = createSlice({
@@ -63,6 +63,25 @@ const riepilogoSlice = createSlice({
             }
         },
         // ---- Abilitazione ----
+        setAbilitazioni: (state, action: PayloadAction<Abilitazione[]>) => {
+            state.abilitazioni = action.payload
+        },
+        addAbilitazione: (state, action: PayloadAction<Abilitazione>) => {
+            state.abilitazioni.push(action.payload)
+        },
+        updateAbilitazione: (state, action: PayloadAction<Abilitazione>) => {
+            const idx = state.abilitazioni.findIndex((a) => a.id === action.payload.id)
+            if (idx >= 0) state.abilitazioni[idx] = action.payload
+        },
+        removeAbilitazione: (state, action: PayloadAction<Abilitazione>) => {
+            const abilitazione = action.payload
+            if (abilitazione.id > 0) {
+                const existing = state.abilitazioni.find((a) => a.id === abilitazione.id)
+                if (existing) existing.daEliminare = true
+            } else {
+                state.abilitazioni = state.abilitazioni.filter((a) => a.id !== abilitazione.id)
+            }
+        }
         // ---- Cruscotto ---
     }
 })
@@ -78,7 +97,11 @@ export const {
     setGruppi,
     addGruppo,
     updateGruppo,
-    removeGruppo
+    removeGruppo,
+    setAbilitazioni,
+    addAbilitazione,
+    updateAbilitazione,
+    removeAbilitazione
 } = riepilogoSlice.actions
 
 export const riepilogoReducer = riepilogoSlice.reducer

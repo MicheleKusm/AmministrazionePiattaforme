@@ -14,6 +14,7 @@ export function RiepilogoTable() {
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
     const gruppi = useAppSelector((state) => state.riepilogo.gruppi)
+    const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
 
     const rows: RiepilogoRow[] = []
 
@@ -66,6 +67,23 @@ export function RiepilogoTable() {
         })
     }
 
+    // Abilitazioni
+    for (const abilitazione of abilitazioni) {
+        let stato: RiepilogoRow["stato"] = "Esistente"
+        if (abilitazione.daEliminare) {
+            stato = "Eliminato"
+        } else if (abilitazione.id < 0) {
+            stato = "Nuovo"
+        }
+        rows.push({
+            id: `abilitazione-${abilitazione.id}`,
+            tipo: "Abilitazione",
+            nome: abilitazione.nome,
+            descrizione: abilitazione.riferimento,
+            stato
+        })
+    }
+
     const columns = [
         { header: "Tipo", render: (row: RiepilogoRow) => row.tipo },
         { header: "Nome", render: (row: RiepilogoRow) => row.nome },
@@ -96,7 +114,7 @@ export function RiepilogoTable() {
                 emptyMessage="Nessun dato da riepilogare."
             />
             <div className="px-6 py-3 text-sm text-gray-500 border-t border-gray-200">
-                Totale: {rows.length} elementi ({ruoli.filter((r) => r.daEliminare).length} eliminati)
+                Totale: {rows.length} elementi ({ruoli.filter((r) => r.daEliminare).length + gruppi.filter((g) => g.daEliminare).length + abilitazioni.filter((a) => a.daEliminare).length} eliminati)
             </div>
         </div>
     )

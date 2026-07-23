@@ -93,11 +93,11 @@ export type Gruppo = {
     daEliminare?: boolean
 }
 export type GruppiStepProps = {
-    gruppi: Gruppo[];
-    onAdd: () => void;
-    onEdit: (gruppo: Gruppo) => void;
-    onDelete: (gruppo: Gruppo) => void;
-};
+    gruppi: Gruppo[]
+    onAdd: () => void
+    onEdit: (gruppo: Gruppo) => void
+    onDelete: (gruppo: Gruppo) => void
+}
 
 export type GroupModalProps = {
     group: Gruppo
@@ -110,67 +110,68 @@ export type GroupModalProps = {
 export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const
 
 //  Abilitazione associata
-export type TipoAbilitazione = "TICKET" | "VERTICALE";
+export type TipoAbilitazione = "TICKET" | "VERTICALE"
 
-export type StatoAbilitazione = "Attiva" | "Disattiva";
+export type StatoAbilitazione = "Attiva" | "Disattiva"
 
-export type CanaleComunicazione = "Email" | "SMS" | "In-app" | "Push" | "Webhook" | "WhatsApp";
+export type CanaleComunicazione = "Email" | "SMS" | "In-app" | "Push" | "Webhook" | "WhatsApp"
 
 export type TipologicaCampoDinamico = {
-    tipoDati: string;
-    type: string;
-    regex: string | null;
-    idTipoDati: number;
-};
+    tipoDati: string
+    type: string
+    regex: string | null
+    idTipoDati: number
+}
 
 export type CampoTicket = {
-    id: number;
-    label: string;
-    descrizione: string;
-    campo: string;
-    tipoValore: string;
-    obbligatoria: boolean;
-    regex: string;
-};
+    id: number
+    label: string
+    descrizione: string
+    campo: string
+    tipoValore: string
+    obbligatoria: boolean
+    regex: string
+}
 
 export type ComunicazioneOnboarding = {
-    id: number;
-    canale: CanaleComunicazione;
-    descrizione: string;
-    obbligatoria: boolean;
-};
+    id: number
+    canale: CanaleComunicazione
+    descrizione: string
+    obbligatoria: boolean
+}
 
 export type Abilitazione = {
-    id: number;
-    nome: string;
-    tipo: TipoAbilitazione;
-    riferimento: string;
-    stato: StatoAbilitazione;
-    processKey: string;
-    codiceScim: string;
-    processoVerticale: string;
-    campi: CampoTicket[];
-    comunicazioni: ComunicazioneOnboarding[];
-};
+    id: number
+    nome: string
+    tipo: TipoAbilitazione
+    riferimento: string
+    stato: StatoAbilitazione
+    processKey: string
+    codiceScim: string
+    processoVerticale: string
+    campi: CampoTicket[]
+    comunicazioni: ComunicazioneOnboarding[]
+    daEliminare?: boolean
+}
 
 export type AbilitazioniTableProps = {
-    abilitazioni: Abilitazione[];
-    onDetail: (abilitazione: Abilitazione) => void;
-    onEdit: (abilitazione: Abilitazione) => void;
-    onDelete: (abilitazione: Abilitazione) => void;
-};
+    abilitazioni: Abilitazione[]
+    onDetail: (abilitazione: Abilitazione) => void
+    onEdit: (abilitazione: Abilitazione) => void
+    onDelete: (abilitazione: Abilitazione) => void
+}
 
 export type CampiTicketTableProps = {
-    campi: CampoTicket[];
-    onEdit: (campo: CampoTicket) => void;
-    onDelete: (campo: CampoTicket) => void;
-};
+    campi: CampoTicket[]
+    onEdit: (campo: CampoTicket) => void
+    onDelete: (campo: CampoTicket) => void
+}
 
 export type ComunicazioniTableProps = {
-    comunicazioni: ComunicazioneOnboarding[];
-    onEdit: (comunicazione: ComunicazioneOnboarding) => void;
-    onDelete: (comunicazione: ComunicazioneOnboarding) => void;
-};
+    comunicazioni: ComunicazioneOnboarding[]
+    onEdit: (comunicazione: ComunicazioneOnboarding) => void
+    onDelete: (comunicazione: ComunicazioneOnboarding) => void
+}
 
 export const emptyCampoTicket: CampoTicket = {
     id: 0,
@@ -180,14 +181,14 @@ export const emptyCampoTicket: CampoTicket = {
     tipoValore: "",
     obbligatoria: true,
     regex: ""
-};
+}
 
 export const emptyComunicazione: ComunicazioneOnboarding = {
     id: 0,
     canale: "Email",
     descrizione: "",
     obbligatoria: true
-};
+}
 
 export function makeEmptyAbilitazione(): Abilitazione {
     return {
@@ -206,18 +207,18 @@ export function makeEmptyAbilitazione(): Abilitazione {
 
 // riepilogo
 export type RiepilogoStepProps = {
-    piattaforma: Piattaforma;
-    ruoli: Ruolo[];
-    gruppi: Gruppo[];
-    tipoAbilitazione: "TICKET" | "VERTICALE";
-};
+    piattaforma: Piattaforma
+    ruoli: Ruolo[]
+    gruppi: Gruppo[]
+    tipoAbilitazione: "TICKET" | "VERTICALE"
+}
 
 // slices
 export type RiepilogoState = {
     piattaforma: Piattaforma | null
     ruoli: Ruolo[]
     gruppi: Gruppo[]
-    tipoAbilitazione: "TICKET" | "VERTICALE"
+    abilitazioni: Abilitazione[]
 }
 
 // componenti
@@ -261,11 +262,9 @@ export type TableProps<T> = {
 }
 
 export type PageResponse<T> = {
-    content: T[];
-    number: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-};
-
-
+    content: T[]
+    number: number
+    size: number
+    totalElements: number
+    totalPages: number
+}

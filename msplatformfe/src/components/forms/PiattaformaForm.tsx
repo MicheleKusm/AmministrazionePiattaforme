@@ -24,6 +24,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                 <FormField error={errors.nome}>
+                    <h4>Nome Piattaforma</h4>
                     <input
                         value={piattaforma.nome}
                         onChange={(e) => updateField("nome", e.target.value)}
@@ -33,6 +34,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.canale}>
+                    <h4>Canale</h4>
                     <input
                         value={piattaforma.canale}
                         onChange={(e) => updateField("canale", e.target.value)}
@@ -42,6 +44,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.descrizione}>
+                    <h4>Descrizione</h4>
                     <input
                         value={piattaforma.descrizione}
                         onChange={(e) => updateField("descrizione", e.target.value)}
@@ -51,6 +54,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.objClass}>
+                    <h4>Obj Class</h4>
                     <input
                         value={piattaforma.objClass}
                         onChange={(e) => updateField("objClass", e.target.value)}
@@ -60,6 +64,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.url}>
+                    <h4>URL</h4>
                     <input
                         value={piattaforma.url}
                         onChange={(e) => updateField("url", e.target.value)}
@@ -69,6 +74,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.codiceIct}>
+                    <h4>Codice Ict</h4>
                     <input
                         value={piattaforma.codiceIct}
                         onChange={(e) => updateField("codiceIct", e.target.value)}
@@ -78,6 +84,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.oamMetadataName}>
+                    <h4>OAM Metadata Name</h4>
                     <input
                         value={piattaforma.oamMetadataName}
                         onChange={(e) => updateField("oamMetadataName", e.target.value)}
@@ -87,6 +94,7 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
                 </FormField>
 
                 <FormField error={errors.oamMetadataValue}>
+                    <h4>OAM Metadata Value</h4>
                     <input
                         value={piattaforma.oamMetadataValue}
                         onChange={(e) => updateField("oamMetadataValue", e.target.value)}

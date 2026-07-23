@@ -16,17 +16,17 @@ import { type Gruppo, type Piattaforma, PlatformWizardPageProps, type Ruolo } fr
 import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import {
-    setPiattaforma as setRiepilogoPiattaforma,
-    updatePiattaforma as updateRiepilogoPiattaforma,
-    setRuoli,
-    addRuolo,
-    updateRuolo,
-    removeRuolo,
-    setGruppi,
     addGruppo,
-    updateGruppo,
+    addRuolo,
     removeGruppo,
-    resetRiepilogo
+    removeRuolo,
+    resetRiepilogo,
+    setGruppi,
+    setPiattaforma as setRiepilogoPiattaforma,
+    setRuoli,
+    updateGruppo,
+    updatePiattaforma as updateRiepilogoPiattaforma,
+    updateRuolo
 } from "../store/riepilogoSlice"
 import { piattaformaSchema } from "../utils/schema"
 import * as yup from "yup"
@@ -45,7 +45,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
-    // const initialLoadDone = useRef(false)
     const ruoliLoaded = useRef(false)
     const gruppiLoaded = useRef(false)
 

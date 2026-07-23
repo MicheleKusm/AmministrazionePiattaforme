@@ -97,6 +97,15 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
     const [campoDraft, setCampoDraft] = useState<CampoTicket | null>(null);
     const [comunicazioneDraft, setComunicazioneDraft] = useState<ComunicazioneOnboarding | null>(null);
 
+    function selezionaTipo(nuovo: TipoAbilitazione) {
+        if (nuovo === tipo) return;
+        setTipo(nuovo);
+        setCodiceScim("");
+        setProcessoVerticale("");
+        setCampi([]);
+        setComunicazioni([]);
+    }
+
     function salvaCampo(campo: CampoTicket) {
         setCampi((prev) => {
             const esiste = prev.some((c) => c.id === campo.id && campo.id !== 0);
@@ -165,14 +174,14 @@ export function AbilitazioneForm({ piattaforma, initial, tipologiche, processi, 
                         titolo={Constants.abilitazione.VERTICALE_TITOLO}
                         descrizione={Constants.abilitazione.VERTICALE_DESC}
                         selezionato={tipo === "VERTICALE"}
-                        onClick={() => setTipo("VERTICALE")}
+                        onClick={() => selezionaTipo("VERTICALE")}
                         icona={IconaVerticale}
                     />
                     <ChoiceCard
                         titolo={Constants.abilitazione.TICKET_TITOLO}
                         descrizione={Constants.abilitazione.TICKET_DESC}
                         selezionato={tipo === "TICKET"}
-                        onClick={() => setTipo("TICKET")}
+                        onClick={() => selezionaTipo("TICKET")}
                         icona={IconaTicket}
                     />
                 </div>
