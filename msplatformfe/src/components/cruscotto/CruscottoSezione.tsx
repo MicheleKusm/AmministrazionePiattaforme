@@ -77,7 +77,7 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                 <input
                     type="text"
                     value={config.descrizione}
-                    placeholder={Constants.cruscotto.DESCRIZIONE_PH}
+                    placeholder={Constants.cruscotto.DESCRIZIONE_SEZIONE}
                     onChange={(e) => onChange({ ...config, descrizione: e.target.value })}
                     className={INPUT}
                 />

@@ -6,6 +6,7 @@ import { CruscottoSezioneEditor } from "./CruscottoSezioneEditor"
 type CruscottoSezioniManagerProps = {
     sezioni: CruscottoSezioneConfig[]
     gruppi: Gruppo[]
+    esteso?: boolean
     onChange: (sezioni: CruscottoSezioneConfig[]) => void
 }
 
@@ -19,7 +20,7 @@ function makeEmptySezione(): CruscottoSezioneConfig {
     }
 }
 
-export function CruscottoSezioniManager({ sezioni, gruppi, onChange }: CruscottoSezioniManagerProps) {
+export function CruscottoSezioniManager({ sezioni, gruppi, esteso = false, onChange }: CruscottoSezioniManagerProps) {
     const [expanded, setExpanded] = useState<number | null>(sezioni.length > 0 ? 0 : null)
 
     function updateSezione(i: number, s: CruscottoSezioneConfig) {
@@ -59,6 +60,7 @@ export function CruscottoSezioniManager({ sezioni, gruppi, onChange }: Cruscotto
                         sezione={s}
                         index={i}
                         gruppi={gruppi}
+                        esteso={esteso}
                         collapsed={expanded !== i}
                         onToggleCollapse={() => setExpanded(expanded === i ? null : i)}
                         onChange={(sez) => updateSezione(i, sez)}

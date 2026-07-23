@@ -147,6 +147,7 @@ export class Constants {
         SUBHEADER_PH: "Es. Inserisci il ruolo",
         DESCRIZIONE: "Descrizione",
         DESCRIZIONE_PH: "Es. Inserisci il ruolo",
+        DESCRIZIONE_SEZIONE: "Descrizione Sezione",
         GRUPPI_TITOLO: "Associa Gruppi di Appartenenza a questo Step",
         GRUPPI_VUOTI: "Nessun gruppo di appartenenza configurato nello step Gruppi.",
         STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO).",
@@ -185,6 +186,8 @@ export class Constants {
         CAMPO_DESCRIZIONE: "Descrizione",
         CAMPO_SALVA: "Salva Campo",
         CAMPO_ANNULLA: "Annulla",
+        CAMPO_CHILDREN: "Campi Figli (Children)",
+        CAMPO_CHILDREN_PH: "-- Seleziona --",
         LAYOUT_OPTIONS: [
             { value: "list", label: "Lista (Campi allineati in colonna)" },
             { value: "grid", label: "Griglia (Campi affiancati)" }

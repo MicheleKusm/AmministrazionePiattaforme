@@ -1,5 +1,7 @@
-import type { CruscottoFieldConfig, CruscottoSezioneConfig, CruscottoStepConfig, CruscottoStepKey } from "../types/type" // Struttura CONFIG_JSON v2 (allineata a anag-commons ConfigFormDTO). Il cruscotto della
+import type { CruscottoFieldConfig, CruscottoSezioneConfig, CruscottoStepConfig, CruscottoStepKey } from "../types/type"
 
+// Struttura CONFIG_JSON v2 (allineata a anag-commons ConfigFormDTO). Il cruscotto della
+// piattaforma vive in PIATTAFORMA.CONFIG_JSON sotto la chiave "formSteps".
 export type FieldDTO = {
     order?: number
     name?: string
@@ -38,6 +40,7 @@ function isCruscottoKey(step: string): step is CruscottoStepKey {
     return (STEP_KEYS as string[]).includes(step)
 }
 
+// ---- fields ----
 function fieldDtoToConfig(f: FieldDTO): CruscottoFieldConfig {
     return {
         order: f.order ?? 1,
@@ -51,16 +54,20 @@ function fieldDtoToConfig(f: FieldDTO): CruscottoFieldConfig {
     }
 }
 
-function configToFieldDto(f: CruscottoFieldConfig): FieldDTO {
-    const dto: FieldDTO = { order: f.order, name: f.name, inputType: f.inputType }
+// isChild=true → non serializza `order` (nel JSON i figli hanno solo name/inputType)
+function configToFieldDto(f: CruscottoFieldConfig, isChild = false): FieldDTO {
+    const dto: FieldDTO = isChild
+        ? { name: f.name, inputType: f.inputType }
+        : { order: f.order, name: f.name, inputType: f.inputType }
     if (f.label) dto.label = f.label
     if (f.labelRiepilogo) dto.labelRiepilogo = f.labelRiepilogo
     if (f.description) dto.description = f.description
     if (f.apiSource) dto.apiSource = f.apiSource
-    if (f.children && f.children.length > 0) dto.children = f.children.map(configToFieldDto)
+    if (f.children && f.children.length > 0) dto.children = f.children.map((c) => configToFieldDto(c, true))
     return dto
 }
 
+// ---- sections ----
 function sectionDtoToConfig(s: SectionDTO): CruscottoSezioneConfig {
     return {
         header: s.header ?? "",
@@ -75,16 +82,22 @@ function sectionDtoToConfig(s: SectionDTO): CruscottoSezioneConfig {
     }
 }
 
-function configToSectionDto(s: CruscottoSezioneConfig): SectionDTO {
-    return {
+// includeStyle=false (STEP_DATI) → la sezione non serializza `style`
+function configToSectionDto(s: CruscottoSezioneConfig, includeStyle: boolean): SectionDTO {
+    const dto: SectionDTO = {
         header: s.header,
         subheader: s.subheader,
         role_groups: s.gruppiIds,
-        style: { layout: s.style.layout, bordered: s.style.bordered, dividers: s.style.dividers },
-        fields: s.fields.map(configToFieldDto)
+        fields: s.fields.map((f) => configToFieldDto(f))
     }
+    if (includeStyle) {
+        dto.style = { layout: s.style.layout, bordered: s.style.bordered, dividers: s.style.dividers }
+    }
+    return dto
 }
 
+// ---- steps ----
+// backend (formSteps) -> stato UI del builder
 export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepConfig[] {
     return (formSteps ?? [])
         .filter((s) => isCruscottoKey(s.step))
@@ -97,6 +110,8 @@ export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepCon
         }))
 }
 
+// stato UI del builder -> backend (solo gli step abilitati entrano in formSteps)
+// STEP_RUOLO non ha sezioni; STEP_DATI ha sezioni SENZA style; STEP_METADATI ha sezioni CON style.
 export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStepDTO[] {
     return cruscotto
         .filter((c) => c.abilitato)
@@ -107,7 +122,8 @@ export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStep
                 role_groups: c.gruppiIds
             }
             if (c.chiave !== "STEP_RUOLO" && c.sezioni.length > 0) {
-                step.sections = c.sezioni.map(configToSectionDto)
+                const includeStyle = c.chiave === "STEP_METADATI"
+                step.sections = c.sezioni.map((s) => configToSectionDto(s, includeStyle))
             }
             return step
         })

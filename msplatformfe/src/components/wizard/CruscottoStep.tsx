@@ -121,17 +121,18 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                 })}
             </div>
 
-            {activeConfig && (active === "STEP_RUOLO" || active === "STEP_DATI") ? (
+            {activeConfig && (active === "STEP_RUOLO" || active === "STEP_DATI" || active === "STEP_METADATI") ? (
                 <>
                     <CruscottoSezione
                         config={activeConfig}
                         gruppi={gruppi}
                         onChange={(c) => dispatch(updateCruscottoStep(c))}
                     />
-                    {active === "STEP_DATI" && (
+                    {(active === "STEP_DATI" || active === "STEP_METADATI") && (
                         <CruscottoSezioniManager
                             sezioni={activeConfig.sezioni}
                             gruppi={gruppi.filter((g) => g.id != null && activeConfig.gruppiIds.includes(g.id))}
+                            esteso={active === "STEP_METADATI"}
                             onChange={(sezioni) => dispatch(updateCruscottoStep({ ...activeConfig, sezioni }))}
                         />
                     )}

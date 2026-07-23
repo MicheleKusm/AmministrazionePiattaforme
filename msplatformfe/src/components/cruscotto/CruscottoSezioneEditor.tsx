@@ -7,6 +7,7 @@ type CruscottoSezioneEditorProps = {
     sezione: CruscottoSezioneConfig
     index: number
     gruppi: Gruppo[]
+    esteso?: boolean
     collapsed: boolean
     onToggleCollapse: () => void
     onChange: (sezione: CruscottoSezioneConfig) => void
@@ -27,6 +28,7 @@ export function CruscottoSezioneEditor({
     sezione,
     index,
     gruppi,
+    esteso = false,
     collapsed,
     onToggleCollapse,
     onChange,
@@ -149,38 +151,40 @@ export function CruscottoSezioneEditor({
                         </div>
                     </div>
 
-                    <div className="mt-4 grid gap-4 md:grid-cols-2 md:items-center">
-                        <div>
-                            <label className={LABEL}>{Constants.cruscotto.SEZIONE_LAYOUT_LABEL}</label>
-                            <select className={INPUT} value={sezione.style.layout} onChange={(e) => setStyle({ layout: e.target.value })}>
-                                {Constants.cruscotto.LAYOUT_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
-                            </select>
+                    {esteso && (
+                        <div className="mt-4 grid gap-4 md:grid-cols-2 md:items-center">
+                            <div>
+                                <label className={LABEL}>{Constants.cruscotto.SEZIONE_LAYOUT_LABEL}</label>
+                                <select className={INPUT} value={sezione.style.layout} onChange={(e) => setStyle({ layout: e.target.value })}>
+                                    {Constants.cruscotto.LAYOUT_OPTIONS.map((o) => (
+                                        <option key={o.value} value={o.value}>
+                                            {o.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex gap-6 md:mt-6">
+                                <label className="flex items-center gap-2 text-sm text-gray-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={sezione.style.bordered}
+                                        onChange={(e) => setStyle({ bordered: e.target.checked })}
+                                        className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                                    />
+                                    {Constants.cruscotto.SEZIONE_BORDO}
+                                </label>
+                                <label className="flex items-center gap-2 text-sm text-gray-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={sezione.style.dividers}
+                                        onChange={(e) => setStyle({ dividers: e.target.checked })}
+                                        className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                                    />
+                                    {Constants.cruscotto.SEZIONE_DIVISORI}
+                                </label>
+                            </div>
                         </div>
-                        <div className="flex gap-6 md:mt-6">
-                            <label className="flex items-center gap-2 text-sm text-gray-700">
-                                <input
-                                    type="checkbox"
-                                    checked={sezione.style.bordered}
-                                    onChange={(e) => setStyle({ bordered: e.target.checked })}
-                                    className="h-4 w-4 rounded border-gray-300 text-primary-600"
-                                />
-                                {Constants.cruscotto.SEZIONE_BORDO}
-                            </label>
-                            <label className="flex items-center gap-2 text-sm text-gray-700">
-                                <input
-                                    type="checkbox"
-                                    checked={sezione.style.dividers}
-                                    onChange={(e) => setStyle({ dividers: e.target.checked })}
-                                    className="h-4 w-4 rounded border-gray-300 text-primary-600"
-                                />
-                                {Constants.cruscotto.SEZIONE_DIVISORI}
-                            </label>
-                        </div>
-                    </div>
+                    )}
 
                     <div className="mt-6 flex items-center justify-between">
                         <p className="text-sm font-semibold text-gray-900">
@@ -201,6 +205,7 @@ export function CruscottoSezioneEditor({
                         <div className="mt-3">
                             <CruscottoCampoEditor
                                 initial={campoDraft}
+                                esteso={esteso}
                                 onSave={salvaCampo}
                                 onCancel={() => {
                                     setCampoDraft(null)
