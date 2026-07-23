@@ -60,7 +60,7 @@ export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: 
             data={abilitazioni}
             columns={columns}
             keyExtractor={(a: Abilitazione) => a.id}
-            emptyMessage={<p className="px-6 py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUNA}</p>}
+            emptyMessage={<span className="block px-6 py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUNA}</span>}
         />
     );
 }
