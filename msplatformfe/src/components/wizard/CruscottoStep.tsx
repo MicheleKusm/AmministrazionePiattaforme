@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import type { CruscottoStepConfig, CruscottoStepKey, Piattaforma } from "../../types/type"
 import { makeDefaultCruscotto } from "../../types/type"
@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks"
 import { setCruscotto, updateCruscottoStep } from "../../store/riepilogoSlice"
 import { Constants } from "../../utils/Constants"
 import { CruscottoSezione } from "./CruscottoSezione"
+import { CruscottoSezioniManager } from "./CruscottoSezioniManager"
 
 type CruscottoStepProps = {
     piattaforma?: Piattaforma
@@ -26,7 +27,20 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
     const cruscottoLoaded = useRef(false)
 
     const cruscotto = useAppSelector((state) => state.riepilogo.cruscotto)
-    const gruppi = useAppSelector((state) => state.riepilogo.gruppi)
+    // La lista dei gruppi mostrata nel cruscotto deve essere quella completa (come lo step Gruppi):
+    // i gruppi caricati da DB (state.gruppi.items) fusi con quelli creati/modificati nel wizard
+    // (state.riepilogo.gruppi). Prima si leggeva solo il secondo, vuoto finché non si salvava un gruppo.
+    const allGruppi = useAppSelector((state) => state.gruppi.items)
+    const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi)
+    const gruppi = useMemo(() => {
+        const all = [...allGruppi]
+        for (const t of editedGruppi) {
+            const idx = all.findIndex((g) => g.id === t.id)
+            if (idx >= 0) all[idx] = t
+            else all.push(t)
+        }
+        return all
+    }, [allGruppi, editedGruppi])
 
     const { data: cruscottoData } = useGetCruscottoQuery(piattaforma?.id ?? skipToken)
 
@@ -89,12 +103,21 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                 })}
             </div>
 
-            {active === "STEP_RUOLO" && activeConfig ? (
-                <CruscottoSezione
-                    config={activeConfig}
-                    gruppi={gruppi}
-                    onChange={(c) => dispatch(updateCruscottoStep(c))}
-                />
+            {activeConfig && (active === "STEP_RUOLO" || active === "STEP_DATI") ? (
+                <>
+                    <CruscottoSezione
+                        config={activeConfig}
+                        gruppi={gruppi}
+                        onChange={(c) => dispatch(updateCruscottoStep(c))}
+                    />
+                    {active === "STEP_DATI" && (
+                        <CruscottoSezioniManager
+                            sezioni={activeConfig.sezioni}
+                            gruppi={gruppi}
+                            onChange={(sezioni) => dispatch(updateCruscottoStep({ ...activeConfig, sezioni }))}
+                        />
+                    )}
+                </>
             ) : (
                 <div className="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center text-sm text-gray-500">
                     {Constants.cruscotto.STEP_NON_DISPONIBILE}

@@ -208,19 +208,44 @@ export function makeEmptyAbilitazione(): Abilitazione {
 // cruscotto
 export type CruscottoStepKey = "STEP_RUOLO" | "STEP_DATI" | "STEP_METADATI"
 
+export type CruscottoFieldConfig = {
+    order: number
+    name: string
+    inputType: string
+    label?: string
+    labelRiepilogo?: string
+    description?: string
+    apiSource?: string
+    children?: CruscottoFieldConfig[]
+}
+
+export type CruscottoSezioneStyle = {
+    layout: string
+    bordered: boolean
+    dividers: boolean
+}
+
+export type CruscottoSezioneConfig = {
+    header: string
+    subheader: string
+    gruppiIds: number[]
+    style: CruscottoSezioneStyle
+    fields: CruscottoFieldConfig[]
+}
+
 export type CruscottoStepConfig = {
     chiave: CruscottoStepKey
     abilitato: boolean
     descrizione: string
     gruppiIds: number[]
-    sezioni?: unknown[]
+    sezioni: CruscottoSezioneConfig[]
 }
 
 export function makeDefaultCruscotto(): CruscottoStepConfig[] {
     return [
-        { chiave: "STEP_RUOLO", abilitato: true, descrizione: "", gruppiIds: [] },
-        { chiave: "STEP_DATI", abilitato: true, descrizione: "", gruppiIds: [] },
-        { chiave: "STEP_METADATI", abilitato: true, descrizione: "", gruppiIds: [] }
+        { chiave: "STEP_RUOLO", abilitato: true, descrizione: "", gruppiIds: [], sezioni: [] },
+        { chiave: "STEP_DATI", abilitato: true, descrizione: "", gruppiIds: [], sezioni: [] },
+        { chiave: "STEP_METADATI", abilitato: true, descrizione: "", gruppiIds: [], sezioni: [] }
     ]
 }
 

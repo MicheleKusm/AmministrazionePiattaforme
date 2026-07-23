@@ -152,7 +152,56 @@ export class Constants {
         STEP_NON_DISPONIBILE: "Configurazione non ancora disponibile per questo step (bozza: al momento e gestito solo STEP_RUOLO).",
         NON_ABILITATA_TITOLO: "Piattaforma non abilitata al cruscotto",
         NON_ABILITATA_MSG:
-            "Questa piattaforma non è abilitata per il cruscotto dinamico. Per abilitarla, torna allo step Piattaforma e attiva l'opzione «Richiedibile da cruscotto»."
+            "Questa piattaforma non è abilitata per il cruscotto dinamico. Per abilitarla, torna allo step Piattaforma e attiva l'opzione «Richiedibile da cruscotto».",
+        COMPONI_SEZIONE: "Componi la sezione",
+        SEZIONE_SINGOLO: "sezione",
+        SEZIONE_PLURALE: "sezioni",
+        AGGIUNGI_SEZIONE: "+ Aggiungi Sezione",
+        NUOVA_SEZIONE_TITOLO: "Nuova sezione",
+        NESSUN_GRUPPO: "Nessun gruppo",
+        GRUPPI_LABEL: "gruppi",
+        CAMPO_LABEL_SINGOLO: "campo",
+        CAMPO_LABEL_PLURALE: "campi",
+        SEZIONE_GRUPPI_TITOLO: "Associa Gruppi di Appartenenza a questa Sezione",
+        SEZIONE_GRUPPI_HINT: "Seleziona quali gruppi avranno visibilità su questa sezione.",
+        SEZIONE_GRUPPI_VUOTI: "Nessun gruppo configurato.",
+        SEZIONE_HEADER_LABEL: "Titolo Sezione (Header)",
+        SEZIONE_HEADER_PH: "Es. Nuova sezione",
+        SEZIONE_SUBHEADER_LABEL: "Sottotitolo (Subheader)",
+        SEZIONE_SUBHEADER_PH: "Descrivi lo scopo della sezione",
+        SEZIONE_LAYOUT_LABEL: "Layout Sezione",
+        SEZIONE_BORDO: "Bordo Esterno Sezione",
+        SEZIONE_DIVISORI: "Divisori tra i Campi",
+        SEZIONE_CAMPI_TITOLO: "Campi definiti in questa sezione",
+        AGGIUNGI_CAMPO: "+ Aggiungi Campo",
+        CAMPI_VUOTI: "Nessun campo aggiunto alla sezione.",
+        CAMPO_TITOLO: "Aggiungi Nuovo Campo",
+        CAMPO_TIPOLOGIA: "Seleziona Campo da Tipologia",
+        CAMPO_TIPOLOGIA_PH: "Seleziona un campo",
+        CAMPO_ORDINE: "Ordine (Posizione)",
+        CAMPO_LABEL: "Etichetta (Label)",
+        CAMPO_LABEL_PH: "Es. Ente",
+        CAMPO_LABEL_RIEPILOGO: "Etichetta Riepilogo",
+        CAMPO_DESCRIZIONE: "Descrizione",
+        CAMPO_SALVA: "Salva Campo",
+        CAMPO_ANNULLA: "Annulla",
+        LAYOUT_OPTIONS: [
+            { value: "list", label: "Lista (Campi allineati in colonna)" },
+            { value: "grid", label: "Griglia (Campi affiancati)" }
+        ],
+        TIPOLOGIE_CAMPO: [
+            { name: "STEP_ENTE_IPA", inputType: "component", apiSource: "" },
+            { name: "STEP_AZIENDA", inputType: "component", apiSource: "" },
+            { name: "STEP_ENTE_RTS", inputType: "component", apiSource: "" },
+            { name: "STEP_UO", inputType: "component", apiSource: "" },
+            { name: "PROFILO_MAPPING_FLAG_ABILITAZIONE_STOCK", inputType: "toggle", apiSource: "" },
+            { name: "PROFILO_MAPPING_IMPORTO_MASSIMALE_CERTIFICABILE", inputType: "numeric", apiSource: "" },
+            { name: "PROFILO_MAPPING_ISTAT_REGIONE", inputType: "select", apiSource: "cruscotto/regioni" },
+            { name: "PROFILO_MAPPING_ISTAT_PROVINCIA", inputType: "select", apiSource: "cruscotto/province" },
+            { name: "PROFILO_MAPPING_SERVIZI_READER", inputType: "multi_select", apiSource: "cruscotto/piattaforme" },
+            { name: "PROFILO_MAPPING_SERVIZI_ADMIN", inputType: "multi_select", apiSource: "cruscotto/piattaforme" },
+            { name: "PROFILO_MAPPING_FUNZIONALITA", inputType: "multi_select", apiSource: "cruscotto/funzionalita" }
+        ]
     } as const
 
     static readonly api = {

@@ -1,7 +1,6 @@
 package it.sogei.acrgs.platformms.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,19 +15,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SectionDTO implements Serializable {
+public class FieldDTO implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 4410021882345600002L;
+    private static final long serialVersionUID = 4410021882345600003L;
 
-    private String header;
-
-    private String subheader;
-
-    @JsonProperty("role_groups")
-    private List<Long> roleGroups;
-
-    private StyleDTO style;
-
-    private List<FieldDTO> fields;
+    private Integer order;
+    private String name;
+    private String inputType;
+    private String label;
+    private String labelRiepilogo;
+    private String description;
+    private String apiSource;
+    private List<FieldDTO> children;
 }
