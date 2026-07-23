@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery } from "../api/gruppiApi"
 import { useValidatePiattaformaInitMutation } from "../api/piattaformeApi"
@@ -15,6 +15,7 @@ import { RuoliStep } from "../components/wizard/RuoliStep"
 import { Stepper } from "../components/wizard/Stepper"
 import { type Gruppo, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
 import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
+import { setGruppi as setMainGruppi } from "../store/gruppiSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import {
     addGruppo,
@@ -52,11 +53,23 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
-    const gruppi = useAppSelector((state) => state.riepilogo.gruppi)
+    const allGruppi = useAppSelector((state) => state.gruppi.items) // main store
+    const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi) // wizard store
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma?.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
     const { data: dependenciesData, isLoading: depsLoading } = useGetGruppoDependenciesQuery(gruppoToDelete?.id ?? skipToken)
+
+    const mergedGruppi = useMemo(() => {
+        const all = [...allGruppi]
+        for (const t of editedGruppi) {
+            const idx = all.findIndex((g) => g.id === t.id)
+            if (idx >= 0)
+                all[idx] = t
+            else all.push(t)
+        }
+        return all
+    }, [allGruppi, editedGruppi])
 
     useEffect(() => {
         if (initialPiattaforma) {
@@ -74,7 +87,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
     useEffect(() => {
         if (gruppiData && !gruppiLoaded.current) {
-            dispatch(setGruppi(gruppiData))
+            dispatch(setMainGruppi(gruppiData))
             gruppiLoaded.current = true
         }
     }, [gruppiData, dispatch])
@@ -139,7 +152,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 const newPlatform = { ...piattaforma!, id: tempId }
                 dispatch(addPiattaforma(newPlatform))
             }
-
             dispatch(resetRiepilogo())
             onDone()
         } catch (error) {
@@ -161,14 +173,36 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         }
     }
     const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
-    const handleUpdateGruppo = (gruppo: Gruppo) => dispatch(updateGruppo(gruppo))
+    const handleUpdateGruppo = (gruppo: Gruppo) => {
+        const isEdited = editedGruppi.some((g) => g.id === gruppo.id)
+        if (!isEdited && gruppo.id && gruppo.id > 0) {
+            const original = allGruppi.find((g) => g.id === gruppo.id)
+            if (original) {
+                dispatch(addGruppo({ ...original, ...gruppo }))
+            } else {
+                dispatch(addGruppo(gruppo))
+            }
+        } else {
+            dispatch(updateGruppo(gruppo))
+        }
+    }
     const handleDeleteGruppo = (gruppo: Gruppo) => {
         setGruppoToDelete(gruppo)
         setDeleteGruppoModalOpen(true)
     }
     const confirmDeleteGruppo = () => {
         if (gruppoToDelete) {
-            dispatch(removeGruppo(gruppoToDelete))
+            const isEdited = editedGruppi.some((g) => g.id === gruppoToDelete.id)
+            if (!isEdited && gruppoToDelete.id && gruppoToDelete.id > 0) {
+                const original = allGruppi.find((g) => g.id === gruppoToDelete.id)
+                if (original) {
+                    dispatch(addGruppo({ ...original, daEliminare: true }))
+                } else {
+                    dispatch(addGruppo({ ...gruppoToDelete, daEliminare: true }))
+                }
+            } else {
+                dispatch(removeGruppo(gruppoToDelete))
+            }
             setGruppoToDelete(null)
             setDeleteGruppoModalOpen(false)
         }
@@ -212,7 +246,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
             {step === 5 && (
                 <GruppiStep
-                    gruppi={gruppi}
+                    gruppi={mergedGruppi}
                     onAdd={() => {
                         const tempId = gruppiTempIdCounter.current--
                         setGroupDraft({
@@ -231,7 +265,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
             {step === 7 && (
                 <RiepilogoStep
-                    gruppi={gruppi}
+                    gruppi={editedGruppi}
                     piattaforma={piattaforma ?? initialPiattaforma}
                     ruoli={ruoli}
                     tipoAbilitazione={tipoAbilitazione}
@@ -284,7 +318,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     group={groupDraft}
                     onClose={() => setGroupDraft(null)}
                     onSave={(group) => {
-                        const exists = gruppi.some((g) => g.id === group.id)
+                        const exists = mergedGruppi.some((g) => g.id === group.id)
                         if (exists) {
                             handleUpdateGruppo(group)
                         } else {
