@@ -128,25 +128,16 @@ public class GruppoAppartenenzaService {
      * Estrae i ruoli associati al gruppo e alle piattaforme che li utilizzano
      */
     private List<GruppoDependenciesDTO.Dependency> extractRuoliDependencies(Long gruppoId) {
-        List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
-        List<Ruolo> ruoli = ruoloRepository.findByGruppoAppartenenzaId(gruppoId);
-
-        for (Ruolo ruolo : ruoli) {
-            String piattaformaNome = piattaformaRepository.findById(ruolo.getIdPiattaforma())
-                    .map(Piattaforma::getNome)
-                    .orElse(NA);
-            deps.add(GruppoDependenciesDTO.Dependency.builder()
-                    .type(Constants.RUOLO)
-                    .name(ruolo.getNome() + " (" + piattaformaNome + ")")
-                    .id(ruolo.getId())
-                    .build());
-        }
-        return deps;
+        return this.gruppoRepository.extractDependencies(gruppoId)
+                .stream()
+                .map(el -> new GruppoDependenciesDTO.Dependency(el.getType(), el.getName(), el.getId().longValue()))
+                .toList();
     }
 
     /**
      * estrae tutti i role_groups dal config_json di una piattaforma in maniera ricorsiva
      */
+    // TODO rimpiazzare con metodo che utilizza oggetto che rispecchia json e utilizzare ObjectMapper readValue()
     private List<Long> extractRoleGroups(JsonNode node) {
         List<Long> result = new ArrayList<>();
         if (node.isArray()) {
