@@ -30,7 +30,6 @@ public class Constants {
     public static final String VALIDAZIONE_INIZIALE_PIATTAFORMA = "/validazioneInitPiattaforma";
     public static final List<String> ICONE = List.of("business_center", "description", "files", "mail", "summarize");
     //regex
-    public static final String REGEX_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-    public static final String REGEX_PLACEHOLDER1 = "^[a-zA-Z0-9_ ]+$";
-    public static final String REGEX_PLACEHOLDER2 = "^[a-zA-Z0-9_ ]+[a-zA-Z0-9_ ]+$";
+    public static final String REGEX_NOMI = "^[a-zA-Z0-9_ ,.#]+$";
+    public static final String REGEX_DESCRIZIONI = "^[^<>&]+$";
 }

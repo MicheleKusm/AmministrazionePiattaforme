@@ -106,6 +106,14 @@ export type GroupModalProps = {
     onClose: () => void
 }
 
+// dto persistenza
+export type PersistenceObject = {
+    piattaforma: Piattaforma
+    ruoli: Ruolo[]
+    gruppiAppartenenza: Gruppo[]
+    abilitazioni: Abilitazione[]
+}
+
 // wizard
 export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const
 

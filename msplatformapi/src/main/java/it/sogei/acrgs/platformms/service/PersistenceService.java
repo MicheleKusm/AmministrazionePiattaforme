@@ -25,6 +25,14 @@ public class PersistenceService {
     public List<String> persist (PersistenceObjectDTO persistenceObjectDTO) {
         List<String> errors = new ArrayList<>();
         new Validation().validazionePersistenceObject(persistenceObjectDTO, errors);
+        if (!errors.isEmpty()) {
+            log.debug("Errore nella validazione dei dati: {}", errors);
+            return errors;
+        }
+        validateDbConstraints(persistenceObjectDTO, errors);
+        if (!errors.isEmpty()) {
+            log.debug("Errore nella validazione dati a DB: {}", errors);
+        }
 
         return errors;
     }

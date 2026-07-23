@@ -3,6 +3,7 @@ import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery } from "../api/gruppiApi"
 import { useValidatePiattaformaInitMutation } from "../api/piattaformeApi"
 import { useGetRuoliQuery } from "../api/ruoliApi"
+import { usePersistMutation } from "../api/persistenceApi"
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
 import { GroupModal } from "../components/modals/GroupModal"
@@ -13,7 +14,7 @@ import { PiattaformaStep } from "../components/wizard/PiattaformaStep"
 import { RiepilogoStep } from "../components/wizard/RiepilogoStep"
 import { RuoliStep } from "../components/wizard/RuoliStep"
 import { Stepper } from "../components/wizard/Stepper"
-import { type Gruppo, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
+import { type Gruppo, PersistenceObject, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
 import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
 import { setGruppi as setMainGruppi } from "../store/gruppiSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
@@ -35,7 +36,7 @@ import * as yup from "yup"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
     const dispatch = useAppDispatch()
-
+    const [persist, { isLoading: isPersisting }] = usePersistMutation()
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
     const [validatePiattaforma, { isLoading: isValidating }] = useValidatePiattaformaInitMutation()
     const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
@@ -143,19 +144,25 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         }
         setStep((s) => Math.min(7, s + 1))
     }
+
     async function saveFinalConfiguration() {
         try {
-            if (piattaforma?.id) {
-                dispatch(updatePiattaforma(piattaforma))
-            } else {
-                const tempId = Math.floor(Math.random() * -1000) - 1
-                const newPlatform = { ...piattaforma!, id: tempId }
-                dispatch(addPiattaforma(newPlatform))
+            const payload: PersistenceObject = {
+                piattaforma: piattaforma!,
+                ruoli: ruoli,
+                gruppiAppartenenza: editedGruppi,
+                abilitazioni: []
             }
+            await persist(payload).unwrap()
             dispatch(resetRiepilogo())
             onDone()
-        } catch (error) {
-            console.error("Salvataggio fallito: ", error)
+        } catch (err: any) {
+            console.error("Salvataggio fallito: ", err)
+            if (err?.data && Array.isArray(err.data)) {
+                setPiattaformaErrors({ _general: err.data.join(", ") })
+            } else {
+                setPiattaformaErrors({ _general: "Errore durante il salvataggio." })
+            }
         }
     }
 

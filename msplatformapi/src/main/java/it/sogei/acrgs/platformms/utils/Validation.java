@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-import static it.sogei.acrgs.platformms.utils.Constants.REGEX_PLACEHOLDER1;
-import static it.sogei.acrgs.platformms.utils.Constants.REGEX_PLACEHOLDER2;
+import static it.sogei.acrgs.platformms.utils.Constants.REGEX_NOMI;
+import static it.sogei.acrgs.platformms.utils.Constants.REGEX_DESCRIZIONI;
 
 // mettere validazioni qui, richiamare con new validation().nomeMetodo()
 @Slf4j
@@ -39,7 +39,7 @@ public class Validation {
     }
 
     public void validazionePersistenceObject (PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
-        log.debug("validazionePersistenceObject, INIZIO");
+        log.debug("validazionePersistenceObject, INIZIO, persistenceObjectDTO: {}", persistenceObjectDTO);
         if (null == persistenceObjectDTO) {
             log.error("Errore nella ricezione dei dati, persistenceDTO nullo");
             errors.add("Errore nella ricezione dei dati, persistenceDTO nullo");
@@ -71,7 +71,7 @@ public class Validation {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
             }
-            if (!skipName && dto.getNome().matches(REGEX_PLACEHOLDER1)) {
+            if (!skipName && !dto.getNome().matches(REGEX_NOMI)) {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma non valido");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma non valido");
             }
@@ -84,7 +84,7 @@ public class Validation {
                 log.error("Errore nella validazione della piattaforma, descrizione piattaforma troppo lunga");
                 errors.add("Errore nella validazione della piattaforma, descrizione piattaforma troppo lunga");
             }
-            if (!skipDescription && dto.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+            if (!skipDescription && !dto.getDescrizione().matches(REGEX_DESCRIZIONI)) {
                 log.error("Errore nella validazione della piattaforma, descrizione piattaforma non valida");
                 errors.add("Errore nella validazione della piattaforma, descrizione piattaforma non valida");
             }
@@ -97,7 +97,7 @@ public class Validation {
                 log.error("Errore nella validazione della piattaforma, objClass piattaforma troppo lungo");
                 errors.add("Errore nella validazione della piattaforma, objClass piattaforma troppo lungo");
             }
-            if (!skipObjClass && dto.getObjClass().matches(REGEX_PLACEHOLDER1)) {
+            if (!skipObjClass && !dto.getObjClass().matches(REGEX_NOMI)) {
                 log.error("Errore nella validazione della piattaforma, objClass piattaforma non valido");
                 errors.add("Errore nella validazione della piattaforma, objClass piattaforma non valido");
             }
@@ -131,7 +131,7 @@ public class Validation {
                     log.error("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                 }
-                if (skipName && ruolo.getNome().matches(REGEX_PLACEHOLDER1)) {
+                if (skipName && !ruolo.getNome().matches(REGEX_NOMI)) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo non valido");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo non valido");
                 }
@@ -144,7 +144,7 @@ public class Validation {
                     log.error("Errore nella validazione dei ruoli, descrizione ruolo troppo lunga");
                     errors.add("Errore nella validazione dei ruoli, descrizione ruolo troppo lunga");
                 }
-                if (!skipDescription && ruolo.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+                if (!skipDescription && !ruolo.getDescrizione().matches(REGEX_DESCRIZIONI)) {
                     log.error("Errore nella validazione dei ruoli, descrizione ruolo non valida");
                     errors.add("Errore nella validazione dei ruoli, descrizione ruolo non valida");
                 }
@@ -181,7 +181,7 @@ public class Validation {
                     errors.add("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza troppo lungo");
                     log.error("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza troppo lungo");
                 }
-                if (!skipName && gruppo.getNome().matches(REGEX_PLACEHOLDER1)) {
+                if (!skipName && !gruppo.getNome().matches(REGEX_NOMI)) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza non valido");
                     log.error("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza non valido");
                 }
@@ -194,7 +194,7 @@ public class Validation {
                     errors.add("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza troppo lunga");
                     log.error("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza troppo lunga");
                 }
-                if (!skipDescription && gruppo.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+                if (!skipDescription && !gruppo.getDescrizione().matches(REGEX_DESCRIZIONI)) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza non valida");
                     log.error("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza non valida");
                 }
