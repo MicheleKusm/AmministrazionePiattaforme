@@ -53,48 +53,50 @@ public class Validation {
     private void validazionePiattaforma (PiattaformaDTO dto, List<String> errors) {
         try {
             Integer initialSize = errors.size();
-            boolean skip = false;
+            boolean skipName = false;
+            boolean skipDescription = false;
+            boolean skipObjClass = false;
             if (null == dto) {
                 log.error("Errore nella ricezione dei dati, piattaforma nulla");
                 errors.add("Errore nella ricezione dei dati, piattaforma nulla");
-                skip = true;
+                return;
             }
-            if (!skip && null == dto.getNome() || dto.getNome().isBlank()) {
+            if (null == dto.getNome() || dto.getNome().isBlank()) {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma nullo");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma nullo");
-                skip = true;
+                skipName = true;
             }
-            if (!skip && dto.getNome().length() > 255) {
+            if (!skipName && dto.getNome().length() > 255) {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma troppo lungo");
             }
-            if (!skip && dto.getNome().matches(REGEX_PLACEHOLDER1)) {
+            if (! skipName && dto.getNome().matches(REGEX_PLACEHOLDER1)) {
                 log.error("Errore nella validazione della piattaforma, nome piattaforma non valido");
                 errors.add("Errore nella validazione della piattaforma, nome piattaforma non valido");
             }
-            if (!skip && null == dto.getDescrizione() || dto.getDescrizione().isBlank()) {
+            if (null == dto.getDescrizione() || dto.getDescrizione().isBlank()) {
                 log.error("Errore nella validazione della piattaforma, descrizione piattaforma nullo");
                 errors.add("Errore nella validazione della piattaforma, descrizione piattaforma nullo");
-                skip = true;
+                skipDescription = true;
             }
-            if (!skip && dto.getDescrizione().length() > 255) {
+            if (!skipDescription && dto.getDescrizione().length() > 255) {
                 log.error("Errore nella validazione della piattaforma, descrizione piattaforma troppo lunga");
                 errors.add("Errore nella validazione della piattaforma, descrizione piattaforma troppo lunga");
             }
-            if (!skip && dto.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+            if (!skipDescription && dto.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
                 log.error("Errore nella validazione della piattaforma, descrizione piattaforma non valida");
                 errors.add("Errore nella validazione della piattaforma, descrizione piattaforma non valida");
             }
-            if (!skip && null == dto.getObjClass() || dto.getObjClass().isBlank()) {
+            if (null == dto.getObjClass() || dto.getObjClass().isBlank()) {
                 log.error("Errore nella validazione della piattaforma, objClass piattaforma nullo");
                 errors.add("Errore nella validazione della piattaforma, objClass piattaforma nullo");
-                skip = true;
+                skipObjClass = true;
             }
-            if (!skip && dto.getObjClass().length() > 255) {
+            if (!skipObjClass && dto.getObjClass().length() > 255) {
                 log.error("Errore nella validazione della piattaforma, objClass piattaforma troppo lungo");
                 errors.add("Errore nella validazione della piattaforma, objClass piattaforma troppo lungo");
             }
-            if (!skip && dto.getObjClass().matches(REGEX_PLACEHOLDER1)) {
+            if (!skipObjClass && dto.getObjClass().matches(REGEX_PLACEHOLDER1)) {
                 log.error("Errore nella validazione della piattaforma, objClass piattaforma non valido");
                 errors.add("Errore nella validazione della piattaforma, objClass piattaforma non valido");
             }
@@ -112,26 +114,41 @@ public class Validation {
     private void validazioneRuoli (List<RuoloDTO> ruoli, List<String> errors) {
         try {
             Integer initialSize = errors.size();
-            boolean skip = false;
+            boolean skipName = false;
+            boolean skipDescription = false;
             if (null == ruoli || ruoli.isEmpty()) {
                 log.debug("Nessun ruolo presente, validazione non necessaria");
                 return;
             }
             for (RuoloDTO ruolo : ruoli) {
-                if (!skip && null == ruolo.getNome() || ruolo.getNome().isBlank()) {
+                if (null == ruolo.getNome() || ruolo.getNome().isBlank()) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo nullo");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo nullo");
-                    skip = true;
+                    skipName = true;
                 }
-                if (!skip && ruolo.getNome().length() > 255) {
+                if (skipName && ruolo.getNome().length() > 255) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                 }
-                if (!skip && ruolo.getNome().matches(REGEX_PLACEHOLDER1)) {
+                if (skipName && ruolo.getNome().matches(REGEX_PLACEHOLDER1)) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo non valido");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo non valido");
                 }
-                skip = false;
+                if (null == ruolo.getDescrizione() || ruolo.getDescrizione().isBlank()) {
+                    log.error("Errore nella validazione dei ruoli, descrizione ruolo nullo");
+                    errors.add("Errore nella validazione dei ruoli, descrizione ruolo nullo");
+                    skipDescription = true;
+                }
+                if (!skipDescription && ruolo.getDescrizione().length() > 255) {
+                    log.error("Errore nella validazione dei ruoli, descrizione ruolo troppo lunga");
+                    errors.add("Errore nella validazione dei ruoli, descrizione ruolo troppo lunga");
+                }
+                if (!skipDescription && ruolo.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+                    log.error("Errore nella validazione dei ruoli, descrizione ruolo non valida");
+                    errors.add("Errore nella validazione dei ruoli, descrizione ruolo non valida");
+                }
+                skipName = false;
+                skipDescription = false;
             }
             if (errors.size() > initialSize) {
                 log.error("Errore nella validazione dei ruoli: {}", errors);
@@ -147,7 +164,8 @@ public class Validation {
     private void validazioneGruppoAppartenenza (List<GruppoAppartenenzaDTO> gruppi, List<String> errors) {
         try {
             Integer initialSize = errors.size();
-            boolean skip = false;
+            boolean skipName = false;
+            boolean skipDescription = false;
             if (null == gruppi || gruppi.isEmpty()) {
                 log.debug("Nessun gruppoAppartenenza presente, validazione non necessaria");
                 return;
@@ -156,30 +174,31 @@ public class Validation {
                 if (null == gruppo.getNome() || gruppo.getNome().isBlank()) {
                     log.error("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza nullo");
                     errors.add("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza nullo");
-                    skip = true;
+                    skipName = true;
                 }
-                if (!skip && gruppo.getNome().length() > 255) {
+                if (!skipName && gruppo.getNome().length() > 255) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza troppo lungo");
                     log.error("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza troppo lungo");
                 }
-                if (!skip && gruppo.getNome().matches(REGEX_PLACEHOLDER1)) {
+                if (!skipName && gruppo.getNome().matches(REGEX_PLACEHOLDER1)) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza non valido");
                     log.error("Errore nella validazione del gruppoAppartenenza, nome gruppoAppartenenza non valido");
                 }
-                if (!skip && null == gruppo.getDescrizione() || gruppo.getDescrizione().isBlank()) {
+                if (null == gruppo.getDescrizione() || gruppo.getDescrizione().isBlank()) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza nullo");
                     log.error("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza nullo");
-                    skip = true;
+                    skipDescription = true;
                 }
-                if (!skip && gruppo.getDescrizione().length() > 255) {
+                if (!skipDescription && gruppo.getDescrizione().length() > 255) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza troppo lunga");
                     log.error("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza troppo lunga");
                 }
-                if (!skip && gruppo.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
+                if (!skipDescription && gruppo.getDescrizione().matches(REGEX_PLACEHOLDER2)) {
                     errors.add("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza non valida");
                     log.error("Errore nella validazione del gruppoAppartenenza, descrizione gruppoAppartenenza non valida");
                 }
-                skip = false;
+                skipName = false;
+                skipDescription = false;
             }
             if (errors.size() > initialSize) {
                 log.error("Errore nella validazione del gruppoAppartenenza: {}", errors);
@@ -195,13 +214,15 @@ public class Validation {
     private void validazioneAbilitazioni (List<AbilitazioneDTO> abilitazioni, List<String> errors) {
         try {
             Integer initialSize = errors.size();
-            boolean skip = false;
+            boolean skipNome = false; //ecc
             if (null == abilitazioni || abilitazioni.isEmpty()) {
                 log.debug("Nessuna abilitazione presente, validazione non necessaria");
                 return;
             }
             for (AbilitazioneDTO abilitazione : abilitazioni) {
                 //TODO
+
+                // reset skip a ogni ciclo
             }
         } catch (Exception exception) {
             log.error("Errore nella validazione delle abilitazioni: {}", exception.getMessage());
