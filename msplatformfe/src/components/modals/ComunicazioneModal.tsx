@@ -1,46 +1,53 @@
-import { useState } from "react";
-import type { ComunicazioneOnboarding } from "../../types/type";
-import { Modal } from "../common/Modal";
-import { Button } from "../common/Button";
-import { IconaComunicazioneGlyph } from "../common/IconaComunicazione";
-import { useGetIconeQuery } from "../../api/abilitazioniApi";
-import { Constants } from "../../utils/Constants";
+import { useState } from "react"
+import type { ComunicazioneOnboarding } from "../../types/type"
+import { Modal } from "../common/Modal"
+import { Button } from "../common/Button"
+import { IconaComunicazioneGlyph } from "../common/IconaComunicazione"
+import { useGetIconeQuery } from "../../api/abilitazioniApi"
+import { Constants } from "../../utils/Constants"
 
 type ComunicazioneModalProps = {
-    comunicazione: ComunicazioneOnboarding;
-    onSave: (comunicazione: ComunicazioneOnboarding) => void;
-    onClose: () => void;
-};
+    comunicazione: ComunicazioneOnboarding
+    onSave: (comunicazione: ComunicazioneOnboarding) => void
+    onClose: () => void
+}
 
-const LABEL_CLS = "mb-2 block text-sm font-semibold text-gray-800";
-const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none";
+const LABEL_CLS = "mb-2 block text-sm font-semibold text-gray-800"
+const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
 
 export function ComunicazioneModal({ comunicazione, onSave, onClose }: ComunicazioneModalProps) {
-    const [draft, setDraft] = useState<ComunicazioneOnboarding>(comunicazione);
-    const [iconeOpen, setIconeOpen] = useState(false);
+    const [draft, setDraft] = useState<ComunicazioneOnboarding>(comunicazione)
+    const [iconeOpen, setIconeOpen] = useState(false)
 
-    const { data: icone = [] } = useGetIconeQuery();
+    const { data: icone = [] } = useGetIconeQuery()
 
-    const valido = draft.descrizione.trim() !== "" && draft.icona.trim() !== "";
+    const valido = draft.testo.trim() !== "" && draft.icona.trim() !== ""
 
     const footer = (
         <>
-            <Button variant="secondary" onClick={onClose}>
+            <Button
+                variant="secondary"
+                onClick={onClose}>
                 {Constants.comunicazioneModal.ANNULLA}
             </Button>
-            <Button onClick={() => onSave(draft)} disabled={!valido}>
+            <Button
+                onClick={() => onSave(draft)}
+                disabled={!valido}>
                 {Constants.comunicazioneModal.SALVA}
             </Button>
         </>
-    );
+    )
 
     function selezionaIcona(nome: string) {
-        setDraft({ ...draft, icona: nome });
-        setIconeOpen(false);
+        setDraft({ ...draft, icona: nome })
+        setIconeOpen(false)
     }
 
     return (
-        <Modal title={Constants.comunicazioneModal.TITOLO} onClose={onClose} footer={footer}>
+        <Modal
+            title={Constants.comunicazioneModal.TITOLO}
+            onClose={onClose}
+            footer={footer}>
             <div className="space-y-4">
                 <div>
                     <label className={LABEL_CLS}>
@@ -59,7 +66,13 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                             ) : (
                                 <span className="text-gray-400">{Constants.comunicazioneModal.ICONA}</span>
                             )}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2">
                                 <path d="m6 9 6 6 6-6" />
                             </svg>
                         </button>
@@ -74,7 +87,7 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                                 />
                                 <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg">
                                     {icone.map((nome) => {
-                                        const attivo = draft.icona === nome;
+                                        const attivo = draft.icona === nome
                                         return (
                                             <li key={nome}>
                                                 <button
@@ -87,7 +100,7 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                                                     {nome}
                                                 </button>
                                             </li>
-                                        );
+                                        )
                                     })}
                                 </ul>
                             </>
@@ -103,12 +116,12 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                         className={INPUT_CLS}
                         rows={3}
                         placeholder={Constants.comunicazioneModal.DESCRIZIONE_PH}
-                        value={draft.descrizione}
-                        onChange={(e) => setDraft({ ...draft, descrizione: e.target.value })}
+                        value={draft.testo}
+                        onChange={(e) => setDraft({ ...draft, testo: e.target.value })}
                     />
                     <p className="mt-1 text-xs text-gray-500">{Constants.comunicazioneModal.HINT}</p>
                 </div>
             </div>
         </Modal>
-    );
+    )
 }

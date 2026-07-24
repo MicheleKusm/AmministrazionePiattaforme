@@ -1,8 +1,8 @@
-import type { Column, ComunicazioneOnboarding, ComunicazioniTableProps } from "../../types/type";
-import { TableCommon } from "../common/TableCommon";
-import { IconActions, RequiredMark } from "./RowActions";
-import { IconaComunicazioneGlyph } from "../common/IconaComunicazione";
-import { Constants } from "../../utils/Constants";
+import type { Column, ComunicazioneOnboarding, ComunicazioniTableProps } from "../../types/type"
+import { TableCommon } from "../common/TableCommon"
+import { IconActions, RequiredMark } from "./RowActions"
+import { IconaComunicazioneGlyph } from "../common/IconaComunicazione"
+import { Constants } from "../../utils/Constants"
 
 export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: ComunicazioniTableProps) {
     const columns: Column<ComunicazioneOnboarding>[] = [
@@ -12,7 +12,7 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
         },
         {
             header: Constants.abilitazioneTable.TITOLO,
-            render: (c) => <span className="text-gray-800">{c.descrizione}</span>
+            render: (c) => <span className="text-gray-800">{c.testo}</span>
         },
         {
             header: Constants.comunicazioneModal.ICONA_LABEL,
@@ -29,9 +29,14 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
         },
         {
             header: Constants.abilitazioneTable.AZIONI,
-            render: (c) => <IconActions onEdit={() => onEdit(c)} onDelete={() => onDelete(c)} />
+            render: (c) => (
+                <IconActions
+                    onEdit={() => onEdit(c)}
+                    onDelete={() => onDelete(c)}
+                />
+            )
         }
-    ];
+    ]
 
     return (
         <TableCommon
@@ -40,5 +45,5 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
             keyExtractor={(c: ComunicazioneOnboarding) => c.id}
             emptyMessage={<p className="py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUNA_COMUNICAZIONE}</p>}
         />
-    );
+    )
 }

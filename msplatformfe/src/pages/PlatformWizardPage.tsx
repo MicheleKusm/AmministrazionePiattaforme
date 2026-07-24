@@ -31,6 +31,7 @@ import {
     updateRuolo
 } from "../store/riepilogoSlice"
 import { piattaformaSchema } from "../utils/schema"
+import { abilitazioneToDto } from "../utils/abilitazioneMapper"
 import * as yup from "yup"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
@@ -59,6 +60,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
     const allGruppi = useAppSelector((state) => state.gruppi.items) // main store
     const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi) // wizard store
+    const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma?.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
@@ -161,7 +163,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 piattaforma: piattaforma!,
                 ruoli: ruoli,
                 gruppiAppartenenza: editedGruppi,
-                abilitazioni: []
+                abilitazioni: abilitazioni.map(abilitazioneToDto)
             }
             const result = await persist(payload).unwrap()
             if (Array.isArray(result) && result.length > 0) {

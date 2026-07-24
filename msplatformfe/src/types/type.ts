@@ -111,18 +111,48 @@ export type PersistenceObject = {
     piattaforma: Piattaforma
     ruoli: Ruolo[]
     gruppiAppartenenza: Gruppo[]
-    abilitazioni: Abilitazione[]
+    abilitazioni: AbilitazioneDto[]
+}
+
+// dto abilitazione lato persistenza (nomi campi allineati al backend AbilitazioneDTO)
+export type CampoTicketDto = {
+    id: number
+    label: string
+    descrizione: string
+    key: string
+    inputType: string
+    required: boolean
+    regex: string
+}
+
+export type ComunicazioneOnboardingDto = {
+    id: number
+    icona: string
+    testo: string
+    obbligatoria: boolean
+}
+
+export type AbilitazioneDto = {
+    id: number
+    idPiattaforma?: number
+    nome: string
+    tipo: TipoAbilitazione
+    riferimento: string
+    stato: StatoAbilitazione
+    processKey: string
+    codiceScim: string
+    processoVerticale: string
+    daEliminare: boolean
+    campi: CampoTicketDto[]
+    comunicazioni: ComunicazioneOnboardingDto[]
 }
 
 // wizard
 export const WIZARD_STEPS = ["Elenco", "Piattaforma", "Ruoli", "Abilitazione", "Gruppi", "Cruscotto", "Riepilogo"] as const
 
-//  Abilitazione associata
 export type TipoAbilitazione = "TICKET" | "VERTICALE"
 
 export type StatoAbilitazione = "Attiva" | "Disattiva"
-
-export type CanaleComunicazione = "Email" | "SMS" | "In-app" | "Push" | "Webhook" | "WhatsApp"
 
 export type TipologicaCampoDinamico = {
     tipoDati: string
@@ -144,7 +174,7 @@ export type CampoTicket = {
 export type ComunicazioneOnboarding = {
     id: number
     icona: string
-    descrizione: string
+    testo: string
     obbligatoria: boolean
 }
 
@@ -194,7 +224,7 @@ export const emptyCampoTicket: CampoTicket = {
 export const emptyComunicazione: ComunicazioneOnboarding = {
     id: 0,
     icona: "",
-    descrizione: "",
+    testo: "",
     obbligatoria: true
 }
 
@@ -328,7 +358,7 @@ export type ModalProps = {
     children: ReactNode
     footer?: ReactNode
     headerClassName?: string
-    modalClassName?: string;
+    modalClassName?: string
 }
 
 export type ResultModalProps = {
@@ -338,4 +368,3 @@ export type ResultModalProps = {
     errors?: string[]
     genericError?: boolean
 }
-
