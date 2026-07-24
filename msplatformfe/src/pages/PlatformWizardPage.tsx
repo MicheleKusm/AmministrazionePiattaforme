@@ -7,6 +7,7 @@ import { usePersistMutation } from "../api/persistenceApi"
 import { DeleteConfirmationModal } from "../components/modals/DeleteConfirmModal"
 import { RoleModal } from "../components/modals/RoleModal"
 import { GroupModal } from "../components/modals/GroupModal"
+import { ResultModal } from "../components/modals/ResultModal"
 import { AbilitazioneStep } from "../components/wizard/AbilitazioneStep"
 import { CruscottoStep } from "../components/wizard/CruscottoStep"
 import { GruppiStep } from "../components/wizard/GruppiStep"
@@ -15,7 +16,6 @@ import { RiepilogoStep } from "../components/wizard/RiepilogoStep"
 import { RuoliStep } from "../components/wizard/RuoliStep"
 import { Stepper } from "../components/wizard/Stepper"
 import { type Gruppo, PersistenceObject, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
-import { addPiattaforma, updatePiattaforma } from "../store/piattaformeSlice"
 import { setGruppi as setMainGruppi } from "../store/gruppiSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import {
@@ -24,7 +24,6 @@ import {
     removeGruppo,
     removeRuolo,
     resetRiepilogo,
-    setGruppi,
     setPiattaforma as setRiepilogoPiattaforma,
     setRuoli,
     updateGruppo,
@@ -36,7 +35,7 @@ import * as yup from "yup"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
     const dispatch = useAppDispatch()
-    const [persist, { isLoading: isPersisting }] = usePersistMutation()
+    const [persist] = usePersistMutation()
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
     const [validatePiattaforma, { isLoading: isValidating }] = useValidatePiattaformaInitMutation()
     const [ruoloToDelete, setRuoloToDelete] = useState<Ruolo | null>(null)
@@ -51,6 +50,10 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const gruppiTempIdCounter = useRef(-1)
     const ruoliLoaded = useRef(false)
     const gruppiLoaded = useRef(false)
+    const [resultModalOpen, setResultModalOpen] = useState(false)
+    const [saveSuccess, setSaveSuccess] = useState(false)
+    const [saveErrors, setSaveErrors] = useState<string[]>([])
+    const [saveGenericError, setSaveGenericError] = useState(false)
 
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
@@ -65,12 +68,19 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         const all = [...allGruppi]
         for (const t of editedGruppi) {
             const idx = all.findIndex((g) => g.id === t.id)
-            if (idx >= 0)
-                all[idx] = t
+            if (idx >= 0) all[idx] = t
             else all.push(t)
         }
         return all
     }, [allGruppi, editedGruppi])
+
+    const handleResultModalClose = () => {
+        setResultModalOpen(false)
+        if (saveSuccess) {
+            dispatch(resetRiepilogo())
+            onDone()
+        }
+    }
 
     useEffect(() => {
         if (initialPiattaforma) {
@@ -154,15 +164,22 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 abilitazioni: []
             }
             await persist(payload).unwrap()
-            dispatch(resetRiepilogo())
-            onDone()
+            setSaveSuccess(true)
+            setSaveErrors([])
+            setSaveGenericError(false)
+            setResultModalOpen(true)
         } catch (err: any) {
             console.error("Salvataggio fallito: ", err)
-            if (err?.data && Array.isArray(err.data)) {
-                setPiattaformaErrors({ _general: err.data.join(", ") })
+            if (err?.data && Array.isArray(err.data) && err.data.length > 0) {
+                setSaveSuccess(false)
+                setSaveErrors(err.data)
+                setSaveGenericError(false)
             } else {
-                setPiattaformaErrors({ _general: "Errore durante il salvataggio." })
+                setSaveSuccess(false)
+                setSaveErrors([])
+                setSaveGenericError(true)
             }
+            setResultModalOpen(true)
         }
     }
 
@@ -346,7 +363,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 onConfirm={confirmDeleteRuolo}
                 message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
             />
-
             <DeleteConfirmationModal
                 isOpen={deleteGruppoModalOpen}
                 onClose={() => {
@@ -364,6 +380,13 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 }
                 confirmLabel={depsLoading ? "Attendi..." : "Elimina"}
                 cancelLabel="Annulla"
+            />
+            <ResultModal
+                isOpen={resultModalOpen}
+                onClose={handleResultModalClose}
+                success={saveSuccess}
+                errors={saveErrors}
+                genericError={saveGenericError}
             />
         </>
     )

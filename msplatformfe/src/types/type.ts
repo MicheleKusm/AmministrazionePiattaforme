@@ -321,3 +321,12 @@ export type PageResponse<T> = {
     totalElements: number
     totalPages: number
 }
+
+export type ResultModalProps = {
+    isOpen: boolean
+    onClose: () => void
+    success: boolean
+    errors?: string[]
+    genericError?: boolean
+}
+
