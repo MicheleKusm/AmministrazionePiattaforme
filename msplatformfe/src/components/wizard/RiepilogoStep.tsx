@@ -34,15 +34,20 @@ export function RiepilogoStep({ piattaforma, ruoli, gruppi, tipoAbilitazione }: 
                             <span className="font-bold">ObjClass:</span> {piattaforma?.objClass}
                         </p>
                         <p>
-                            <span className="font-bold">OAM Metadata:</span> {piattaforma?.oamMetadataName} / {piattaforma?.oamMetadataValue}
+                            <span className="font-bold">OAM Metadata Name:</span> {piattaforma?.oamMetadataName}
+                        </p>
+                        <p>
+                            <span className="font-bold">OAM Metadata Value:</span> {piattaforma?.oamMetadataValue}
                         </p>
                         <div className="mt-2 space-y-1">
                             {togglesToShow.map((key) => (
                                 <div
                                     key={key}
                                     className="flex items-center gap-2">
-                                    <span className="w-32 text-gray-600">{toggleLabel(key)}:</span>
-                                    <span className={piattaforma?.[key] ? "text-green-600" : "text-gray-400"}>{piattaforma?.[key] ? "Sì" : "No"}</span>
+                                    <span className="w-32 font-bold">{toggleLabel(key)}:</span>
+                                    <span className={piattaforma?.[key] ? "text-green-600" : "text-gray-400"}>
+                                        {piattaforma?.[key] ? "Sì" : "No"}
+                                    </span>
                                 </div>
                             ))}
                         </div>
