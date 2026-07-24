@@ -132,11 +132,11 @@ public class Validation {
                     errors.add("Errore nella validazione dei ruoli, nome ruolo nullo");
                     skipName = true;
                 }
-                if (skipName && ruolo.getNome().length() > 255) {
+                if (!skipName && ruolo.getNome().length() > 255) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo troppo lungo");
                 }
-                if (skipName && !ruolo.getNome().matches(REGEX_NOMI)) {
+                if (!skipName && !ruolo.getNome().matches(REGEX_NOMI)) {
                     log.error("Errore nella validazione dei ruoli, nome ruolo non valido");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo non valido");
                 }
@@ -231,6 +231,10 @@ public class Validation {
                 if (null == abilitazione) {
                     log.error("Errore nella validazione delle abilitazioni, abilitazione nulla");
                     errors.add("Errore nella validazione delle abilitazioni, abilitazione nulla");
+                    continue;
+                }
+                // abilitazione marcata per l'eliminazione: nessuna validazione di contenuto
+                if (abilitazione.isDaEliminare()) {
                     continue;
                 }
                 // tipo obbligatorio e deve essere TICKET o VERTICALE

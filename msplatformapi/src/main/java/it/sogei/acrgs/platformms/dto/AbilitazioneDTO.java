@@ -28,6 +28,7 @@ public class AbilitazioneDTO implements Serializable {
     private String codiceScim;
     private String processoVerticale;
     private Long idRuolo;
+    private boolean daEliminare;
 
     @Builder.Default
     private List<CampoTicketDTO> campi = new ArrayList<>();

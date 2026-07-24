@@ -1,9 +1,6 @@
 package it.sogei.acrgs.platformms.service;
 
-import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
-import it.sogei.acrgs.platformms.dto.PersistenceObjectDTO;
-import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
-import it.sogei.acrgs.platformms.dto.RuoloDTO;
+import it.sogei.acrgs.platformms.dto.*;
 import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
 import it.sogei.acrgs.platformms.utils.Validation;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +17,11 @@ public class PersistenceService {
     private final PiattaformaService piattaformaService;
     private final RuoloService ruoloService;
     private final GruppoAppartenenzaService gruppoService;
+    private final AbilitazioneService abilitazioneService;
     private final RuoliRefAppartenenzaRepository refRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public List<String> persist (PersistenceObjectDTO persistenceObjectDTO) {
+    public List<String> persist(PersistenceObjectDTO persistenceObjectDTO) {
         List<String> errors = new ArrayList<>();
         new Validation().validazionePersistenceObject(persistenceObjectDTO, errors);
         if (!errors.isEmpty()) {
@@ -39,6 +37,7 @@ public class PersistenceService {
             Long idPiattaforma = persistPiattaforma(persistenceObjectDTO.getPiattaforma());
             Map<Long, Long> roleIdMap = persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
             persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
+            persistAbilitazioni(persistenceObjectDTO.getAbilitazioni(), idPiattaforma, roleIdMap);
             deleteRuoli(persistenceObjectDTO.getRuoli());
             log.info("Persistenza effettuata con successo, idPiattaforma: {}.", idPiattaforma);
         } catch (Exception e) {
@@ -123,6 +122,36 @@ public class PersistenceService {
         }
     }
 
+    private void persistAbilitazioni(List<AbilitazioneDTO> abilitazioni, Long idPiattaforma, Map<Long, Long> roleIdMap) {
+        if (null == abilitazioni || abilitazioni.isEmpty()) {
+            log.debug("Nessuna abilitazione presente, persistenza non necessaria");
+            return;
+        }
+        for (AbilitazioneDTO abilitazione : abilitazioni) {
+            if (null != abilitazione.getIdRuolo() && abilitazione.getIdRuolo() < 0) {
+                Long realId = roleIdMap.get(abilitazione.getIdRuolo());
+                abilitazione.setIdRuolo(realId != null ? realId : abilitazione.getIdRuolo());
+            }
+            if (abilitazione.isDaEliminare()) {
+                if (null != abilitazione.getId() && abilitazione.getId() > 0) {
+                    abilitazioneService.delete(abilitazione.getId());
+                    log.info("Abilitazione eliminata: {}", abilitazione.getId());
+                } else {
+                    log.debug("Abilitazione nuova marcata daEliminare, nessuna azione");
+                }
+            } else if (null != abilitazione.getId() && abilitazione.getId() > 0) {
+                abilitazione.setIdPiattaforma(idPiattaforma);
+                abilitazioneService.update(abilitazione.getId(), abilitazione);
+                log.info("Abilitazione aggiornata: {}", abilitazione.getId());
+            } else {
+                abilitazione.setIdPiattaforma(idPiattaforma);
+                abilitazione.setId(null);
+                AbilitazioneDTO created = abilitazioneService.create(abilitazione);
+                log.info("Abilitazione creata con id: {}", created.getId());
+            }
+        }
+    }
+
     /**
      * elima ruoli marcati daEliminare se presenti, altrimenti non fa nulla
      **/
@@ -186,7 +215,8 @@ public class PersistenceService {
                 // gruppi check constraint nella bridge table
                 if (null != dto.getGruppiAppartenenza() && !dto.getGruppiAppartenenza().isEmpty()) {
                     for (GruppoAppartenenzaDTO gruppo : dto.getGruppiAppartenenza()) {
-                        if (gruppo.isDaEliminare() || null == gruppo.getRuoliIds() || gruppo.getRuoliIds().isEmpty()) continue;
+                        if (gruppo.isDaEliminare() || null == gruppo.getRuoliIds() || gruppo.getRuoliIds().isEmpty())
+                            continue;
                         if (null == gruppo.getId() || gruppo.getId() < 0) {
                             Set<Long> seen = new HashSet<>();
                             for (Long idRuolo : gruppo.getRuoliIds()) {
@@ -198,15 +228,34 @@ public class PersistenceService {
                         }
                     }
                 }
-                if (errors.size() > initialSize) {
-                    log.error("Errore nella validazione a DB: {}", errors);
-                } else {
-                    log.debug("Validazione a DB completata");
-                }
+            }
+            validateAbilitazioniSingleTipo(dto.getAbilitazioni(), errors);
+            if (errors.size() > initialSize) {
+                log.error("Errore nella validazione a DB: {}", errors);
+            } else {
+                log.debug("Validazione a DB completata");
             }
         } catch (Exception exception) {
             log.error("Errore durante la validazione a DB: {}", exception.getMessage());
             errors.add("Errore generico durante la validazione a DB");
+        }
+    }
+
+    private void validateAbilitazioniSingleTipo(List<AbilitazioneDTO> abilitazioni, List<String> errors) {
+        if (null == abilitazioni || abilitazioni.isEmpty()) {
+            return;
+        }
+        String tipoComune = null;
+        for (AbilitazioneDTO abilitazione : abilitazioni) {
+            if (abilitazione.isDaEliminare() || null == abilitazione.getTipo() || abilitazione.getTipo().isBlank()) {
+                continue;
+            }
+            if (null == tipoComune) {
+                tipoComune = abilitazione.getTipo();
+            } else if (!tipoComune.equalsIgnoreCase(abilitazione.getTipo())) {
+                errors.add("Le abilitazioni della piattaforma devono essere tutte dello stesso tipo (TICKET o VERTICALE).");
+                break;
+            }
         }
     }
 }

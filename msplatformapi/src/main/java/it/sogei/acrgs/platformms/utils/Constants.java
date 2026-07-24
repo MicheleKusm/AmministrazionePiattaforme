@@ -42,4 +42,7 @@ public class Constants {
     public static final String COL_ID_PIATTAFORMA = "ID_PIATTAFORMA";
     public static final String COL_ID_RUOLO = "ID_RUOLO";
     public static final String COL_ID_GRUPPO = "ID_GRUPPO_APPARTENENZA";
+    public static final String TABLE_PIATTAFORMA_REF_PROCESS = "PIATTAFORMA_REF_PROCESS";
+    public static final String SEQ_PIATTAFORMA_REF_PROCESS = "SEQ_PIATTAFORMA_REF_PROCESS";
+    public static final String COL_ID_PIATTAFORMA_REF_PROCESS = "ID_PIATTAFORMA_REF_PROCESS";
 }
