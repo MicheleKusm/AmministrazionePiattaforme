@@ -44,7 +44,9 @@ public class PiattaformaService {
         return piattaforme.map(this::toDto);
     }
 
-    public List<String> validaPiattaformaNomeAndObjclass(PiattaformaDTO dto) {
+    public List<String>
+
+    validaPiattaformaNomeAndObjclass(PiattaformaDTO dto) {
         List<String> errors = new ArrayList<>();
         new Validation().validazioneNomeDescObjclass(dto, errors);
         validazioneNomeObjClassUnique(dto, errors);
@@ -81,7 +83,12 @@ public class PiattaformaService {
         entity.setUrl(dto.getUrl());
         entity.setCanale(dto.getCanale());
         entity.setObjClass(dto.getObjClass());
+        entity.setCodiceIct(dto.getCodiceIct());
         entity.setReadOnly(Boolean.TRUE.equals(dto.getReadOnly()) ? 1 : 0);
+        entity.setRipetibile(Boolean.TRUE.equals(dto.getRipetibile()) ? 1 : 0);
+        entity.setRichiedibileDaCruscotto(Boolean.TRUE.equals(dto.getRichiedibileDaCruscotto()) ? 1 : 0);
+        entity.setRichiedibileInCorso(Boolean.TRUE.equals(dto.getRichiedibileInCorso()) ? 1 : 0);
+        entity.setUtilizzoModelloAutorizzativo(Boolean.TRUE.equals(dto.getUtilizzoModelloAutorizzativo()) ? 1 : 0);
         entity.setConfigJson(toConfigJson(dto));
     }
 

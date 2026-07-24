@@ -4,16 +4,14 @@ import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
 import it.sogei.acrgs.platformms.dto.PersistenceObjectDTO;
 import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.dto.RuoloDTO;
+import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
 import it.sogei.acrgs.platformms.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -22,23 +20,26 @@ public class PersistenceService {
     private final PiattaformaService piattaformaService;
     private final RuoloService ruoloService;
     private final GruppoAppartenenzaService gruppoService;
+    private final RuoliRefAppartenenzaRepository refRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public List<String> persist (PersistenceObjectDTO persistenceObjectDTO) {
         List<String> errors = new ArrayList<>();
         new Validation().validazionePersistenceObject(persistenceObjectDTO, errors);
         if (!errors.isEmpty()) {
-            log.debug("Errore nella validazione dei dati: {}", errors);
+            log.debug("Errore nella validazione dei dati: {}, operazione interrotta", errors);
             return errors;
         }
         validateDbConstraints(persistenceObjectDTO, errors);
         if (!errors.isEmpty()) {
-            log.debug("Errore nella validazione dati a DB: {}", errors);
+            log.debug("Errore nella validazione dati a DB: {}, operazione interrotta", errors);
+            return errors;
         }
         try {
             Long idPiattaforma = persistPiattaforma(persistenceObjectDTO.getPiattaforma());
-            persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
-            persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), idPiattaforma);
+            Map<Long, Long> roleIdMap = persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
+            persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
+            deleteRuoli(persistenceObjectDTO.getRuoli());
             log.info("Persistenza effettuata con successo, idPiattaforma: {}.", idPiattaforma);
         } catch (Exception e) {
             log.error("Errore durante il salvataggio: {}", e.getMessage(), e);
@@ -61,44 +62,79 @@ public class PersistenceService {
         }
     }
 
-    private void persistRuoli(List<RuoloDTO> ruoli, Long idPiattaforma) {
+    private Map<Long, Long> persistRuoli(List<RuoloDTO> ruoli, Long idPiattaforma) {
+        Map<Long, Long> idMap = new HashMap<>();
         if (null == ruoli || ruoli.isEmpty()) {
             log.debug("Nessun ruolo presente, persistenza non necessaria");
-        } else {
-            for (RuoloDTO ruolo : ruoli) {
-                if (ruolo.isDaEliminare() && null != ruolo.getId() && ruolo.getId() > 0) {
-                    ruoloService.delete(ruolo.getId());
-                    log.info("Ruolo eliminato: {}", ruolo.getId());
-                } else if (null != ruolo.getId() && ruolo.getId() > 0) {
-                    ruolo.setIdPiattaforma(idPiattaforma);
-                    ruoloService.update(ruolo.getId(), ruolo);
-                    log.info("Ruolo aggiornato: {}", ruolo.getId());
-                } else {
-                    ruolo.setIdPiattaforma(idPiattaforma);
-                    ruolo.setId(null);
-                    RuoloDTO created = ruoloService.create(ruolo);
-                    log.info("Ruolo creato con id: {}", created.getId());
+            return idMap;
+        }
+        for (RuoloDTO ruolo : ruoli) {
+            if (ruolo.isDaEliminare() && null != ruolo.getId() && ruolo.getId() > 0) {
+                continue;
+            }
+            if (null != ruolo.getId() && ruolo.getId() > 0) {
+                ruolo.setIdPiattaforma(idPiattaforma);
+                ruoloService.update(ruolo.getId(), ruolo);
+                log.info("Ruolo aggiornato: {}", ruolo.getId());
+            } else {
+                Long tempId = ruolo.getId();
+                ruolo.setIdPiattaforma(idPiattaforma);
+                ruolo.setId(null);
+                RuoloDTO created = ruoloService.create(ruolo);
+                log.info("Ruolo creato con id: {}", created.getId());
+                if (null != tempId && tempId < 0) {
+                    idMap.put(tempId, created.getId());
                 }
+            }
+        }
+        return idMap;
+    }
+
+    private void persistGruppi(List<GruppoAppartenenzaDTO> gruppi, Map<Long, Long> roleIdMap) {
+        if (null == gruppi || gruppi.isEmpty()) {
+            log.debug("Nessun gruppoAppartenenza presente, persistenza non necessaria");
+            return;
+        }
+        for (GruppoAppartenenzaDTO gruppo : gruppi) {
+            // rimpiazziamo id temporanei
+            if (null != gruppo.getRuoliIds() && !gruppo.getRuoliIds().isEmpty()) {
+                List<Long> updatedIds = new ArrayList<>();
+                for (Long id : gruppo.getRuoliIds()) {
+                    if (null != id && id < 0) {
+                        Long realId = roleIdMap.get(id);
+                        updatedIds.add(realId != null ? realId : id);
+                    } else {
+                        updatedIds.add(id);
+                    }
+                }
+                gruppo.setRuoliIds(updatedIds);
+            }
+            if (gruppo.isDaEliminare() && null != gruppo.getId() && gruppo.getId() > 0) {
+                gruppoService.delete(gruppo.getId());
+                log.info("Gruppo eliminato: {}", gruppo.getId());
+            } else if (null != gruppo.getId() && gruppo.getId() > 0) {
+                gruppoService.update(gruppo.getId(), gruppo);
+                log.info("Gruppo aggiornato: {}", gruppo.getId());
+            } else {
+                gruppo.setId(null);
+                GruppoAppartenenzaDTO created = gruppoService.create(gruppo);
+                log.info("Gruppo creato con id: {}", created.getId());
             }
         }
     }
 
-    private void persistGruppi(List<GruppoAppartenenzaDTO> gruppi, Long idPiattaforma) {
-        if (null == gruppi || gruppi.isEmpty()) {
-            log.debug("Nessun gruppoAppartenenza presente, persistenza non necessaria");
-        } else {
-            for (GruppoAppartenenzaDTO gruppo : gruppi) {
-                if (gruppo.isDaEliminare() && null != gruppo.getId() && gruppo.getId() > 0) {
-                    gruppoService.delete(gruppo.getId());
-                    log.info("Gruppo eliminato: {}", gruppo.getId());
-                } else if (null != gruppo.getId() && gruppo.getId() > 0) {
-                    gruppoService.update(gruppo.getId(), gruppo);
-                    log.info("Gruppo aggiornato: {}", gruppo.getId());
-                } else {
-                    gruppo.setId(null);
-                    GruppoAppartenenzaDTO created = gruppoService.create(gruppo);
-                    log.info("Gruppo creato con id: {}", created.getId());
-                }
+    /**
+     * elima ruoli marcati daEliminare se presenti, altrimenti non fa nulla
+     **/
+    private void deleteRuoli(List<RuoloDTO> ruoli) {
+        if (null == ruoli || ruoli.isEmpty()) {
+            return;
+        }
+        for (RuoloDTO ruolo : ruoli) {
+            if (ruolo.isDaEliminare() && null != ruolo.getId() && ruolo.getId() > 0) {
+                refRepository.deleteByIdIdRuolo(ruolo.getId());
+                ruoloService.delete(ruolo.getId());
+                log.info("Ruolo eliminato (dopo gruppi e pulizia bridge): {}", ruolo.getId());
             }
         }
     }
@@ -147,15 +183,16 @@ public class PersistenceService {
                         }
                     }
                 }
-                // gruppi check constraint in bridge table
+                // gruppi check constraint nella bridge table
                 if (null != dto.getGruppiAppartenenza() && !dto.getGruppiAppartenenza().isEmpty()) {
                     for (GruppoAppartenenzaDTO gruppo : dto.getGruppiAppartenenza()) {
-                        if (gruppo.isDaEliminare() || null == gruppo.getId() || gruppo.getId() <= 0) continue;
-                        if (null != gruppo.getRuoliIds() && !gruppo.getRuoliIds().isEmpty()) {
+                        if (gruppo.isDaEliminare() || null == gruppo.getRuoliIds() || gruppo.getRuoliIds().isEmpty()) continue;
+                        if (null == gruppo.getId() || gruppo.getId() < 0) {
+                            Set<Long> seen = new HashSet<>();
                             for (Long idRuolo : gruppo.getRuoliIds()) {
                                 if (null == idRuolo) continue;
-                                if (gruppoService.existsBridgeByRuoloAndGruppo(idRuolo, gruppo.getId())) {
-                                    errors.add("Associazione ruolo-gruppo già esistente: ruolo " + idRuolo + " - gruppo " + gruppo.getId());
+                                if (!seen.add(idRuolo)) {
+                                    errors.add("Ruolo duplicato all'interno del gruppo: " + gruppo.getNome());
                                 }
                             }
                         }

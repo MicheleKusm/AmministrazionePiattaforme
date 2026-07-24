@@ -12,4 +12,6 @@ public interface RuoliRefAppartenenzaRepository extends JpaRepository<RuoliRefAp
     List<RuoliRefAppartenenza> findByIdIdGruppoAppartenenza(Long idGruppoAppartenenza);
 
     void deleteByIdIdGruppoAppartenenza(Long idGruppoAppartenenza);
+
+    void deleteByIdIdRuolo(Long idRuolo);
 }
