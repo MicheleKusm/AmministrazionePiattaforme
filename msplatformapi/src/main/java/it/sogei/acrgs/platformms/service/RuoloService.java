@@ -36,6 +36,7 @@ public class RuoloService {
         ruolo.setIdPiattaforma(dto.getIdPiattaforma());
         ruolo.setNome(dto.getNome());
         ruolo.setDescrizione(dto.getDescrizione());
+        ruolo.setRichiedibileDaProcesso(Boolean.TRUE.equals(dto.isRichiedibileDaProcesso()) ? 1L : 0L);
         return toDto(ruoloRepository.save(ruolo));
     }
 
@@ -45,6 +46,7 @@ public class RuoloService {
         ruolo.setIdPiattaforma(dto.getIdPiattaforma());
         ruolo.setNome(dto.getNome());
         ruolo.setDescrizione(dto.getDescrizione());
+        ruolo.setRichiedibileDaProcesso(Boolean.TRUE.equals(dto.isRichiedibileDaProcesso()) ? 1L : 0L);
         return toDto(ruoloRepository.save(ruolo));
     }
 
