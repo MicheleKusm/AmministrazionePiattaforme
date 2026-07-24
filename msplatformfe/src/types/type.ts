@@ -322,6 +322,15 @@ export type PageResponse<T> = {
     totalPages: number
 }
 
+export type ModalProps = {
+    title: string
+    onClose: () => void
+    children: ReactNode
+    footer?: ReactNode
+    headerClassName?: string
+    modalClassName?: string;
+}
+
 export type ResultModalProps = {
     isOpen: boolean
     onClose: () => void

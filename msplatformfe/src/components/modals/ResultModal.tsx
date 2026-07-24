@@ -4,7 +4,12 @@ import { ResultModalProps } from "../../types/type"
 
 export function ResultModal({ isOpen, onClose, success, errors, genericError }: ResultModalProps) {
     if (!isOpen) return null
+
     const title = success ? "Operazione completata" : "Errore"
+    const headerClassName = success ? "bg-green-700 text-white" : "bg-red-700 text-white"
+    const modalClassName = success ? "border-0" : "border-0"
+    const textClassName = success ? "text-green-800" : "text-red-800"
+
     let message = ""
     if (success) {
         message = "La piattaforma e i suoi elementi sono stati salvati correttamente."
@@ -18,7 +23,7 @@ export function ResultModal({ isOpen, onClose, success, errors, genericError }: 
 
     const footer = (
         <Button
-            variant="primary"
+            variant={success ? "success" : "danger"}
             onClick={onClose}>
             {success ? "OK" : "Chiudi"}
         </Button>
@@ -27,8 +32,10 @@ export function ResultModal({ isOpen, onClose, success, errors, genericError }: 
         <Modal
             title={title}
             onClose={onClose}
-            footer={footer}>
-            <div className="whitespace-pre-line text-sm text-gray-700">{message}</div>
+            footer={footer}
+            headerClassName={headerClassName}
+            modalClassName={modalClassName}>
+            <div className={`whitespace-pre-line text-sm ${textClassName}`}>{message}</div>
         </Modal>
     )
 }

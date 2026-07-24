@@ -163,22 +163,22 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 gruppiAppartenenza: editedGruppi,
                 abilitazioni: []
             }
-            await persist(payload).unwrap()
-            setSaveSuccess(true)
-            setSaveErrors([])
-            setSaveGenericError(false)
+            const result = await persist(payload).unwrap()
+            if (Array.isArray(result) && result.length > 0) {
+                setSaveSuccess(false)
+                setSaveErrors(result)
+                setSaveGenericError(false)
+            } else {
+                setSaveSuccess(true)
+                setSaveErrors([])
+                setSaveGenericError(false)
+            }
             setResultModalOpen(true)
         } catch (err: any) {
             console.error("Salvataggio fallito: ", err)
-            if (err?.data && Array.isArray(err.data) && err.data.length > 0) {
-                setSaveSuccess(false)
-                setSaveErrors(err.data)
-                setSaveGenericError(false)
-            } else {
-                setSaveSuccess(false)
-                setSaveErrors([])
-                setSaveGenericError(true)
-            }
+            setSaveSuccess(false)
+            setSaveErrors([])
+            setSaveGenericError(true)
             setResultModalOpen(true)
         }
     }
