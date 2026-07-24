@@ -12,6 +12,9 @@ import static it.sogei.acrgs.platformms.utils.Constants.REGEX_DESCRIZIONI;
 @Slf4j
 public class Validation {
 
+    private static final String TIPO_TICKET = "TICKET";
+    private static final String TIPO_VERTICALE = "VERTICALE";
+
     public void validazioneNomeDescObjclass (PiattaformaDTO dto, List<String> errors) {
         try {
             log.info("validazioneNomeDescObjclass, INIZIO");
@@ -48,6 +51,8 @@ public class Validation {
         validazionePiattaforma(persistenceObjectDTO.getPiattaforma(), errors);
         validazioneRuoli(persistenceObjectDTO.getRuoli(), errors);
         validazioneGruppoAppartenenza(persistenceObjectDTO.getGruppiAppartenenza(), errors);
+        validazioneAbilitazioni(persistenceObjectDTO.getAbilitazioni(), errors);
+        validazioneCruscotto(null != persistenceObjectDTO.getPiattaforma() ? persistenceObjectDTO.getPiattaforma().getFormSteps() : null, errors);
         log.debug("validazionePersistenceObject, FINE");
     }
 
@@ -215,19 +220,224 @@ public class Validation {
     private void validazioneAbilitazioni (List<AbilitazioneDTO> abilitazioni, List<String> errors) {
         try {
             int initialSize = errors.size();
-            boolean skipNome = false; //ecc
+            boolean skipTipo = false;
+            boolean skipScim = false;
+            boolean skipProcesso = false;
             if (null == abilitazioni || abilitazioni.isEmpty()) {
                 log.debug("Nessuna abilitazione presente, validazione non necessaria");
                 return;
             }
             for (AbilitazioneDTO abilitazione : abilitazioni) {
-                //TODO
-
+                if (null == abilitazione) {
+                    log.error("Errore nella validazione delle abilitazioni, abilitazione nulla");
+                    errors.add("Errore nella validazione delle abilitazioni, abilitazione nulla");
+                    continue;
+                }
+                // tipo obbligatorio e deve essere TICKET o VERTICALE
+                if (null == abilitazione.getTipo() || abilitazione.getTipo().isBlank()) {
+                    log.error("Errore nella validazione delle abilitazioni, tipo abilitazione nullo");
+                    errors.add("Errore nella validazione delle abilitazioni, tipo abilitazione nullo");
+                    skipTipo = true;
+                }
+                boolean ticket = !skipTipo && TIPO_TICKET.equalsIgnoreCase(abilitazione.getTipo());
+                boolean verticale = !skipTipo && TIPO_VERTICALE.equalsIgnoreCase(abilitazione.getTipo());
+                if (!skipTipo && !ticket && !verticale) {
+                    log.error("Errore nella validazione delle abilitazioni, tipo abilitazione non valido");
+                    errors.add("Errore nella validazione delle abilitazioni, tipo abilitazione non valido");
+                }
+                // ticket -> codice SCIM obbligatorio
+                if (ticket) {
+                    if (null == abilitazione.getCodiceScim() || abilitazione.getCodiceScim().isBlank()) {
+                        log.error("Errore nella validazione delle abilitazioni, codice SCIM obbligatorio per le abilitazioni ticket");
+                        errors.add("Errore nella validazione delle abilitazioni, codice SCIM obbligatorio per le abilitazioni ticket");
+                        skipScim = true;
+                    }
+                    if (!skipScim && abilitazione.getCodiceScim().length() > 255) {
+                        log.error("Errore nella validazione delle abilitazioni, codice SCIM troppo lungo");
+                        errors.add("Errore nella validazione delle abilitazioni, codice SCIM troppo lungo");
+                    }
+                }
+                // verticale -> processo verticale obbligatorio
+                if (verticale) {
+                    if (null == abilitazione.getProcessoVerticale() || abilitazione.getProcessoVerticale().isBlank()) {
+                        log.error("Errore nella validazione delle abilitazioni, processo verticale obbligatorio per le abilitazioni verticali");
+                        errors.add("Errore nella validazione delle abilitazioni, processo verticale obbligatorio per le abilitazioni verticali");
+                        skipProcesso = true;
+                    }
+                    if (!skipProcesso && abilitazione.getProcessoVerticale().length() > 255) {
+                        log.error("Errore nella validazione delle abilitazioni, processo verticale troppo lungo");
+                        errors.add("Errore nella validazione delle abilitazioni, processo verticale troppo lungo");
+                    }
+                }
+                // campi ticket e comunicazioni onboarding
+                validazioneCampiTicket(abilitazione.getCampi(), errors);
+                validazioneComunicazioni(abilitazione.getComunicazioni(), errors);
                 // reset skip a ogni ciclo
+                skipTipo = false;
+                skipScim = false;
+                skipProcesso = false;
+            }
+            if (errors.size() > initialSize) {
+                log.error("Errore nella validazione delle abilitazioni: {}", errors);
+            } else {
+                log.debug("Validazione delle abilitazioni completata");
             }
         } catch (Exception exception) {
             log.error("Errore nella validazione delle abilitazioni: {}", exception.getMessage());
             errors.add("Errore nella validazione delle abilitazioni");
+        }
+    }
+
+    private void validazioneCampiTicket (List<CampoTicketDTO> campi, List<String> errors) {
+        boolean skipLabel = false;
+        boolean skipKey = false;
+        if (null == campi || campi.isEmpty()) {
+            log.debug("Nessun campo ticket presente, validazione non necessaria");
+            return;
+        }
+        for (CampoTicketDTO campo : campi) {
+            if (null == campo) {
+                continue;
+            }
+            if (null == campo.getLabel() || campo.getLabel().isBlank()) {
+                log.error("Errore nella validazione delle abilitazioni, label del campo ticket nulla");
+                errors.add("Errore nella validazione delle abilitazioni, label del campo ticket nulla");
+                skipLabel = true;
+            }
+            if (!skipLabel && campo.getLabel().length() > 255) {
+                log.error("Errore nella validazione delle abilitazioni, label del campo ticket troppo lunga");
+                errors.add("Errore nella validazione delle abilitazioni, label del campo ticket troppo lunga");
+            }
+            if (null == campo.getKey() || campo.getKey().isBlank()) {
+                log.error("Errore nella validazione delle abilitazioni, key del campo ticket nulla");
+                errors.add("Errore nella validazione delle abilitazioni, key del campo ticket nulla");
+                skipKey = true;
+            }
+            if (!skipKey && campo.getKey().length() > 255) {
+                log.error("Errore nella validazione delle abilitazioni, key del campo ticket troppo lunga");
+                errors.add("Errore nella validazione delle abilitazioni, key del campo ticket troppo lunga");
+            }
+            skipLabel = false;
+            skipKey = false;
+        }
+    }
+
+    private void validazioneComunicazioni (List<ComunicazioneOnboardingDTO> comunicazioni, List<String> errors) {
+        if (null == comunicazioni || comunicazioni.isEmpty()) {
+            log.debug("Nessuna comunicazione onboarding presente, validazione non necessaria");
+            return;
+        }
+        for (ComunicazioneOnboardingDTO comunicazione : comunicazioni) {
+            if (null == comunicazione) {
+                continue;
+            }
+            // NB: il testo può contenere HTML, quindi niente REGEX_DESCRIZIONI qui
+            if (null == comunicazione.getTesto() || comunicazione.getTesto().isBlank()) {
+                log.error("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
+                errors.add("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
+            }
+        }
+    }
+
+    private void validazioneCruscotto (List<FormStepDTO> formSteps, List<String> errors) {
+        try {
+            int initialSize = errors.size();
+            boolean skipStep = false;
+            if (null == formSteps || formSteps.isEmpty()) {
+                log.debug("Nessuno step cruscotto presente, validazione non necessaria");
+                return;
+            }
+            for (FormStepDTO formStep : formSteps) {
+                if (null == formStep) {
+                    log.error("Errore nella validazione del cruscotto, step nullo");
+                    errors.add("Errore nella validazione del cruscotto, step nullo");
+                    continue;
+                }
+                if (null == formStep.getStep() || formStep.getStep().isBlank()) {
+                    log.error("Errore nella validazione del cruscotto, chiave dello step nulla");
+                    errors.add("Errore nella validazione del cruscotto, chiave dello step nulla");
+                    skipStep = true;
+                }
+                if (!skipStep && formStep.getStep().length() > 255) {
+                    log.error("Errore nella validazione del cruscotto, chiave dello step troppo lunga");
+                    errors.add("Errore nella validazione del cruscotto, chiave dello step troppo lunga");
+                }
+                if (null != formStep.getDescrizione() && !formStep.getDescrizione().isBlank()) {
+                    if (formStep.getDescrizione().length() > 255) {
+                        log.error("Errore nella validazione del cruscotto, descrizione dello step troppo lunga");
+                        errors.add("Errore nella validazione del cruscotto, descrizione dello step troppo lunga");
+                    }
+                    if (!formStep.getDescrizione().matches(REGEX_DESCRIZIONI)) {
+                        log.error("Errore nella validazione del cruscotto, descrizione dello step non valida");
+                        errors.add("Errore nella validazione del cruscotto, descrizione dello step non valida");
+                    }
+                }
+                validazioneSezioniCruscotto(formStep.getSections(), errors);
+                skipStep = false;
+            }
+            if (errors.size() > initialSize) {
+                log.error("Errore nella validazione del cruscotto: {}", errors);
+            } else {
+                log.debug("Validazione del cruscotto completata");
+            }
+        } catch (Exception exception) {
+            log.error("Errore nella validazione del cruscotto: {}", exception.getMessage());
+            errors.add("Errore nella validazione del cruscotto");
+        }
+    }
+
+    private void validazioneSezioniCruscotto (List<SectionDTO> sezioni, List<String> errors) {
+        if (null == sezioni || sezioni.isEmpty()) {
+            return;
+        }
+        for (SectionDTO sezione : sezioni) {
+            if (null == sezione) {
+                continue;
+            }
+            if (null != sezione.getHeader() && sezione.getHeader().length() > 255) {
+                log.error("Errore nella validazione del cruscotto, header della sezione troppo lungo");
+                errors.add("Errore nella validazione del cruscotto, header della sezione troppo lungo");
+            }
+            if (null != sezione.getSubheader() && sezione.getSubheader().length() > 255) {
+                log.error("Errore nella validazione del cruscotto, subheader della sezione troppo lungo");
+                errors.add("Errore nella validazione del cruscotto, subheader della sezione troppo lungo");
+            }
+            validazioneCampiCruscotto(sezione.getFields(), errors);
+        }
+    }
+
+    private void validazioneCampiCruscotto (List<FieldDTO> fields, List<String> errors) {
+        boolean skipName = false;
+        boolean skipInputType = false;
+        if (null == fields || fields.isEmpty()) {
+            return;
+        }
+        for (FieldDTO field : fields) {
+            if (null == field) {
+                continue;
+            }
+            if (null == field.getName() || field.getName().isBlank()) {
+                log.error("Errore nella validazione del cruscotto, name del campo nullo");
+                errors.add("Errore nella validazione del cruscotto, name del campo nullo");
+                skipName = true;
+            }
+            if (!skipName && field.getName().length() > 255) {
+                log.error("Errore nella validazione del cruscotto, name del campo troppo lungo");
+                errors.add("Errore nella validazione del cruscotto, name del campo troppo lungo");
+            }
+            if (null == field.getInputType() || field.getInputType().isBlank()) {
+                log.error("Errore nella validazione del cruscotto, inputType del campo nullo");
+                errors.add("Errore nella validazione del cruscotto, inputType del campo nullo");
+                skipInputType = true;
+            }
+            if (!skipInputType && field.getInputType().length() > 255) {
+                log.error("Errore nella validazione del cruscotto, inputType del campo troppo lungo");
+                errors.add("Errore nella validazione del cruscotto, inputType del campo troppo lungo");
+            }
+            // validazione ricorsiva dei campi figli (children)
+            validazioneCampiCruscotto(field.getChildren(), errors);
+            skipName = false;
+            skipInputType = false;
         }
     }
 }
