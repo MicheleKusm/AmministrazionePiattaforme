@@ -111,7 +111,7 @@ public class PiattaformaService {
                 .build();
     }
 
-    private String toConfigJson(PiattaformaDTO dto) {
+    public String toConfigJson(PiattaformaDTO dto) {
         Map<String, Object> config = new LinkedHashMap<>();
         Map<String, Object> oam = new LinkedHashMap<>();
         config.put(FORM_STEPS, null != dto.getFormSteps() ? dto.getFormSteps() : Collections.emptyList());

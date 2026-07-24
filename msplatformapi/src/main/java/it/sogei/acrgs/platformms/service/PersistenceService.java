@@ -23,6 +23,27 @@ public class PersistenceService {
     @Transactional(rollbackFor = Exception.class)
     public List<String> persist(PersistenceObjectDTO persistenceObjectDTO) {
         List<String> errors = new ArrayList<>();
+        errors = validate(persistenceObjectDTO, errors);
+        if (!errors.isEmpty()) {
+            return errors;
+        } else {
+            try {
+                Long idPiattaforma = persistPiattaforma(persistenceObjectDTO.getPiattaforma());
+                Map<Long, Long> roleIdMap = persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
+                persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
+                persistAbilitazioni(persistenceObjectDTO.getAbilitazioni(), idPiattaforma, roleIdMap);
+                deleteRuoli(persistenceObjectDTO.getRuoli());
+                log.info("Persistenza effettuata con successo, idPiattaforma: {}.", idPiattaforma);
+            } catch (Exception e) {
+                log.error("Errore durante il salvataggio: {}", e.getMessage(), e);
+                errors.add("Errore durante il salvataggio: " + e.getMessage());
+                throw new RuntimeException("Errore durante il salvataggio, eseguo rollback", e);
+            }
+            return errors;
+        }
+    }
+
+    public List<String> validate (PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
         new Validation().validazionePersistenceObject(persistenceObjectDTO, errors);
         if (!errors.isEmpty()) {
             log.debug("Errore nella validazione dei dati: {}, operazione interrotta", errors);
@@ -32,18 +53,6 @@ public class PersistenceService {
         if (!errors.isEmpty()) {
             log.debug("Errore nella validazione dati a DB: {}, operazione interrotta", errors);
             return errors;
-        }
-        try {
-            Long idPiattaforma = persistPiattaforma(persistenceObjectDTO.getPiattaforma());
-            Map<Long, Long> roleIdMap = persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
-            persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
-            persistAbilitazioni(persistenceObjectDTO.getAbilitazioni(), idPiattaforma, roleIdMap);
-            deleteRuoli(persistenceObjectDTO.getRuoli());
-            log.info("Persistenza effettuata con successo, idPiattaforma: {}.", idPiattaforma);
-        } catch (Exception e) {
-            log.error("Errore durante il salvataggio: {}", e.getMessage(), e);
-            errors.add("Errore durante il salvataggio: " + e.getMessage());
-            throw new RuntimeException("Errore durante il salvataggio, eseguo rollback", e);
         }
         return errors;
     }
