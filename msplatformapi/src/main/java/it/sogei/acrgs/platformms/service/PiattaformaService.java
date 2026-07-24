@@ -17,10 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static it.sogei.acrgs.platformms.utils.Constants.*;
 
@@ -116,16 +113,11 @@ public class PiattaformaService {
 
     private String toConfigJson(PiattaformaDTO dto) {
         Map<String, Object> config = new LinkedHashMap<>();
-        config.put(CODICE_ICT, dto.getCodiceIct());
-        config.put(OAMMETADATANAME, dto.getOamMetadataName());
-        config.put(OAMMETADATAVALUE, dto.getOamMetadataValue());
-        config.put(RICHIEDIBILE_DA_CRUSCOTTO, dto.getRichiedibileDaCruscotto());
-        config.put(RICHIEDIBILE_IN_CORSO, dto.getRichiedibileInCorso());
-        config.put(RIPETIBILE, dto.getRipetibile());
-        config.put(UTILIZZO_MODELLO_AUTORIZZATIVO, dto.getUtilizzoModelloAutorizzativo());
-        if (dto.getFormSteps() != null) {
-            config.put(FORM_STEPS, dto.getFormSteps());
-        }
+        Map<String, Object> oam = new LinkedHashMap<>();
+        config.put(FORM_STEPS, null != dto.getFormSteps() ? dto.getFormSteps() : Collections.emptyList());
+        oam.put(OAM_METADATA_NAME, dto.getOamMetadataName());
+        oam.put(OAM_METADATA_VALUE, dto.getOamMetadataValue());
+        config.put(OAM_METADATA, oam);
         try {
             return objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException ex) {
