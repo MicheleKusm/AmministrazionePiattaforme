@@ -18,6 +18,7 @@ import { Stepper } from "../components/wizard/Stepper"
 import { type Gruppo, PersistenceObject, type Piattaforma, PlatformWizardPageProps, type Ruolo } from "../types/type"
 import { setGruppi as setMainGruppi } from "../store/gruppiSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
+import { useExport } from "../hooks/useExport"
 import {
     addGruppo,
     addRuolo,
@@ -55,6 +56,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [saveSuccess, setSaveSuccess] = useState(false)
     const [saveErrors, setSaveErrors] = useState<string[]>([])
     const [saveGenericError, setSaveGenericError] = useState(false)
+    const { exportSql, isLoading: isExporting } = useExport()
 
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
     const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
@@ -81,6 +83,20 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         if (saveSuccess) {
             dispatch(resetRiepilogo())
             onDone()
+        }
+    }
+
+    const handleExport = async () => {
+        try {
+            const payload: PersistenceObject = {
+                piattaforma: piattaforma!,
+                ruoli: ruoli,
+                gruppiAppartenenza: editedGruppi,
+                abilitazioni: abilitazioni.map(abilitazioneToDto)
+            }
+            await exportSql(payload)
+        } catch (err) {
+            setPiattaformaErrors({ _general: err instanceof Error ? err.message : "Errore sconosciuto" })
         }
     }
 
@@ -306,19 +322,29 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     type="button">
                     Indietro
                 </button>
-                {step < 7 ? (
+                {step === 7 ? (
+                    <div className="flex gap-2">
+                        <button
+                            className="btn-primary"
+                            onClick={() => void saveFinalConfiguration()}
+                            disabled={isExporting}
+                            type="button">
+                            Salva configurazione
+                        </button>
+                        <button
+                            className="btn-secondary border border-gray-300"
+                            onClick={() => void handleExport()}
+                            disabled={isExporting}
+                            type="button">
+                            {isExporting ? "Esportazione..." : "📦 Esporta SQL"}
+                        </button>
+                    </div>
+                ) : (
                     <button
                         className="btn-primary"
                         onClick={nextStep}
                         type="button">
                         Avanti
-                    </button>
-                ) : (
-                    <button
-                        className="btn-primary"
-                        onClick={() => void saveFinalConfiguration()}
-                        type="button">
-                        Salva configurazione
                     </button>
                 )}
             </div>
