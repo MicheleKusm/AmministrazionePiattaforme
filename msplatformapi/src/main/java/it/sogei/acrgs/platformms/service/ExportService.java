@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static it.sogei.acrgs.platformms.utils.Constants.NOME_SCHEMA;
+import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @Slf4j
 @Service
@@ -32,6 +32,8 @@ public class ExportService {
     private final Environment environment;
     @Value("${show-export-schema}")
     private Boolean showExportSchema;
+    @Value("${export-multi-file:true}")
+    private boolean multiFile;
 
     public byte[] exportSqlZip(PersistenceObjectDTO dto) throws ExportException {
         List<String> errors = persistenceService.validate(dto, new ArrayList<>());
@@ -39,13 +41,23 @@ public class ExportService {
             log.error("Errore nella validazione dei dati: {}", errors);
             throw new ExportException(errors);
         }
-        String script = buildSqlScript(dto);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(baos)) {
-            ZipEntry entry = new ZipEntry("export.sql");
-            zos.putNextEntry(entry);
-            zos.write(script.getBytes(StandardCharsets.UTF_8));
-            zos.closeEntry();
+            if (multiFile) {
+                Map<String, String> scripts = buildSqlMultiFile(dto);
+                for (Map.Entry<String, String> entry : scripts.entrySet()) {
+                    ZipEntry zipEntry = new ZipEntry(entry.getKey());
+                    zos.putNextEntry(zipEntry);
+                    zos.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
+            } else {
+                String script = buildSqlScript(dto);
+                ZipEntry zipEntry = new ZipEntry("export.sql");
+                zos.putNextEntry(zipEntry);
+                zos.write(script.getBytes(StandardCharsets.UTF_8));
+                zos.closeEntry();
+            }
             zos.finish();
             return baos.toByteArray();
         } catch (IOException e) {
@@ -64,6 +76,50 @@ public class ExportService {
         appendGruppiBridge(sql, dto.getGruppiAppartenenza(), dto.getRuoli(), dto.getPiattaforma());
         appendAbilitazioni(sql, dto, dto.getPiattaforma());
         return sql.toString();
+    }
+
+    private Map<String, String> buildSqlMultiFile(PersistenceObjectDTO dto) {
+        Map<String, String> scripts = new LinkedHashMap<>();
+        // gruppi.sql
+        if (null != dto.getGruppiAppartenenza() && !dto.getGruppiAppartenenza().isEmpty()) {
+            StringBuilder sbGruppi = new StringBuilder();
+            sbGruppi.append("SET DEFINE OFF;\n\n");
+            appendGruppiRows(sbGruppi, dto.getGruppiAppartenenza());
+            scripts.put(GRUPPI_SQL_FILENAME, sbGruppi.toString());
+        }
+        // piattaforma.sql
+        if (null != dto.getPiattaforma()) {
+            StringBuilder sbPiattaforma = new StringBuilder();
+            sbPiattaforma.append("SET DEFINE OFF;\n\n");
+            appendPiattaforma(sbPiattaforma, dto.getPiattaforma(), dto.getGruppiAppartenenza());
+            scripts.put(PIATTAFORMA_SQL_FILENAME, sbPiattaforma.toString());
+        }
+        // ruoli.sql
+        if (null != dto.getRuoli() && !dto.getRuoli().isEmpty()) {
+            StringBuilder sbRuoli = new StringBuilder();
+            sbRuoli.append("SET DEFINE OFF;\n\n");
+            appendRuoli(sbRuoli, dto.getRuoli(), dto.getPiattaforma());
+            scripts.put(RUOLI_SQL_FILENAME, sbRuoli.toString());
+        }
+        // bridge.sql
+        if (null != dto.getGruppiAppartenenza()) {
+            boolean hasDatiInBridgeTable = dto.getGruppiAppartenenza().stream()
+                    .anyMatch(g -> (null != g.getRuoliIds() && !g.getRuoliIds().isEmpty()) || g.isDaEliminare());
+            if (hasDatiInBridgeTable) {
+                StringBuilder sbBridge = new StringBuilder();
+                sbBridge.append("SET DEFINE OFF;\n\n");
+                appendGruppiBridge(sbBridge, dto.getGruppiAppartenenza(), dto.getRuoli(), dto.getPiattaforma());
+                scripts.put(RUOLI_REF_APPARTENENZA_SQL_FILENAME, sbBridge.toString());
+            }
+        }
+        // abilitazioni.sql
+        if (dto.getAbilitazioni() != null && !dto.getAbilitazioni().isEmpty()) {
+            StringBuilder sbAbilitazioni = new StringBuilder();
+            sbAbilitazioni.append("SET DEFINE OFF;\n\n");
+            appendAbilitazioni(sbAbilitazioni, dto, dto.getPiattaforma());
+            scripts.put(ABILITAZIONI_SQL_FILENAME, sbAbilitazioni.toString());
+        }
+        return scripts;
     }
 
     private String resolveRoleIdForSql(Long roleId, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {

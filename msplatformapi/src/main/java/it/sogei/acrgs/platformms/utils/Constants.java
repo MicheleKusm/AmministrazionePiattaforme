@@ -31,7 +31,7 @@ public class Constants {
     public static final List<String> ICONE = List.of("business_center", "description", "files", "mail", "summarize");
     public static final String EXPORT = "/export";
     //regex
-    public static final String REGEX_NOMI = "^[a-zA-Z0-9_ ,.#]+$";
+    public static final String REGEX_NOMI = "^[a-zA-Z0-9_ ,.#-]+$";
     public static final String REGEX_DESCRIZIONI = "^[^<>&]+$";
     //sql
     public static final String TABLE_PIATTAFORMA = "PIATTAFORMA";
@@ -47,5 +47,10 @@ public class Constants {
     public static final String SEQ_PIATTAFORMA_REF_PROCESS = "SEQ_PIATTAFORMA_REF_PROCESS";
     public static final String COL_ID_PIATTAFORMA_REF_PROCESS = "ID_PIATTAFORMA_REF_PROCESS";
     // export
-    public static final String NOME_SCHEMA  = "ANAGRAFICA_RGS";
+    public static final String NOME_SCHEMA = "ANAGRAFICA_RGS";
+    public static final String GRUPPI_SQL_FILENAME = "gruppi.sql";
+    public static final String PIATTAFORMA_SQL_FILENAME = "piattaforma.sql";
+    public static final String RUOLI_SQL_FILENAME = "ruoli.sql";
+    public static final String RUOLI_REF_APPARTENENZA_SQL_FILENAME = "ruoli_ref_appartenenza.sql";
+    public static final String ABILITAZIONI_SQL_FILENAME = "abilitazioni.sql";
 }
