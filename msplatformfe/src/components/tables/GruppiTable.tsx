@@ -30,7 +30,7 @@ export function GruppiTable({ gruppi, ruoli, onEdit, onDelete }: GruppiTableProp
             render: (gruppo) => <span className="text-gray-700">{gruppo.descrizione}</span>
         },
         {
-            header: "Ruoli nel gruppo (solo per questa piattaforma)",
+            header: "Ruoli nel gruppo",
             render: (gruppo) => <Badge tone="gray">{filteredCount(gruppo)} ruoli</Badge>
         },
         {
