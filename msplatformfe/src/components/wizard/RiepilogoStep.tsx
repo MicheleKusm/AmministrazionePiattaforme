@@ -1,11 +1,14 @@
-
 import type { Piattaforma, RiepilogoStepProps } from "../../types/type"
 import { CardCommon } from "../../components/common/CardCommon"
 
 export function RiepilogoStep({ piattaforma, ruoli, gruppi, tipoAbilitazione }: RiepilogoStepProps) {
-
     const visibleRuoli = ruoli.filter((r) => !r.daEliminare)
     const visibleGruppi = gruppi.filter((g) => !g.daEliminare)
+    const platformRuoloIds = new Set(ruoli.map((r) => r.id))
+    const filteredGruppi = visibleGruppi.map((g) => ({
+        ...g,
+        ruoliIds: g.ruoliIds?.filter((id) => platformRuoloIds.has(id)) ?? []
+    }))
 
     const toggleLabel = (key: keyof Piattaforma) => {
         const map: Record<string, string> = {
@@ -71,7 +74,7 @@ export function RiepilogoStep({ piattaforma, ruoli, gruppi, tipoAbilitazione }: 
                         <p className="text-sm text-gray-500">Nessun gruppo configurato</p>
                     ) : (
                         <ul className="space-y-2 text-sm">
-                            {visibleGruppi.map((g) => (
+                            {filteredGruppi.map((g) => (
                                 <li key={g.id}>
                                     <span className="font-bold">{g.nome}</span>
                                     {g.ruoliIds && g.ruoliIds.length > 0 && (

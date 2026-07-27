@@ -87,15 +87,17 @@ export type RuoliTableProps = {
 
 // gruppi
 export type Gruppo = {
-    id?: number
+    id: number
     idPiattaforma?: number
     nome: string
     descrizione: string
     ruoliIds: number[]
     daEliminare?: boolean
 }
+
 export type GruppiStepProps = {
     gruppi: Gruppo[]
+    ruoli: Ruolo[]
     onAdd: () => void
     onEdit: (gruppo: Gruppo) => void
     onDelete: (gruppo: Gruppo) => void
@@ -106,6 +108,13 @@ export type GroupModalProps = {
     ruoli: Ruolo[]
     onSave: (group: Gruppo) => void
     onClose: () => void
+}
+
+export type GruppiTableProps = {
+    gruppi: Gruppo[]
+    ruoli: Ruolo[]
+    onEdit: (gruppo: Gruppo) => void
+    onDelete: (gruppo: Gruppo) => void
 }
 
 // dto persistenza
