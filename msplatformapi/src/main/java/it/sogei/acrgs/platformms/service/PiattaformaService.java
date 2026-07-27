@@ -86,6 +86,12 @@ public class PiattaformaService {
         entity.setRichiedibileDaCruscotto(Boolean.TRUE.equals(dto.getRichiedibileDaCruscotto()) ? 1 : 0);
         entity.setRichiedibileInCorso(Boolean.TRUE.equals(dto.getRichiedibileInCorso()) ? 1 : 0);
         entity.setUtilizzoModelloAutorizzativo(Boolean.TRUE.equals(dto.getUtilizzoModelloAutorizzativo()) ? 1 : 0);
+        if (null == dto.getFormSteps() || dto.getFormSteps().isEmpty()) {
+            List<FormStepDTO> formStepsEsistenti = extractFormSteps(parseConfig(entity.getConfigJson()));
+            if (!formStepsEsistenti.isEmpty()) {
+                dto.setFormSteps(formStepsEsistenti);
+            }
+        }
         entity.setConfigJson(toConfigJson(dto));
     }
 
@@ -130,7 +136,8 @@ public class PiattaformaService {
             return Map.of();
         }
         try {
-            return objectMapper.readValue(configJson, new TypeReference<>() {});
+            return objectMapper.readValue(configJson, new TypeReference<>() {
+            });
         } catch (JsonProcessingException ex) {
             log.error("CONFIG_JSON non valido: {}", configJson, ex);
             return Map.of();
@@ -151,7 +158,8 @@ public class PiattaformaService {
         if (formStepsObj == null) {
             return List.of();
         }
-        return objectMapper.convertValue(formStepsObj, new TypeReference<List<FormStepDTO>>() {});
+        return objectMapper.convertValue(formStepsObj, new TypeReference<List<FormStepDTO>>() {
+        });
     }
 
     private String extractOamMetadata(Map<String, Object> config, String metadataField) {
@@ -164,7 +172,7 @@ public class PiattaformaService {
         return null;
     }
 
-    private void validazioneNomeObjClassUnique (PiattaformaDTO dto, List<String> errors) {
+    private void validazioneNomeObjClassUnique(PiattaformaDTO dto, List<String> errors) {
         try {
             if (null != dto.getNome() && null != dto.getObjClass() && piattaformaRepository.countByNomeOrObjClassExcludeId(dto.getNome(), dto.getObjClass(), dto.getId()) > 0) {
                 log.debug("Validazione piattaforma fallita: Nome e Obj_class devono essere univoci");

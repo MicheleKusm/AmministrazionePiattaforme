@@ -30,9 +30,10 @@ public class PersistenceService {
             try {
                 Long idPiattaforma = persistPiattaforma(persistenceObjectDTO.getPiattaforma());
                 Map<Long, Long> roleIdMap = persistRuoli(persistenceObjectDTO.getRuoli(), idPiattaforma);
-                persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
+                Map<Long, Long> groupIdMap = persistGruppi(persistenceObjectDTO.getGruppiAppartenenza(), roleIdMap);
                 persistAbilitazioni(persistenceObjectDTO.getAbilitazioni(), idPiattaforma, roleIdMap);
                 deleteRuoli(persistenceObjectDTO.getRuoli());
+                remapCruscotto(persistenceObjectDTO.getPiattaforma(), idPiattaforma, groupIdMap);
                 log.info("Persistenza effettuata con successo, idPiattaforma: {}.", idPiattaforma);
             } catch (Exception e) {
                 log.error("Errore durante il salvataggio: {}", e.getMessage(), e);
@@ -43,7 +44,7 @@ public class PersistenceService {
         }
     }
 
-    public List<String> validate (PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
+    public List<String> validate(PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
         new Validation().validazionePersistenceObject(persistenceObjectDTO, errors);
         if (!errors.isEmpty()) {
             log.debug("Errore nella validazione dei dati: {}, operazione interrotta", errors);
@@ -98,10 +99,11 @@ public class PersistenceService {
         return idMap;
     }
 
-    private void persistGruppi(List<GruppoAppartenenzaDTO> gruppi, Map<Long, Long> roleIdMap) {
+    private Map<Long, Long> persistGruppi(List<GruppoAppartenenzaDTO> gruppi, Map<Long, Long> roleIdMap) {
+        Map<Long, Long> groupIdMap = new HashMap<>();
         if (null == gruppi || gruppi.isEmpty()) {
             log.debug("Nessun gruppoAppartenenza presente, persistenza non necessaria");
-            return;
+            return groupIdMap;
         }
         for (GruppoAppartenenzaDTO gruppo : gruppi) {
             // rimpiazziamo id temporanei
@@ -124,11 +126,55 @@ public class PersistenceService {
                 gruppoService.update(gruppo.getId(), gruppo);
                 log.info("Gruppo aggiornato: {}", gruppo.getId());
             } else {
+                Long tempId = gruppo.getId();
                 gruppo.setId(null);
                 GruppoAppartenenzaDTO created = gruppoService.create(gruppo);
                 log.info("Gruppo creato con id: {}", created.getId());
+                if (null != tempId && tempId < 0) {
+                    groupIdMap.put(tempId, created.getId());
+                }
             }
         }
+        return groupIdMap;
+    }
+
+    private void remapCruscotto(PiattaformaDTO piattaforma, Long idPiattaforma, Map<Long, Long> groupIdMap) {
+        if (null == piattaforma || null == piattaforma.getFormSteps() || piattaforma.getFormSteps().isEmpty() || groupIdMap.isEmpty()) {
+            return;
+        }
+        boolean changed = false;
+        for (FormStepDTO step : piattaforma.getFormSteps()) {
+            if (remapRoleGroups(step.getRoleGroups(), groupIdMap)) {
+                changed = true;
+            }
+            if (null != step.getSections()) {
+                for (SectionDTO section : step.getSections()) {
+                    if (remapRoleGroups(section.getRoleGroups(), groupIdMap)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+        if (changed) {
+            piattaforma.setId(idPiattaforma);
+            piattaformaService.update(idPiattaforma, piattaforma);
+            log.info("CONFIG_JSON cruscotto rimappato con gli id reali dei gruppi, idPiattaforma: {}", idPiattaforma);
+        }
+    }
+
+    private boolean remapRoleGroups(List<Long> roleGroups, Map<Long, Long> groupIdMap) {
+        if (null == roleGroups || roleGroups.isEmpty()) {
+            return false;
+        }
+        boolean changed = false;
+        for (int i = 0; i < roleGroups.size(); i++) {
+            Long id = roleGroups.get(i);
+            if (null != id && id < 0 && groupIdMap.containsKey(id)) {
+                roleGroups.set(i, groupIdMap.get(id));
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     private void persistAbilitazioni(List<AbilitazioneDTO> abilitazioni, Long idPiattaforma, Map<Long, Long> roleIdMap) {

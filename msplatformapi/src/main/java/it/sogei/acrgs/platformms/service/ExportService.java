@@ -14,6 +14,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -55,9 +57,11 @@ public class ExportService {
     private String buildSqlScript(PersistenceObjectDTO dto) {
         StringBuilder sql = new StringBuilder();
         sql.append("SET DEFINE OFF;\n\n");
-        appendPiattaforma(sql, dto.getPiattaforma());
+        // i gruppi vanno inseriti PRIMA della piattaforma: il CONFIG_JSON risolve i loro id (role_groups) via subquery su CATEGORIA
+        appendGruppiRows(sql, dto.getGruppiAppartenenza());
+        appendPiattaforma(sql, dto.getPiattaforma(), dto.getGruppiAppartenenza());
         appendRuoli(sql, dto.getRuoli(), dto.getPiattaforma());
-        appendGruppi(sql, dto.getGruppiAppartenenza(), dto.getRuoli(), dto.getPiattaforma());
+        appendGruppiBridge(sql, dto.getGruppiAppartenenza(), dto.getRuoli(), dto.getPiattaforma());
         appendAbilitazioni(sql, dto, dto.getPiattaforma());
         return sql.toString();
     }
@@ -77,12 +81,12 @@ public class ExportService {
     }
 
     // piattaforma
-    private void appendPiattaforma(StringBuilder sql, PiattaformaDTO piattaforma) {
+    private void appendPiattaforma(StringBuilder sql, PiattaformaDTO piattaforma, List<GruppoAppartenenzaDTO> gruppi) {
         if (null == piattaforma) return;
         if (null != piattaforma.getId() && piattaforma.getId() > 0) {
-            appendUpdate(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", piattaforma.getId());
+            appendUpdate(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma, gruppi), "ID_PIATTAFORMA", piattaforma.getId());
         } else {
-            appendInsert(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", "SEQ_PIATTAFORMA.NEXTVAL");
+            appendInsert(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma, gruppi), "ID_PIATTAFORMA", "SEQ_PIATTAFORMA.NEXTVAL");
         }
     }
 
@@ -103,8 +107,8 @@ public class ExportService {
         }
     }
 
-    // gruppi e bridge
-    private void appendGruppi(StringBuilder sql, List<GruppoAppartenenzaDTO> gruppi, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {
+    // gruppi: solo le righe di GRUPPO_APPARTENENZA_RUOLI (prima della piattaforma, così il CONFIG_JSON le trova via subquery su CATEGORIA)
+    private void appendGruppiRows(StringBuilder sql, List<GruppoAppartenenzaDTO> gruppi) {
         if (null == gruppi || gruppi.isEmpty()) return;
         for (GruppoAppartenenzaDTO gruppo : gruppi) {
             if (gruppo.isDaEliminare() && null != gruppo.getId() && gruppo.getId() > 0) {
@@ -112,24 +116,42 @@ public class ExportService {
                 appendDelete(sql, "GRUPPO_APPARTENENZA_RUOLI", "ID_GRUPPO_APPARTENENZA", gruppo.getId());
             } else if (null != gruppo.getId() && gruppo.getId() > 0) {
                 appendUpdate(sql, "GRUPPO_APPARTENENZA_RUOLI", buildGruppoColumns(gruppo), "ID_GRUPPO_APPARTENENZA", gruppo.getId());
-                sql.append("DELETE FROM RUOLI_REF_APPARTENENZA WHERE ID_GRUPPO_APPARTENENZA = ").append(gruppo.getId()).append(";\n");
-                for (Long ruoloId : gruppo.getRuoliIds()) {
-                    String roleIdExpr = resolveRoleIdForSql(ruoloId, ruoli, piattaforma);
-                    sql.append("INSERT INTO RUOLI_REF_APPARTENENZA (ID_RUOLO, ID_GRUPPO_APPARTENENZA) VALUES (")
-                            .append(roleIdExpr).append(", ").append(gruppo.getId()).append(");\n");
-                }
             } else {
-                Map<String, String> cols = buildGruppoColumns(gruppo);
-                appendInsert(sql, "GRUPPO_APPARTENENZA_RUOLI", cols, "ID_GRUPPO_APPARTENENZA", "SEQ_GRUPPO_DI_APPARTENENZA_RUOLI.NEXTVAL");
-                String gruppoIdExpr = "(SELECT ID_GRUPPO_APPARTENENZA FROM " + tableName("GRUPPO_APPARTENENZA_RUOLI")
-                        + " WHERE CATEGORIA = " + quote(gruppo.getNome()) + ")";
-                for (Long ruoloId : gruppo.getRuoliIds()) {
-                    String roleIdExpr = resolveRoleIdForSql(ruoloId, ruoli, piattaforma);
-                    sql.append("INSERT INTO RUOLI_REF_APPARTENENZA (ID_RUOLO, ID_GRUPPO_APPARTENENZA) VALUES (")
-                            .append(roleIdExpr).append(", ").append(gruppoIdExpr).append(");\n");
-                }
+                appendInsert(sql, "GRUPPO_APPARTENENZA_RUOLI", buildGruppoColumns(gruppo), "ID_GRUPPO_APPARTENENZA", "SEQ_GRUPPO_DI_APPARTENENZA_RUOLI.NEXTVAL");
             }
         }
+    }
+
+    // bridge RUOLI_REF_APPARTENENZA: dopo i ruoli (servono ruoli e gruppi gia' inseriti). Id risolti per chiave naturale.
+    private void appendGruppiBridge(StringBuilder sql, List<GruppoAppartenenzaDTO> gruppi, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {
+        if (null == gruppi || gruppi.isEmpty()) return;
+        for (GruppoAppartenenzaDTO gruppo : gruppi) {
+            if (gruppo.isDaEliminare() && null != gruppo.getId() && gruppo.getId() > 0) {
+                continue;
+            }
+            boolean esistente = null != gruppo.getId() && gruppo.getId() > 0;
+            if (esistente) {
+                sql.append("DELETE FROM RUOLI_REF_APPARTENENZA WHERE ID_GRUPPO_APPARTENENZA = ").append(gruppo.getId()).append(";\n");
+            }
+            if (null == gruppo.getRuoliIds() || gruppo.getRuoliIds().isEmpty()) {
+                continue;
+            }
+            String gruppoIdExpr = gruppoIdExpr(gruppo);
+            for (Long ruoloId : gruppo.getRuoliIds()) {
+                String roleIdExpr = resolveRoleIdForSql(ruoloId, ruoli, piattaforma);
+                sql.append("INSERT INTO RUOLI_REF_APPARTENENZA (ID_RUOLO, ID_GRUPPO_APPARTENENZA) VALUES (")
+                        .append(roleIdExpr).append(", ").append(gruppoIdExpr).append(");\n");
+            }
+        }
+    }
+
+    // id gruppo: reale se esiste, altrimenti subquery su CATEGORIA (univoca)
+    private String gruppoIdExpr(GruppoAppartenenzaDTO gruppo) {
+        if (null != gruppo.getId() && gruppo.getId() > 0) {
+            return gruppo.getId().toString();
+        }
+        return "(SELECT ID_GRUPPO_APPARTENENZA FROM " + tableName("GRUPPO_APPARTENENZA_RUOLI")
+                + " WHERE CATEGORIA = " + quote(gruppo.getNome()) + ")";
     }
 
     // abilitazioni -> PIATTAFORMA_REF_PROCESS
@@ -207,7 +229,7 @@ public class ExportService {
     }
 
     // builder colonne
-    private Map<String, String> buildPlatformColumns(PiattaformaDTO dto) {
+    private Map<String, String> buildPlatformColumns(PiattaformaDTO dto, List<GruppoAppartenenzaDTO> gruppi) {
         Map<String, String> cols = new LinkedHashMap<>();
         cols.put("NOME", quote(dto.getNome()));
         cols.put("DESCRIZIONE", quote(dto.getDescrizione()));
@@ -220,8 +242,41 @@ public class ExportService {
         cols.put("RICHIEDIBILE_IN_CORSO", boolToInt(dto.getRichiedibileInCorso()));
         cols.put("RIPETIBILE", boolToInt(dto.getRipetibile()));
         cols.put("UTILIZZO_MODELLO_AUTORIZZATIVO", boolToInt(dto.getUtilizzoModelloAutorizzativo()));
-        cols.put("CONFIG_JSON", quote(piattaformaService.toConfigJson(dto)));
+        cols.put("CONFIG_JSON", buildConfigJsonSqlExpr(dto, gruppi));
         return cols;
+    }
+
+    private String buildConfigJsonSqlExpr(PiattaformaDTO dto, List<GruppoAppartenenzaDTO> gruppi) {
+        String json = piattaformaService.toConfigJson(dto);
+
+        Matcher matcher = Pattern.compile("(?<=[\\[,])-\\d+(?=[,\\]])").matcher(json);
+        StringBuilder expr = new StringBuilder();
+        int last = 0;
+        boolean trovati = false;
+        while (matcher.find()) {
+            trovati = true;
+            expr.append("'").append(sqlEscape(json.substring(last, matcher.start()))).append("' || ");
+            expr.append(gruppoIdExprById(Long.parseLong(matcher.group()), gruppi));
+            expr.append(" || ");
+            last = matcher.end();
+        }
+        if (!trovati) {
+            return quote(json);
+        }
+        expr.append("'").append(sqlEscape(json.substring(last))).append("'");
+        return expr.toString();
+    }
+
+    private String gruppoIdExprById(Long id, List<GruppoAppartenenzaDTO> gruppi) {
+        if (null != gruppi) {
+            for (GruppoAppartenenzaDTO gruppo : gruppi) {
+                if (null != gruppo.getId() && gruppo.getId().equals(id)) {
+                    return "(SELECT ID_GRUPPO_APPARTENENZA FROM " + tableName("GRUPPO_APPARTENENZA_RUOLI")
+                            + " WHERE CATEGORIA = " + quote(gruppo.getNome()) + ")";
+                }
+            }
+        }
+        return id.toString();
     }
 
     private Map<String, String> buildRuoloColumns(RuoloDTO dto) {
@@ -243,6 +298,10 @@ public class ExportService {
     private String quote(String value) {
         if (null == value) return "NULL";
         return "'" + value.replace("'", "''") + "'";
+    }
+
+    private String sqlEscape(String value) {
+        return null == value ? "" : value.replace("'", "''");
     }
 
     private String nullToSql(Object value) {
