@@ -46,32 +46,6 @@ public class Constants {
     public static final String TABLE_PIATTAFORMA_REF_PROCESS = "PIATTAFORMA_REF_PROCESS";
     public static final String SEQ_PIATTAFORMA_REF_PROCESS = "SEQ_PIATTAFORMA_REF_PROCESS";
     public static final String COL_ID_PIATTAFORMA_REF_PROCESS = "ID_PIATTAFORMA_REF_PROCESS";
-    //export
-    public static final String SQL_EXPORT_HEADER =
-            "-- =============================================\n" +
-                    "-- DML SCRIPT GENERATO AUTOMATICAMENTE\n" +
-                    "-- DATE: %s\n" +
-                    "-- =============================================\n\n" +
-                    "SET DEFINE OFF;\n" +
-                    "SET SERVEROUTPUT ON;\n\n";
-
-    public static final String SQL_DECLARE =
-            "DECLARE\n" +
-                    "  v_piattaforma_id NUMBER;\n" +
-                    "  v_ruolo_id NUMBER;\n" +
-                    "  v_gruppo_id NUMBER;\n" +
-                    "BEGIN\n";
-
-    public static final String SQL_FOOTER =
-            "  COMMIT;\n" +
-                    "  DBMS_OUTPUT.PUT_LINE('Script eseguito con successo.');\n" +
-                    "EXCEPTION\n" +
-                    "  WHEN OTHERS THEN\n" +
-                    "    DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);\n" +
-                    "    ROLLBACK;\n" +
-                    "END;\n" +
-                    "/\n";
-    public static final String SQL_DECLARE_HEADER = "DECLARE\n";
-    public static final String SQL_DECLARE_VAR = "  %s NUMBER;\n";
-    public static final String SQL_BEGIN = "BEGIN\n";
+    // export
+    public static final String NOME_SCHEMA  = "ANAGRAFICA_RGS";
 }
