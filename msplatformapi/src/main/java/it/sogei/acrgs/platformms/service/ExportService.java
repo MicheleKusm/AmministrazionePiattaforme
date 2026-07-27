@@ -55,17 +55,40 @@ public class ExportService {
     private String buildSqlScript(PersistenceObjectDTO dto) {
         StringBuilder sql = new StringBuilder();
         sql.append("SET DEFINE OFF;\n\n");
-        // piattaforma
-        PiattaformaDTO piattaforma = dto.getPiattaforma();
-        if (null != piattaforma) {
-            if (null != piattaforma.getId() && piattaforma.getId() > 0) {
-                appendUpdate(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", piattaforma.getId());
-            } else {
-                appendInsert(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", "SEQ_PIATTAFORMA.NEXTVAL");
+        appendPiattaforma(sql, dto.getPiattaforma());
+        appendRuoli(sql, dto.getRuoli(), dto.getPiattaforma());
+        appendGruppi(sql, dto.getGruppiAppartenenza(), dto.getRuoli(), dto.getPiattaforma());
+        appendAbilitazioni(sql, dto, dto.getPiattaforma());
+        return sql.toString();
+    }
+
+    private String resolveRoleIdForSql(Long roleId, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {
+        if (null == roleId) return "NULL";
+        if (roleId > 0) return roleId.toString();
+        // roleId < 0 -> nuovo
+        for (RuoloDTO ruolo : ruoli) {
+            if (null != ruolo.getId() && ruolo.getId().equals(roleId)) {
+                return "(SELECT ID_RUOLO FROM " + tableName("RUOLO")
+                        + " WHERE NOME = " + quote(ruolo.getNome())
+                        + " AND ID_PIATTAFORMA = " + piattaformaIdExpr(piattaforma) + ")";
             }
         }
-        // ruoli e tabella brige ruoli_ref_appartenenza
-        List<RuoloDTO> ruoli = null != dto.getRuoli() ? dto.getRuoli() : Collections.emptyList();
+        return "NULL";
+    }
+
+    // piattaforma
+    private void appendPiattaforma(StringBuilder sql, PiattaformaDTO piattaforma) {
+        if (null == piattaforma) return;
+        if (null != piattaforma.getId() && piattaforma.getId() > 0) {
+            appendUpdate(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", piattaforma.getId());
+        } else {
+            appendInsert(sql, "PIATTAFORMA", buildPlatformColumns(piattaforma), "ID_PIATTAFORMA", "SEQ_PIATTAFORMA.NEXTVAL");
+        }
+    }
+
+    // ruoli e bridge
+    private void appendRuoli(StringBuilder sql, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {
+        if (null == ruoli || ruoli.isEmpty()) return;
         for (RuoloDTO ruolo : ruoli) {
             if (ruolo.isDaEliminare() && null != ruolo.getId() && ruolo.getId() > 0) {
                 sql.append("DELETE FROM RUOLI_REF_APPARTENENZA WHERE ID_RUOLO = ").append(ruolo.getId()).append(";\n");
@@ -73,51 +96,40 @@ public class ExportService {
             } else if (null != ruolo.getId() && ruolo.getId() > 0) {
                 appendUpdate(sql, "RUOLO", buildRuoloColumns(ruolo), "ID_RUOLO", ruolo.getId());
             } else {
-                // nuovo ruolo, inserimento con sequenza
                 Map<String, String> cols = buildRuoloColumns(ruolo);
                 cols.put("ID_PIATTAFORMA", piattaformaIdExpr(piattaforma));
                 appendInsert(sql, "RUOLO", cols, "ID_RUOLO", "SEQ_RUOLO.NEXTVAL");
             }
         }
-        // gruppi e tavola brige ruoli_ref_appartenenza
-        List<GruppoAppartenenzaDTO> gruppi = null != dto.getGruppiAppartenenza() ? dto.getGruppiAppartenenza() : Collections.emptyList();
+    }
+
+    // gruppi e bridge
+    private void appendGruppi(StringBuilder sql, List<GruppoAppartenenzaDTO> gruppi, List<RuoloDTO> ruoli, PiattaformaDTO piattaforma) {
+        if (null == gruppi || gruppi.isEmpty()) return;
         for (GruppoAppartenenzaDTO gruppo : gruppi) {
             if (gruppo.isDaEliminare() && null != gruppo.getId() && gruppo.getId() > 0) {
                 sql.append("DELETE FROM RUOLI_REF_APPARTENENZA WHERE ID_GRUPPO_APPARTENENZA = ").append(gruppo.getId()).append(";\n");
                 appendDelete(sql, "GRUPPO_APPARTENENZA_RUOLI", "ID_GRUPPO_APPARTENENZA", gruppo.getId());
             } else if (null != gruppo.getId() && gruppo.getId() > 0) {
-                // Update group metadata
                 appendUpdate(sql, "GRUPPO_APPARTENENZA_RUOLI", buildGruppoColumns(gruppo), "ID_GRUPPO_APPARTENENZA", gruppo.getId());
-                // delete vecchi dati in bridge table
                 sql.append("DELETE FROM RUOLI_REF_APPARTENENZA WHERE ID_GRUPPO_APPARTENENZA = ").append(gruppo.getId()).append(";\n");
-                // insert nuovi date in bridge table
                 for (Long ruoloId : gruppo.getRuoliIds()) {
-                    String roleIdExpr = resolveRoleIdForSql(ruoloId);
+                    String roleIdExpr = resolveRoleIdForSql(ruoloId, ruoli, piattaforma);
                     sql.append("INSERT INTO RUOLI_REF_APPARTENENZA (ID_RUOLO, ID_GRUPPO_APPARTENENZA) VALUES (")
                             .append(roleIdExpr).append(", ").append(gruppo.getId()).append(");\n");
                 }
             } else {
-                // nuovo gruppo, inserimento con sequenza
                 Map<String, String> cols = buildGruppoColumns(gruppo);
                 appendInsert(sql, "GRUPPO_APPARTENENZA_RUOLI", cols, "ID_GRUPPO_APPARTENENZA", "SEQ_GRUPPO_DI_APPARTENENZA_RUOLI.NEXTVAL");
+                String gruppoIdExpr = "(SELECT ID_GRUPPO_APPARTENENZA FROM " + tableName("GRUPPO_APPARTENENZA_RUOLI")
+                        + " WHERE CATEGORIA = " + quote(gruppo.getNome()) + ")";
                 for (Long ruoloId : gruppo.getRuoliIds()) {
-                    String roleIdExpr = resolveRoleIdForSql(ruoloId);
+                    String roleIdExpr = resolveRoleIdForSql(ruoloId, ruoli, piattaforma);
                     sql.append("INSERT INTO RUOLI_REF_APPARTENENZA (ID_RUOLO, ID_GRUPPO_APPARTENENZA) VALUES (")
-                            .append(roleIdExpr).append(", SEQ_GRUPPO_DI_APPARTENENZA_RUOLI.CURRVAL);\n");
+                            .append(roleIdExpr).append(", ").append(gruppoIdExpr).append(");\n");
                 }
             }
         }
-        // abilitazioni (PIATTAFORMA_REF_PROCESS)
-        appendAbilitazioni(sql, dto, piattaforma);
-        return sql.toString();
-    }
-
-    private String resolveRoleIdForSql(Long roleId) {
-        if (null == roleId) return "NULL";
-        if (roleId < 0) {
-            return "SEQ_RUOLO.CURRVAL";
-        }
-        return roleId.toString();
     }
 
     // abilitazioni -> PIATTAFORMA_REF_PROCESS
@@ -142,7 +154,7 @@ public class ExportService {
         if (insert) {
             cols.put("ID_PIATTAFORMA", piattaformaIdExpr(piattaforma));
         }
-        cols.put("ID_RUOLO", resolveRoleIdForSql(dto.getIdRuolo()));
+        cols.put("ID_RUOLO", resolveRoleIdForSql(dto.getIdRuolo(), Collections.emptyList(), piattaforma));
         cols.put("PROCESS_KEY", quote(ticket ? "altri" : nullToEmpty(dto.getProcessoVerticale())));
         cols.put("SCIM_CODE", ticket ? quote(nullToEmpty(dto.getCodiceScim())) : "NULL");
         cols.put("PROCESS_VARS", quote(buildProcessVars(dto)));
@@ -157,7 +169,7 @@ public class ExportService {
         }
     }
 
-    // id piattaforma: reale se esiste, altrimenti subquery su NOME + OBJ_CLASS 
+    // id piattaforma: reale se esiste, altrimenti subquery su NOME + OBJ_CLASS
     private String piattaformaIdExpr(PiattaformaDTO piattaforma) {
         if (null != piattaforma && null != piattaforma.getId() && piattaforma.getId() > 0) {
             return piattaforma.getId().toString();
