@@ -17,8 +17,7 @@ type CruscottoSezioneEditorProps = {
 const LABEL = "mb-1 block text-sm font-semibold text-gray-800"
 const INPUT =
     "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-const ICON_BTN =
-    "inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+const ICON_BTN = "inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
 
 function makeEmptyField(nextOrder: number): CruscottoFieldConfig {
     return { order: nextOrder, name: "", inputType: "" }
@@ -54,9 +53,11 @@ export function CruscottoSezioneEditor({
         return sezione.fields.reduce((m, f) => Math.max(m, f.order), 0) + 1
     }
     function salvaCampo(campo: CruscottoFieldConfig) {
-        const fields = [...sezione.fields]
-        if (campoDraftIdx != null) fields[campoDraftIdx] = campo
-        else fields.push(campo)
+        // altri campi (escludo quello in modifica), ordinati per posizione attuale
+        const altri = sezione.fields.filter((_, idx) => idx !== campoDraftIdx).sort((a, b) => a.order - b.order)
+        const pos = Math.min(Math.max(Number(campo.order) || 1, 1), altri.length + 1)
+        altri.splice(pos - 1, 0, campo)
+        const fields = altri.map((f, idx) => ({ ...f, order: idx + 1 }))
         set({ fields })
         setCampoDraft(null)
         setCampoDraftIdx(null)
@@ -88,13 +89,33 @@ export function CruscottoSezioneEditor({
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <button type="button" aria-label="Elimina" onClick={onDelete} className={`${ICON_BTN} hover:border-red-300 hover:text-red-600`}>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <button
+                        type="button"
+                        aria-label="Elimina"
+                        onClick={onDelete}
+                        className={`${ICON_BTN} hover:border-red-300 hover:text-red-600`}>
+                        <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2">
                             <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z" />
                         </svg>
                     </button>
-                    <button type="button" aria-label="Espandi" onClick={onToggleCollapse} className={ICON_BTN}>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <button
+                        type="button"
+                        aria-label="Espandi"
+                        onClick={onToggleCollapse}
+                        className={ICON_BTN}>
+                        <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2">
                             {collapsed ? <path d="m6 9 6 6 6-6" /> : <path d="m18 15-6-6-6 6" />}
                         </svg>
                     </button>
@@ -155,9 +176,14 @@ export function CruscottoSezioneEditor({
                         <div className="mt-4 grid gap-4 md:grid-cols-2 md:items-center">
                             <div>
                                 <label className={LABEL}>{Constants.cruscotto.SEZIONE_LAYOUT_LABEL}</label>
-                                <select className={INPUT} value={sezione.style.layout} onChange={(e) => setStyle({ layout: e.target.value })}>
+                                <select
+                                    className={INPUT}
+                                    value={sezione.style.layout}
+                                    onChange={(e) => setStyle({ layout: e.target.value })}>
                                     {Constants.cruscotto.LAYOUT_OPTIONS.map((o) => (
-                                        <option key={o.value} value={o.value}>
+                                        <option
+                                            key={o.value}
+                                            value={o.value}>
                                             {o.label}
                                         </option>
                                     ))}
@@ -222,10 +248,11 @@ export function CruscottoSezioneEditor({
                             </div>
                         ) : (
                             sezione.fields.map((f, i) => (
-                                <div key={i} className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3">
+                                <div
+                                    key={i}
+                                    className="flex items-center justify-between rounded-md border border-gray-200 px-4 py-3">
                                     <p className="text-sm text-gray-800">
-                                        <span className="font-semibold">{f.name}</span>{" "}
-                                        <span className="text-gray-500">({f.inputType})</span>
+                                        <span className="font-semibold">{f.name}</span> <span className="text-gray-500">({f.inputType})</span>
                                         <span className="ml-2 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
                                             Ordine: {f.order}
                                         </span>
@@ -239,7 +266,13 @@ export function CruscottoSezioneEditor({
                                                 setCampoDraft(f)
                                             }}
                                             className={ICON_BTN}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <svg
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2">
                                                 <path d="M12 20h9" />
                                                 <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                                             </svg>
@@ -249,7 +282,13 @@ export function CruscottoSezioneEditor({
                                             aria-label="Elimina"
                                             onClick={() => eliminaCampo(i)}
                                             className={`${ICON_BTN} hover:border-red-300 hover:text-red-600`}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <svg
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2">
                                                 <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z" />
                                             </svg>
                                         </button>
