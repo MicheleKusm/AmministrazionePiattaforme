@@ -290,6 +290,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             {step === 5 && (
                 <GruppiStep
                     gruppi={mergedGruppi}
+                    ruoli={ruoli} // 👈 pass down
                     onAdd={() => {
                         const tempId = gruppiTempIdCounter.current--
                         setGroupDraft({
