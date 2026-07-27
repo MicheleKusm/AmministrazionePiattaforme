@@ -32,7 +32,6 @@ import {
     updateRuolo
 } from "../store/riepilogoSlice"
 import { piattaformaSchema } from "../utils/schema"
-import { abilitazioneToDto } from "../utils/abilitazioneMapper"
 import { cruscottoToFormSteps } from "../utils/cruscottoMapper"
 import * as yup from "yup"
 
@@ -94,7 +93,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 piattaforma: piattaforma!,
                 ruoli: ruoli,
                 gruppiAppartenenza: editedGruppi,
-                abilitazioni: abilitazioni.map(abilitazioneToDto)
+                abilitazioni: abilitazioni
             }
             await exportSql(payload)
         } catch (err) {
@@ -181,7 +180,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 piattaforma: { ...piattaforma!, formSteps: cruscottoToFormSteps(cruscotto) },
                 ruoli: ruoli,
                 gruppiAppartenenza: editedGruppi,
-                abilitazioni: abilitazioni.map(abilitazioneToDto)
+                abilitazioni: abilitazioni
             }
             const result = await persist(payload).unwrap()
             if (Array.isArray(result) && result.length > 0) {

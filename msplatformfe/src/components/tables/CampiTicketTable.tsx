@@ -15,11 +15,11 @@ export function CampiTicketTable({ campi, onEdit, onDelete }: CampiTicketTablePr
         },
         {
             header: Constants.abilitazioneTable.CAMPO,
-            render: (c) => <span className="font-mono text-xs text-gray-600">{c.campo}</span>
+            render: (c) => <span className="font-mono text-xs text-gray-600">{c.key}</span>
         },
         {
             header: Constants.abilitazioneTable.OBBLIGATORIA,
-            render: (c) => <RequiredMark value={c.obbligatoria} />
+            render: (c) => <RequiredMark value={c.required} />
         },
         {
             header: Constants.abilitazioneTable.AZIONI,

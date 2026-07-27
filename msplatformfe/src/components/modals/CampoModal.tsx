@@ -18,18 +18,18 @@ const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm fo
 export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalProps) {
     const [draft, setDraft] = useState<CampoTicket>(campo);
 
-    const selezionato = draft.campo !== "";
+    const selezionato = draft.key !== "";
 
     function selezionaCampo(tipoDati: string) {
         const tip = tipologiche.find((t) => t.tipoDati === tipoDati);
         if (!tip) {
-            setDraft({ ...draft, campo: "", tipoValore: "", regex: "" });
+            setDraft({ ...draft, key: "", inputType: "", regex: "" });
             return;
         }
         setDraft({
             ...draft,
-            campo: tip.tipoDati,
-            tipoValore: tip.type,
+            key: tip.tipoDati,
+            inputType: tip.type,
             regex: tip.regex ?? ""
         });
     }
@@ -56,7 +56,7 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                     </label>
                     <select
                         className={INPUT_CLS}
-                        value={draft.campo}
+                        value={draft.key}
                         onChange={(e) => selezionaCampo(e.target.value)}>
                         <option value="">{Constants.campoModal.CAMPO_PH}</option>
                         {tipologiche.map((t) => (
@@ -97,15 +97,15 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                         <div className="flex items-center justify-between">
                             <label className={`${LABEL_CLS} mb-0`}>{Constants.campoModal.OBBLIGATORIO}</label>
                             <Toggle
-                                checked={draft.obbligatoria}
-                                onChange={(v) => setDraft({ ...draft, obbligatoria: v })}
+                                checked={draft.required}
+                                onChange={(v) => setDraft({ ...draft, required: v })}
                             />
                         </div>
 
                         <div>
                             <label className={LABEL_CLS}>{Constants.campoModal.TIPO_VALORE}</label>
-                            <select className={`${INPUT_CLS} bg-gray-100 text-gray-600`} value={draft.tipoValore} disabled>
-                                <option value={draft.tipoValore}>{draft.tipoValore}</option>
+                            <select className={`${INPUT_CLS} bg-gray-100 text-gray-600`} value={draft.inputType} disabled>
+                                <option value={draft.inputType}>{draft.inputType}</option>
                             </select>
                         </div>
 

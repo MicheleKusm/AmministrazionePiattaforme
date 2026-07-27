@@ -113,34 +113,7 @@ export type PersistenceObject = {
     piattaforma: Piattaforma
     ruoli: Ruolo[]
     gruppiAppartenenza: Gruppo[]
-    abilitazioni: AbilitazioneDto[]
-}
-
-// dto abilitazione lato persistenza (nomi campi allineati al backend AbilitazioneDTO)
-export type CampoTicketDto = {
-    id: number
-    label: string
-    descrizione: string
-    key: string
-    inputType: string
-    required: boolean
-    regex: string
-    cssClass: string | null
-}
-
-export type AbilitazioneDto = {
-    id: number
-    idPiattaforma?: number
-    nome: string
-    tipo: TipoAbilitazione
-    riferimento: string
-    stato: StatoAbilitazione
-    processKey: string
-    codiceScim: string
-    processoVerticale: string
-    daEliminare: boolean
-    campi: CampoTicketDto[]
-    comunicazioni: ComunicazioneOnboarding[]
+    abilitazioni: Abilitazione[]
 }
 
 // wizard
@@ -161,9 +134,9 @@ export type CampoTicket = {
     id: number
     label: string
     descrizione: string
-    campo: string
-    tipoValore: string
-    obbligatoria: boolean
+    key: string
+    inputType: string
+    required: boolean
     regex: string
     cssClass: string | null
 }
@@ -211,9 +184,9 @@ export const emptyCampoTicket: CampoTicket = {
     id: 0,
     label: "",
     descrizione: "",
-    campo: "",
-    tipoValore: "",
-    obbligatoria: true,
+    key: "",
+    inputType: "",
+    required: true,
     regex: "",
     cssClass: null
 }
