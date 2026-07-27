@@ -90,7 +90,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const handleExport = async () => {
         try {
             const payload: PersistenceObject = {
-                piattaforma: piattaforma!,
+                piattaforma: { ...piattaforma!, formSteps: cruscottoToFormSteps(cruscotto) },
                 ruoli: ruoli,
                 gruppiAppartenenza: editedGruppi,
                 abilitazioni: abilitazioni

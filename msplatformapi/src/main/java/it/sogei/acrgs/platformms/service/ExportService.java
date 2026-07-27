@@ -1,9 +1,8 @@
 package it.sogei.acrgs.platformms.service;
 
-import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
-import it.sogei.acrgs.platformms.dto.PersistenceObjectDTO;
-import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
-import it.sogei.acrgs.platformms.dto.RuoloDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.sogei.acrgs.platformms.dto.*;
 import it.sogei.acrgs.platformms.exceptions.ExportException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +26,7 @@ import static it.sogei.acrgs.platformms.utils.Constants.NOME_SCHEMA;
 public class ExportService {
     private final PersistenceService persistenceService;
     private final PiattaformaService piattaformaService;
+    private final ObjectMapper objectMapper;
     private final Environment environment;
     @Value("${show-export-schema}")
     private Boolean showExportSchema;
@@ -75,13 +75,7 @@ public class ExportService {
             } else {
                 // nuovo ruolo, inserimento con sequenza
                 Map<String, String> cols = buildRuoloColumns(ruolo);
-                String idPiattaformaExpr;
-                if (null != piattaforma.getId() && piattaforma.getId() > 0) {
-                    idPiattaformaExpr = piattaforma.getId().toString();
-                } else {
-                    idPiattaformaExpr = "SEQ_PIATTAFORMA.CURRVAL";
-                }
-                cols.put("ID_PIATTAFORMA", idPiattaformaExpr);
+                cols.put("ID_PIATTAFORMA", piattaformaIdExpr(piattaforma));
                 appendInsert(sql, "RUOLO", cols, "ID_RUOLO", "SEQ_RUOLO.NEXTVAL");
             }
         }
@@ -113,7 +107,8 @@ public class ExportService {
                 }
             }
         }
-        // TODO abilitazioni e cruscotto
+        // abilitazioni (PIATTAFORMA_REF_PROCESS)
+        appendAbilitazioni(sql, dto, piattaforma);
         return sql.toString();
     }
 
@@ -123,6 +118,57 @@ public class ExportService {
             return "SEQ_RUOLO.CURRVAL";
         }
         return roleId.toString();
+    }
+
+    // abilitazioni -> PIATTAFORMA_REF_PROCESS
+    private void appendAbilitazioni(StringBuilder sql, PersistenceObjectDTO dto, PiattaformaDTO piattaforma) {
+        List<AbilitazioneDTO> abilitazioni = null != dto.getAbilitazioni() ? dto.getAbilitazioni() : Collections.emptyList();
+        for (AbilitazioneDTO abilitazione : abilitazioni) {
+            if (abilitazione.isDaEliminare() && null != abilitazione.getId() && abilitazione.getId() > 0) {
+                appendDelete(sql, "PIATTAFORMA_REF_PROCESS", "ID_PIATTAFORMA_REF_PROCESS", abilitazione.getId());
+            } else if (abilitazione.isDaEliminare()) {
+                // nuova abilitazione marcata daEliminare: nessuna azione
+            } else if (null != abilitazione.getId() && abilitazione.getId() > 0) {
+                appendUpdate(sql, "PIATTAFORMA_REF_PROCESS", buildAbilitazioneColumns(abilitazione, piattaforma, false), "ID_PIATTAFORMA_REF_PROCESS", abilitazione.getId());
+            } else {
+                appendInsert(sql, "PIATTAFORMA_REF_PROCESS", buildAbilitazioneColumns(abilitazione, piattaforma, true), "ID_PIATTAFORMA_REF_PROCESS", "SEQ_PIATTAFORMA_REF_PROCESS.NEXTVAL");
+            }
+        }
+    }
+
+    private Map<String, String> buildAbilitazioneColumns(AbilitazioneDTO dto, PiattaformaDTO piattaforma, boolean insert) {
+        boolean ticket = "TICKET".equalsIgnoreCase(dto.getTipo());
+        Map<String, String> cols = new LinkedHashMap<>();
+        if (insert) {
+            cols.put("ID_PIATTAFORMA", piattaformaIdExpr(piattaforma));
+        }
+        cols.put("ID_RUOLO", resolveRoleIdForSql(dto.getIdRuolo()));
+        cols.put("PROCESS_KEY", quote(ticket ? "altri" : nullToEmpty(dto.getProcessoVerticale())));
+        cols.put("SCIM_CODE", ticket ? quote(nullToEmpty(dto.getCodiceScim())) : "NULL");
+        cols.put("PROCESS_VARS", quote(buildProcessVars(dto)));
+        return cols;
+    }
+
+    private String buildProcessVars(AbilitazioneDTO dto) {
+        try {
+            return objectMapper.writeValueAsString(new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni()));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("PROCESS_VARS non serializzabile per l'export", e);
+        }
+    }
+
+    // id piattaforma: reale se esiste, altrimenti subquery su NOME + OBJ_CLASS 
+    private String piattaformaIdExpr(PiattaformaDTO piattaforma) {
+        if (null != piattaforma && null != piattaforma.getId() && piattaforma.getId() > 0) {
+            return piattaforma.getId().toString();
+        }
+        return "(SELECT ID_PIATTAFORMA FROM " + tableName("PIATTAFORMA")
+                + " WHERE NOME = " + quote(null == piattaforma ? null : piattaforma.getNome())
+                + " AND OBJ_CLASS = " + quote(null == piattaforma ? null : piattaforma.getObjClass()) + ")";
+    }
+
+    private String nullToEmpty(String value) {
+        return null == value ? "" : value;
     }
 
     // metodi helper per sql
