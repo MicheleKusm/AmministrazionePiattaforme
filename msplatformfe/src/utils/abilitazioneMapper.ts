@@ -20,13 +20,13 @@ export function abilitazioneToDto(a: Abilitazione): AbilitazioneDto {
             key: c.campo,
             inputType: c.tipoValore,
             required: c.obbligatoria,
-            regex: c.regex
+            regex: c.regex,
+            cssClass: c.cssClass
         })),
         comunicazioni: a.comunicazioni.map((co) => ({
             id: co.id,
             icona: co.icona,
-            testo: co.testo,
-            obbligatoria: co.obbligatoria
+            testo: co.testo
         }))
     }
 }

@@ -1,6 +1,6 @@
 import type { Column, ComunicazioneOnboarding, ComunicazioniTableProps } from "../../types/type"
 import { TableCommon } from "../common/TableCommon"
-import { IconActions, RequiredMark } from "./RowActions"
+import { IconActions } from "./RowActions"
 import { IconaComunicazioneGlyph } from "../common/IconaComunicazione"
 import { Constants } from "../../utils/Constants"
 
@@ -22,10 +22,6 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
                     {c.icona}
                 </span>
             )
-        },
-        {
-            header: Constants.abilitazioneTable.OBBLIGATORIA,
-            render: (c) => <RequiredMark value={c.obbligatoria} />
         },
         {
             header: Constants.abilitazioneTable.AZIONI,

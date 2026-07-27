@@ -132,7 +132,7 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                         <CruscottoSezioniManager
                             sezioni={activeConfig.sezioni}
                             gruppi={gruppi.filter((g) => g.id != null && activeConfig.gruppiIds.includes(g.id))}
-                            esteso={active === "STEP_METADATI"}
+                            esteso={active === "STEP_DATI" || active === "STEP_METADATI"}
                             onChange={(sezioni) => dispatch(updateCruscottoStep({ ...activeConfig, sezioni }))}
                         />
                     )}

@@ -33,6 +33,7 @@ import {
 } from "../store/riepilogoSlice"
 import { piattaformaSchema } from "../utils/schema"
 import { abilitazioneToDto } from "../utils/abilitazioneMapper"
+import { cruscottoToFormSteps } from "../utils/cruscottoMapper"
 import * as yup from "yup"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
@@ -63,6 +64,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const allGruppi = useAppSelector((state) => state.gruppi.items) // main store
     const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi) // wizard store
     const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
+    const cruscotto = useAppSelector((state) => state.riepilogo.cruscotto)
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma?.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
@@ -176,7 +178,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     async function saveFinalConfiguration() {
         try {
             const payload: PersistenceObject = {
-                piattaforma: piattaforma!,
+                piattaforma: { ...piattaforma!, formSteps: cruscottoToFormSteps(cruscotto) },
                 ruoli: ruoli,
                 gruppiAppartenenza: editedGruppi,
                 abilitazioni: abilitazioni.map(abilitazioneToDto)

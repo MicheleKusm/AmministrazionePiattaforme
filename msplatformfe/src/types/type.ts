@@ -1,4 +1,5 @@
 import type { ReactNode, SyntheticEvent } from "react"
+import type { FormStepDTO } from "../utils/cruscottoMapper"
 
 // piattaforme
 export type Piattaforma = {
@@ -17,6 +18,7 @@ export type Piattaforma = {
     ripetibile: boolean
     utilizzoModelloAutorizzativo: boolean
     abilitazione: TipoAbilitazione
+    formSteps?: FormStepDTO[]
 }
 
 export const emptyPiattaforma: Piattaforma = {
@@ -123,13 +125,7 @@ export type CampoTicketDto = {
     inputType: string
     required: boolean
     regex: string
-}
-
-export type ComunicazioneOnboardingDto = {
-    id: number
-    icona: string
-    testo: string
-    obbligatoria: boolean
+    cssClass: string | null
 }
 
 export type AbilitazioneDto = {
@@ -144,7 +140,7 @@ export type AbilitazioneDto = {
     processoVerticale: string
     daEliminare: boolean
     campi: CampoTicketDto[]
-    comunicazioni: ComunicazioneOnboardingDto[]
+    comunicazioni: ComunicazioneOnboarding[]
 }
 
 // wizard
@@ -169,13 +165,13 @@ export type CampoTicket = {
     tipoValore: string
     obbligatoria: boolean
     regex: string
+    cssClass: string | null
 }
 
 export type ComunicazioneOnboarding = {
     id: number
     icona: string
     testo: string
-    obbligatoria: boolean
 }
 
 export type Abilitazione = {
@@ -218,14 +214,14 @@ export const emptyCampoTicket: CampoTicket = {
     campo: "",
     tipoValore: "",
     obbligatoria: true,
-    regex: ""
+    regex: "",
+    cssClass: null
 }
 
 export const emptyComunicazione: ComunicazioneOnboarding = {
     id: 0,
     icona: "",
-    testo: "",
-    obbligatoria: true
+    testo: ""
 }
 
 export function makeEmptyAbilitazione(): Abilitazione {

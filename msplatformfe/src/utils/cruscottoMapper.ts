@@ -56,9 +56,7 @@ function fieldDtoToConfig(f: FieldDTO): CruscottoFieldConfig {
 
 // isChild=true → non serializza `order` (nel JSON i figli hanno solo name/inputType)
 function configToFieldDto(f: CruscottoFieldConfig, isChild = false): FieldDTO {
-    const dto: FieldDTO = isChild
-        ? { name: f.name, inputType: f.inputType }
-        : { order: f.order, name: f.name, inputType: f.inputType }
+    const dto: FieldDTO = isChild ? { name: f.name, inputType: f.inputType } : { order: f.order, name: f.name, inputType: f.inputType }
     if (f.label) dto.label = f.label
     if (f.labelRiepilogo) dto.labelRiepilogo = f.labelRiepilogo
     if (f.description) dto.description = f.description
@@ -82,7 +80,7 @@ function sectionDtoToConfig(s: SectionDTO): CruscottoSezioneConfig {
     }
 }
 
-// includeStyle=false (STEP_DATI) → la sezione non serializza `style`
+// includeStyle=false → la sezione non serializza `style` (sia STEP_DATI che STEP_METADATI lo includono)
 function configToSectionDto(s: CruscottoSezioneConfig, includeStyle: boolean): SectionDTO {
     const dto: SectionDTO = {
         header: s.header,
@@ -111,7 +109,7 @@ export function formStepsToCruscotto(formSteps: FormStepDTO[]): CruscottoStepCon
 }
 
 // stato UI del builder -> backend (solo gli step abilitati entrano in formSteps)
-// STEP_RUOLO non ha sezioni; STEP_DATI ha sezioni SENZA style; STEP_METADATI ha sezioni CON style.
+// STEP_RUOLO non ha sezioni; STEP_DATI e STEP_METADATI hanno sezioni CON style (stesso form).
 export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStepDTO[] {
     return cruscotto
         .filter((c) => c.abilitato)
@@ -122,7 +120,7 @@ export function cruscottoToFormSteps(cruscotto: CruscottoStepConfig[]): FormStep
                 role_groups: c.gruppiIds
             }
             if (c.chiave !== "STEP_RUOLO" && c.sezioni.length > 0) {
-                const includeStyle = c.chiave === "STEP_METADATI"
+                const includeStyle = c.chiave === "STEP_DATI" || c.chiave === "STEP_METADATI"
                 step.sections = c.sezioni.map((s) => configToSectionDto(s, includeStyle))
             }
             return step

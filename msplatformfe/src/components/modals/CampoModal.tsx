@@ -121,6 +121,19 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                                 onChange={(e) => setDraft({ ...draft, regex: e.target.value })}
                             />
                         </div>
+
+                        <div>
+                            <label className={LABEL_CLS}>
+                                {Constants.campoModal.CSS_CLASS}{" "}
+                                <span className="font-normal text-gray-400">{Constants.campoModal.REGEX_OPZIONALE}</span>
+                            </label>
+                            <input
+                                className={INPUT_CLS}
+                                placeholder={Constants.campoModal.CSS_CLASS_PH}
+                                value={draft.cssClass ?? ""}
+                                onChange={(e) => setDraft({ ...draft, cssClass: e.target.value })}
+                            />
+                        </div>
                     </>
                 )}
             </div>

@@ -116,6 +116,8 @@ export class Constants {
         REGEX: "Regex",
         REGEX_OPZIONALE: "(opzionale)",
         REGEX_PH: "Inserisci regex di validazione (opzionale)",
+        CSS_CLASS: "Css Class",
+        CSS_CLASS_PH: "Classe CSS",
         HINT: "Seleziona un campo per configurare la chiave.",
         SALVA: "Salva campo",
         ANNULLA: "Annulla"
