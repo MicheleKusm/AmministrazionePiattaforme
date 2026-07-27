@@ -1,9 +1,13 @@
 package it.sogei.acrgs.platformms.service;
 
-import it.sogei.acrgs.platformms.dto.*;
+import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
+import it.sogei.acrgs.platformms.dto.PersistenceObjectDTO;
+import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
+import it.sogei.acrgs.platformms.dto.RuoloDTO;
 import it.sogei.acrgs.platformms.exceptions.ExportException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +25,11 @@ import static it.sogei.acrgs.platformms.utils.Constants.NOME_SCHEMA;
 @Service
 @RequiredArgsConstructor
 public class ExportService {
-
     private final PersistenceService persistenceService;
     private final PiattaformaService piattaformaService;
     private final Environment environment;
+    @Value("${show-export-schema}")
+    private Boolean showExportSchema;
 
     public byte[] exportSqlZip(PersistenceObjectDTO dto) throws ExportException {
         List<String> errors = persistenceService.validate(dto, new ArrayList<>());
@@ -111,6 +116,7 @@ public class ExportService {
         // TODO abilitazioni e cruscotto
         return sql.toString();
     }
+
     private String resolveRoleIdForSql(Long roleId) {
         if (null == roleId) return "NULL";
         if (roleId < 0) {
@@ -192,8 +198,8 @@ public class ExportService {
     }
 
     // env
-    private String getPrefissoSchema () {
-        if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+    private String getPrefissoSchema() {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("dev") || !showExportSchema) {
             return "";
         }
         return NOME_SCHEMA + ".";
