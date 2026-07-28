@@ -27,7 +27,9 @@ export function TableCommon<T>({
                         {columns.map((col, index) => (
                             <th
                                 key={index}
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                                className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300 ${
+                                    col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : "text-left"
+                                }`}>
                                 {col.header}
                             </th>
                         ))}
@@ -39,7 +41,9 @@ export function TableCommon<T>({
                             {columns.map((col, colIndex) => (
                                 <td
                                     key={colIndex}
-                                    className="px-6 py-4 text-sm border-b border-gray-200 break-words">
+                                    className={`px-6 py-4 text-sm border-b border-gray-200 break-words ${
+                                        col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : "text-left"
+                                    }`}>
                                     {col.render(item)}
                                 </td>
                             ))}

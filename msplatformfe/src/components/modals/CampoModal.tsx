@@ -114,12 +114,10 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
 
                         <div>
                             <label className={LABEL_CLS}>{Constants.campoModal.TIPO_VALORE}</label>
-                            <select
+                            <input
                                 className={`${INPUT_CLS} bg-gray-100 text-gray-600`}
                                 value={draft.inputType}
-                                disabled>
-                                <option value={draft.inputType}>{draft.inputType}</option>
-                            </select>
+                                disabled></input>
                         </div>
 
                         <div>

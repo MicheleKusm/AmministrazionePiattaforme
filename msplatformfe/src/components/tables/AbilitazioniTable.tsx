@@ -1,11 +1,11 @@
-import type { Abilitazione, AbilitazioniTableProps, Column } from "../../types/type";
-import { Badge } from "../common/Badge";
-import { TableCommon } from "../common/TableCommon";
-import { Constants } from "../../utils/Constants";
+import type { Abilitazione, AbilitazioniTableProps, Column } from "../../types/type"
+import { Badge } from "../common/Badge"
+import { TableCommon } from "../common/TableCommon"
+import { Constants } from "../../utils/Constants"
 
-const ACTION_BTN = "rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors";
+const ACTION_BTN = "rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors"
 
-export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: AbilitazioniTableProps) {
+export function AbilitazioniTable({ abilitazioni, onEdit, onDelete }: AbilitazioniTableProps) {
     const columns: Column<Abilitazione>[] = [
         {
             header: Constants.abilitazioneTable.NOME,
@@ -13,6 +13,7 @@ export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: 
         },
         {
             header: Constants.abilitazioneTable.TIPO,
+            align: "center",
             render: (a) =>
                 a.tipo === "VERTICALE" ? (
                     <Badge tone="green">{Constants.labelAbilitazione.VERTICALE}</Badge>
@@ -26,18 +27,14 @@ export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: 
         },
         {
             header: Constants.abilitazioneTable.STATO,
+            align: "center",
             render: (a) => <Badge tone="green">{a.stato}</Badge>
         },
         {
             header: Constants.abilitazioneTable.AZIONI,
+            align: "center",
             render: (a) => (
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={() => onDetail(a)}
-                        className={`${ACTION_BTN} border-gray-300 bg-white text-gray-700 hover:bg-gray-50`}>
-                        {Constants.abilitazione.DETTAGLIO}
-                    </button>
+                <div className="flex flex-nowrap justify-center gap-2">
                     <button
                         type="button"
                         onClick={() => onEdit(a)}
@@ -53,7 +50,7 @@ export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: 
                 </div>
             )
         }
-    ];
+    ]
 
     return (
         <TableCommon
@@ -62,5 +59,5 @@ export function AbilitazioniTable({ abilitazioni, onDetail, onEdit, onDelete }: 
             keyExtractor={(a: Abilitazione) => a.id}
             emptyMessage={<span className="block px-6 py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUNA}</span>}
         />
-    );
+    )
 }

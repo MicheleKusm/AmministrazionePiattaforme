@@ -67,7 +67,6 @@ export class Constants {
         SELEZIONA_PROCESSO_PH: "Seleziona un processo",
         COMUNICAZIONI: "Comunicazioni onboarding",
         AGGIUNGI_COMUNICAZIONE: "+ Aggiungi comunicazione",
-        DETTAGLIO: "Dettaglio",
         MODIFICA: "Modifica",
         ELIMINA: "Elimina",
         ANNULLA: "Annulla",
