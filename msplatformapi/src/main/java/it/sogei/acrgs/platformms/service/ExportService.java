@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.sogei.acrgs.platformms.dto.*;
 import it.sogei.acrgs.platformms.exceptions.ExportException;
+import it.sogei.acrgs.platformms.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -241,7 +242,9 @@ public class ExportService {
 
     private String buildProcessVars(AbilitazioneDTO dto) {
         try {
-            return objectMapper.writeValueAsString(new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni()));
+            ProcessVarDTO processVar = new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni());
+            Utility.mergeIcona(processVar.getOnboarding());
+            return objectMapper.writeValueAsString(processVar);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("PROCESS_VARS non serializzabile per l'export", e);
         }

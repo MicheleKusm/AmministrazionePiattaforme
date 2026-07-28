@@ -16,6 +16,7 @@ public class Constants {
     public static final String ROLE_GROUPS = "role_groups";
     public static final String CRUSCOTTO_PIATTAFORMA = "CRUSCOTTO PER PIATTAFORMA";
     public static final String FORM_STEPS = "formSteps";
+    public static final String SEP_ICONA = "-";
     //url const
     public static final String CRUSCOTTO = "/cruscotto";
     public static final String ID = "/{id}";

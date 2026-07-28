@@ -2,11 +2,7 @@ package it.sogei.acrgs.platformms.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.sogei.acrgs.platformms.dto.AbilitazioneDTO;
-import it.sogei.acrgs.platformms.dto.CampoTicketDTO;
-import it.sogei.acrgs.platformms.dto.ComunicazioneOnboardingDTO;
-import it.sogei.acrgs.platformms.dto.ProcessVarDTO;
-import it.sogei.acrgs.platformms.dto.TipologicaCampoDTO;
+import it.sogei.acrgs.platformms.dto.*;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.entity.PiattaformaRefProcess;
 import it.sogei.acrgs.platformms.entity.Ruolo;
@@ -14,12 +10,15 @@ import it.sogei.acrgs.platformms.repository.PiattaformaRefProcessRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.TipologicaCampoDinamicoRepository;
 import it.sogei.acrgs.platformms.utils.Constants;
+import it.sogei.acrgs.platformms.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static it.sogei.acrgs.platformms.utils.Constants.SEP_ICONA;
 
 @Slf4j
 @Service
@@ -30,7 +29,6 @@ public class AbilitazioneService {
     private static final String TIPO_VERTICALE = "VERTICALE";
     private static final String PROCESS_KEY_TICKET = "altri";
     private static final String STATO_ATTIVA = "Attiva";
-
     private final PiattaformaRefProcessRepository refProcessRepository;
     private final TipologicaCampoDinamicoRepository tipologicaRepository;
     private final PiattaformaRepository piattaformaRepository;
@@ -109,6 +107,7 @@ public class AbilitazioneService {
     private String buildProcessVars(AbilitazioneDTO dto) {
         ProcessVarDTO processVarDTO = new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni());
         assegnaIdMancanti(processVarDTO);
+        Utility.mergeIcona(processVarDTO.getOnboarding());
         try {
             return this.objectMapper.writeValueAsString(processVarDTO);
         } catch (JsonProcessingException ex) {
@@ -147,6 +146,13 @@ public class AbilitazioneService {
         try {
             ProcessVarDTO processVarDTO = this.objectMapper.readValue(s, ProcessVarDTO.class);
             assegnaIdMancanti(processVarDTO);
+            processVarDTO.getOnboarding().forEach(comunicazione -> {
+                if (comunicazione.getIcona() != null && !comunicazione.getIcona().isBlank()) {
+                    String[] parts = comunicazione.getIcona().split(SEP_ICONA, 2);
+                    comunicazione.setIcona(parts[0]);
+                    comunicazione.setTypeIcona(parts.length > 1 ? parts[1] : "");
+                }
+            });
             return processVarDTO;
         } catch (JsonProcessingException e) {
             log.error("Errore nel parsing di processVars: {}", s, e);
@@ -222,6 +228,7 @@ public class AbilitazioneService {
             }
         }
     }
+
 
     private String nullToEmpty(String value) {
         return value == null ? "" : value;
