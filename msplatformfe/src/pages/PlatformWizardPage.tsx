@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { useExport } from "../hooks/useExport"
 import {
     resetRiepilogo,
+    setCruscotto,
     setPiattaforma as setRiepilogoPiattaforma,
     setRuoli,
     updatePiattaforma as updateRiepilogoPiattaforma
@@ -155,6 +156,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 }
             }
             return
+        }
+        if (step === 6) {
+            const cruscottoPulito = cruscotto.map((c) => {
+                if (c.chiave !== "STEP_DATI" && c.chiave !== "STEP_METADATI") return c
+                const usati = new Set<number>()
+                c.sezioni.forEach((s) => s.gruppiIds.forEach((id) => usati.add(id)))
+                return { ...c, gruppiIds: c.gruppiIds.filter((id) => usati.has(id)) }
+            })
+            dispatch(setCruscotto(cruscottoPulito))
         }
         setStep((s) => Math.min(7, s + 1))
     }
