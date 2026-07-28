@@ -311,9 +311,11 @@ export type FormFieldProps = {
     error?: string
     className?: string
 }
+
 export type Column<T> = {
     header: string
     render: (item: T) => React.ReactNode
+    align?: "left" | "center" | "right"
 }
 
 export type TableProps<T> = {
