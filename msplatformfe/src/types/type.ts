@@ -1,5 +1,5 @@
-import type {ReactNode, SyntheticEvent} from "react"
-import type {FormStepDTO} from "../utils/cruscottoMapper" // piattaforme
+import type { ReactNode, SyntheticEvent } from "react"
+import type { FormStepDTO } from "../utils/cruscottoMapper" // piattaforme
 
 // piattaforme
 export type Piattaforma = {
@@ -343,6 +343,8 @@ export type ModalProps = {
 }
 
 export type ResultModalProps = {
+    title?: string
+    message?: string
     isOpen: boolean
     onClose: () => void
     success: boolean
