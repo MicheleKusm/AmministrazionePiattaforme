@@ -4,6 +4,7 @@ import it.sogei.acrgs.platformms.dto.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Set;
 
 import static it.sogei.acrgs.platformms.utils.Constants.REGEX_DESCRIZIONI;
 import static it.sogei.acrgs.platformms.utils.Constants.REGEX_NOMI;
@@ -14,6 +15,8 @@ public class Validation {
 
     private static final String TIPO_TICKET = "TICKET";
     private static final String TIPO_VERTICALE = "VERTICALE";
+
+    private static final Set<String> TIPI_ICONA_AMMESSI = Set.of("Solid", "outline");
 
     public void validazioneNomeDescObjclass(PiattaformaDTO dto, List<String> errors) {
         try {
@@ -339,6 +342,9 @@ public class Validation {
             if (null == comunicazione.getTesto() || comunicazione.getTesto().isBlank()) {
                 log.error("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
                 errors.add("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
+            }
+            if (null != comunicazione.getTypeIcona() && !TIPI_ICONA_AMMESSI.contains(comunicazione.getTypeIcona())) {
+                errors.add("Errore nella validazione delle abilitazioni, typeIcona non valido: " + comunicazione.getTypeIcona());
             }
         }
     }

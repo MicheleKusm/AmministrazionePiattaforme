@@ -18,5 +18,6 @@ public class ComunicazioneOnboardingDTO implements Serializable {
 
     private Long id;
     private String icona;
+    private String typeIcona;
     private String testo;
 }

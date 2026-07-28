@@ -152,9 +152,12 @@ export type CampoTicket = {
     apiSource: string | null
 }
 
+export type TipoIcona = "Solid" | "outline"
+
 export type ComunicazioneOnboarding = {
     id: number
     icona: string
+    typeIcona: TipoIcona
     testo: string
 }
 
@@ -206,6 +209,7 @@ export const emptyCampoTicket: CampoTicket = {
 export const emptyComunicazione: ComunicazioneOnboarding = {
     id: 0,
     icona: "",
+    typeIcona: "Solid",
     testo: ""
 }
 

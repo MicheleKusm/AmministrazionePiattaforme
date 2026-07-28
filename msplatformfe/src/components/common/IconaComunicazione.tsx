@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { TipoIcona } from "../../types/type";
 
 const common = {
     width: 18,
@@ -48,7 +49,8 @@ const GLYPHS: Record<string, ReactNode> = {
     )
 };
 
-export function IconaComunicazioneGlyph({ nome }: { nome: string }) {
+export function IconaComunicazioneGlyph({ nome, tipo = "outline" }: { nome: string; tipo?: TipoIcona }) {
     const glyph = GLYPHS[nome] ?? <rect x="4" y="4" width="16" height="16" rx="2" />;
-    return <svg {...common}>{glyph}</svg>;
+    const paint = tipo === "Solid" ? { fill: "currentColor", stroke: "none", strokeWidth: 0 } : {};
+    return <svg {...common} {...paint}>{glyph}</svg>;
 }

@@ -16,7 +16,7 @@ const LABEL_CLS = "mb-2 block text-sm font-semibold text-gray-800"
 const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
 
 export function ComunicazioneModal({ comunicazione, onSave, onClose }: ComunicazioneModalProps) {
-    const [draft, setDraft] = useState<ComunicazioneOnboarding>(comunicazione)
+    const [draft, setDraft] = useState<ComunicazioneOnboarding>({ ...comunicazione, typeIcona: comunicazione.typeIcona ?? "Solid" })
     const [iconeOpen, setIconeOpen] = useState(false)
 
     const { data: icone = [] } = useGetIconeQuery()
@@ -60,7 +60,7 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                             className={`${INPUT_CLS} flex items-center justify-between gap-2`}>
                             {draft.icona ? (
                                 <span className="flex items-center gap-2 text-gray-800">
-                                    <IconaComunicazioneGlyph nome={draft.icona} />
+                                    <IconaComunicazioneGlyph nome={draft.icona} tipo="outline" />
                                     {draft.icona}
                                 </span>
                             ) : (
@@ -96,7 +96,7 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                                                     className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
                                                         attivo ? "bg-primary-50 text-primary-700" : "text-gray-700 hover:bg-gray-50"
                                                     }`}>
-                                                    <IconaComunicazioneGlyph nome={nome} />
+                                                    <IconaComunicazioneGlyph nome={nome} tipo="outline" />
                                                     {nome}
                                                 </button>
                                             </li>
@@ -105,6 +105,28 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                                 </ul>
                             </>
                         )}
+                    </div>
+                </div>
+
+                <div>
+                    <label className={LABEL_CLS}>{Constants.comunicazioneModal.TIPO_ICONA_LABEL}</label>
+                    <div className="flex items-center gap-6">
+                        <label className="flex items-center gap-2 text-sm text-gray-800">
+                            <input
+                                type="checkbox"
+                                checked={draft.typeIcona === "Solid"}
+                                onChange={() => setDraft({ ...draft, typeIcona: "Solid" })}
+                            />
+                            {Constants.comunicazioneModal.TIPO_ICONA_SOLID}
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-gray-800">
+                            <input
+                                type="checkbox"
+                                checked={draft.typeIcona === "outline"}
+                                onChange={() => setDraft({ ...draft, typeIcona: "outline" })}
+                            />
+                            {Constants.comunicazioneModal.TIPO_ICONA_OUTLINE}
+                        </label>
                     </div>
                 </div>
 
