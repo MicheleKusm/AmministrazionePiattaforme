@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-import static it.sogei.acrgs.platformms.utils.Constants.REGEX_NOMI;
 import static it.sogei.acrgs.platformms.utils.Constants.REGEX_DESCRIZIONI;
+import static it.sogei.acrgs.platformms.utils.Constants.REGEX_NOMI;
 
 // mettere validazioni qui, richiamare con new validation().nomeMetodo()
 @Slf4j
@@ -15,7 +15,7 @@ public class Validation {
     private static final String TIPO_TICKET = "TICKET";
     private static final String TIPO_VERTICALE = "VERTICALE";
 
-    public void validazioneNomeDescObjclass (PiattaformaDTO dto, List<String> errors) {
+    public void validazioneNomeDescObjclass(PiattaformaDTO dto, List<String> errors) {
         try {
             log.info("validazioneNomeDescObjclass, INIZIO");
             if (null == dto.getNome() || dto.getNome().isBlank()) {
@@ -41,7 +41,7 @@ public class Validation {
         }
     }
 
-    public void validazionePersistenceObject (PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
+    public void validazionePersistenceObject(PersistenceObjectDTO persistenceObjectDTO, List<String> errors) {
         log.debug("validazionePersistenceObject, INIZIO, persistenceObjectDTO: {}", persistenceObjectDTO);
         if (null == persistenceObjectDTO) {
             log.error("Errore nella ricezione dei dati, persistenceDTO nullo");
@@ -56,7 +56,7 @@ public class Validation {
         log.debug("validazionePersistenceObject, FINE");
     }
 
-    private void validazionePiattaforma (PiattaformaDTO dto, List<String> errors) {
+    private void validazionePiattaforma(PiattaformaDTO dto, List<String> errors) {
         try {
             int initialSize = errors.size();
             boolean skipName = false;
@@ -117,7 +117,7 @@ public class Validation {
         }
     }
 
-    private void validazioneRuoli (List<RuoloDTO> ruoli, List<String> errors) {
+    private void validazioneRuoli(List<RuoloDTO> ruoli, List<String> errors) {
         try {
             int initialSize = errors.size();
             boolean skipName = false;
@@ -140,7 +140,7 @@ public class Validation {
                     log.error("Errore nella validazione dei ruoli, nome ruolo non valido");
                     errors.add("Errore nella validazione dei ruoli, nome ruolo non valido");
                 }
-                if (null == ruolo.getDescrizione() || ruolo.getDescrizione().isBlank()) {
+                if (null == ruolo.getDescrizione()) {
                     log.error("Errore nella validazione dei ruoli, descrizione ruolo nullo");
                     errors.add("Errore nella validazione dei ruoli, descrizione ruolo nullo");
                     skipDescription = true;
@@ -167,7 +167,7 @@ public class Validation {
         }
     }
 
-    private void validazioneGruppoAppartenenza (List<GruppoAppartenenzaDTO> gruppi, List<String> errors) {
+    private void validazioneGruppoAppartenenza(List<GruppoAppartenenzaDTO> gruppi, List<String> errors) {
         try {
             int initialSize = errors.size();
             boolean skipName = false;
@@ -217,7 +217,7 @@ public class Validation {
         }
     }
 
-    private void validazioneAbilitazioni (List<AbilitazioneDTO> abilitazioni, List<String> errors) {
+    private void validazioneAbilitazioni(List<AbilitazioneDTO> abilitazioni, List<String> errors) {
         try {
             int initialSize = errors.size();
             boolean skipTipo = false;
@@ -292,7 +292,7 @@ public class Validation {
         }
     }
 
-    private void validazioneCampiTicket (List<CampoTicketDTO> campi, List<String> errors) {
+    private void validazioneCampiTicket(List<CampoTicketDTO> campi, List<String> errors) {
         boolean skipLabel = false;
         boolean skipKey = false;
         if (null == campi || campi.isEmpty()) {
@@ -326,7 +326,7 @@ public class Validation {
         }
     }
 
-    private void validazioneComunicazioni (List<ComunicazioneOnboardingDTO> comunicazioni, List<String> errors) {
+    private void validazioneComunicazioni(List<ComunicazioneOnboardingDTO> comunicazioni, List<String> errors) {
         if (null == comunicazioni || comunicazioni.isEmpty()) {
             log.debug("Nessuna comunicazione onboarding presente, validazione non necessaria");
             return;
@@ -343,7 +343,7 @@ public class Validation {
         }
     }
 
-    private void validazioneCruscotto (List<FormStepDTO> formSteps, List<String> errors) {
+    private void validazioneCruscotto(List<FormStepDTO> formSteps, List<String> errors) {
         try {
             int initialSize = errors.size();
             boolean skipStep = false;
@@ -390,7 +390,7 @@ public class Validation {
         }
     }
 
-    private void validazioneSezioniCruscotto (List<SectionDTO> sezioni, List<String> errors) {
+    private void validazioneSezioniCruscotto(List<SectionDTO> sezioni, List<String> errors) {
         if (null == sezioni || sezioni.isEmpty()) {
             return;
         }
@@ -410,7 +410,7 @@ public class Validation {
         }
     }
 
-    private void validazioneCampiCruscotto (List<FieldDTO> fields, List<String> errors) {
+    private void validazioneCampiCruscotto(List<FieldDTO> fields, List<String> errors) {
         boolean skipName = false;
         boolean skipInputType = false;
         if (null == fields || fields.isEmpty()) {
