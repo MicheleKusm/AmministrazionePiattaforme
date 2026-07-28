@@ -20,4 +20,5 @@ public class TipologicaCampoDTO implements Serializable {
     private String type;
     private String regex;
     private Long idTipoDati;
+    private String apiSource;
 }

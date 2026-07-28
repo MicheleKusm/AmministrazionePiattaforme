@@ -1,54 +1,62 @@
-import { useState } from "react";
-import type { CampoTicket, TipologicaCampoDinamico } from "../../types/type";
-import { Modal } from "../common/Modal";
-import { Toggle } from "../common/Toggle";
-import { Button } from "../common/Button";
-import { Constants } from "../../utils/Constants";
+import { useState } from "react"
+import type { CampoTicket, TipologicaCampoDinamico } from "../../types/type"
+import { Modal } from "../common/Modal"
+import { Toggle } from "../common/Toggle"
+import { Button } from "../common/Button"
+import { Constants } from "../../utils/Constants"
 
 type CampoModalProps = {
-    campo: CampoTicket;
-    tipologiche: TipologicaCampoDinamico[];
-    onSave: (campo: CampoTicket) => void;
-    onClose: () => void;
-};
+    campo: CampoTicket
+    tipologiche: TipologicaCampoDinamico[]
+    onSave: (campo: CampoTicket) => void
+    onClose: () => void
+}
 
-const LABEL_CLS = "mb-1 block text-sm font-semibold text-gray-800";
-const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none";
+const LABEL_CLS = "mb-1 block text-sm font-semibold text-gray-800"
+const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
 
 export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalProps) {
-    const [draft, setDraft] = useState<CampoTicket>(campo);
+    const [draft, setDraft] = useState<CampoTicket>(campo)
 
-    const selezionato = draft.key !== "";
+    const selezionato = draft.key !== ""
 
     function selezionaCampo(tipoDati: string) {
-        const tip = tipologiche.find((t) => t.tipoDati === tipoDati);
+        const tip = tipologiche.find((t) => t.tipoDati === tipoDati)
         if (!tip) {
-            setDraft({ ...draft, key: "", inputType: "", regex: "" });
-            return;
+            setDraft({ ...draft, key: "", inputType: "", regex: "", apiSource: "" })
+            return
         }
         setDraft({
             ...draft,
             key: tip.tipoDati,
             inputType: tip.type,
-            regex: tip.regex ?? ""
-        });
+            regex: tip.regex ?? "",
+            apiSource: tip.apiSource ?? ""
+        })
     }
 
-    const valido = selezionato && draft.label.trim() !== "";
+    const valido = selezionato && draft.label.trim() !== ""
 
     const footer = (
         <>
-            <Button variant="secondary" onClick={onClose}>
+            <Button
+                variant="secondary"
+                onClick={onClose}>
                 {Constants.campoModal.ANNULLA}
             </Button>
-            <Button onClick={() => onSave(draft)} disabled={!valido}>
+            <Button
+                onClick={() => onSave(draft)}
+                disabled={!valido}>
                 {Constants.campoModal.SALVA}
             </Button>
         </>
-    );
+    )
 
     return (
-        <Modal title={Constants.campoModal.TITOLO} onClose={onClose} footer={footer}>
+        <Modal
+            title={Constants.campoModal.TITOLO}
+            onClose={onClose}
+            footer={footer}>
             <div className="space-y-4">
                 <div>
                     <label className={LABEL_CLS}>
@@ -60,7 +68,9 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                         onChange={(e) => selezionaCampo(e.target.value)}>
                         <option value="">{Constants.campoModal.CAMPO_PH}</option>
                         {tipologiche.map((t) => (
-                            <option key={t.idTipoDati} value={t.tipoDati}>
+                            <option
+                                key={t.idTipoDati}
+                                value={t.tipoDati}>
                                 {t.tipoDati}
                             </option>
                         ))}
@@ -104,15 +114,17 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
 
                         <div>
                             <label className={LABEL_CLS}>{Constants.campoModal.TIPO_VALORE}</label>
-                            <select className={`${INPUT_CLS} bg-gray-100 text-gray-600`} value={draft.inputType} disabled>
+                            <select
+                                className={`${INPUT_CLS} bg-gray-100 text-gray-600`}
+                                value={draft.inputType}
+                                disabled>
                                 <option value={draft.inputType}>{draft.inputType}</option>
                             </select>
                         </div>
 
                         <div>
                             <label className={LABEL_CLS}>
-                                {Constants.campoModal.REGEX}{" "}
-                                <span className="font-normal text-gray-400">{Constants.campoModal.REGEX_OPZIONALE}</span>
+                                {Constants.campoModal.REGEX} <span className="font-normal text-gray-400">{Constants.campoModal.REGEX_OPZIONALE}</span>
                             </label>
                             <input
                                 className={INPUT_CLS}
@@ -138,5 +150,5 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                 )}
             </div>
         </Modal>
-    );
+    )
 }

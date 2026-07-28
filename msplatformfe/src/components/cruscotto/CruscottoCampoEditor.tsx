@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { CruscottoFieldConfig } from "../../types/type"
 import { Constants } from "../../utils/Constants"
+import { useGetTipologicheQuery } from "../../api/abilitazioniApi"
 
 type CruscottoCampoEditorProps = {
     initial: CruscottoFieldConfig
@@ -14,7 +15,7 @@ const INPUT =
     "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
 
 export function CruscottoCampoEditor({ initial, esteso = false, onSave, onCancel }: CruscottoCampoEditorProps) {
-    const tipologie = Constants.cruscotto.TIPOLOGIE_CAMPO
+    const { data: tipologie = [] } = useGetTipologicheQuery()
 
     const [name, setName] = useState(initial.name)
     const [inputType, setInputType] = useState(initial.inputType)
@@ -28,20 +29,17 @@ export function CruscottoCampoEditor({ initial, esteso = false, onSave, onCancel
 
     function selezionaTipologia(value: string) {
         setName(value)
-        const t = tipologie.find((x) => x.name === value)
+        const t = tipologie.find((x) => x.tipoDati === value)
         if (t) {
-            setInputType(t.inputType)
-            setApiSource(t.apiSource)
+            setInputType(t.type)
+            setApiSource(t.apiSource ?? "")
         }
     }
 
     function aggiungiFiglio(value: string) {
-        const t = tipologie.find((x) => x.name === value)
+        const t = tipologie.find((x) => x.tipoDati === value)
         if (!t) return
-        setFigli((prev) => [
-            ...prev,
-            { order: prev.length + 1, name: t.name, inputType: t.inputType, apiSource: t.apiSource || undefined }
-        ])
+        setFigli((prev) => [...prev, { order: prev.length + 1, name: t.tipoDati ?? "", inputType: t.type, apiSource: t.apiSource ?? undefined }])
         setFiglioSel("")
     }
 
@@ -72,11 +70,16 @@ export function CruscottoCampoEditor({ initial, esteso = false, onSave, onCancel
                     <label className={LABEL}>
                         {Constants.cruscotto.CAMPO_TIPOLOGIA} <span className="text-primary-600">*</span>
                     </label>
-                    <select className={INPUT} value={name} onChange={(e) => selezionaTipologia(e.target.value)}>
+                    <select
+                        className={INPUT}
+                        value={name}
+                        onChange={(e) => selezionaTipologia(e.target.value)}>
                         <option value="">{Constants.cruscotto.CAMPO_TIPOLOGIA_PH}</option>
                         {tipologie.map((t) => (
-                            <option key={t.name} value={t.name}>
-                                {t.name} ({t.inputType})
+                            <option
+                                key={t.tipoDati}
+                                value={t.tipoDati ?? ""}>
+                                {t.tipoDati} ({t.type})
                             </option>
                         ))}
                     </select>
@@ -135,11 +138,16 @@ export function CruscottoCampoEditor({ initial, esteso = false, onSave, onCancel
             {esteso && (
                 <div className="mt-4">
                     <label className={LABEL}>{Constants.cruscotto.CAMPO_CHILDREN}</label>
-                    <select className={INPUT} value={figlioSel} onChange={(e) => aggiungiFiglio(e.target.value)}>
+                    <select
+                        className={INPUT}
+                        value={figlioSel}
+                        onChange={(e) => aggiungiFiglio(e.target.value)}>
                         <option value="">{Constants.cruscotto.CAMPO_CHILDREN_PH}</option>
                         {tipologie.map((t) => (
-                            <option key={t.name} value={t.name}>
-                                {t.name} ({t.inputType})
+                            <option
+                                key={t.tipoDati}
+                                value={t.tipoDati ?? ""}>
+                                {t.tipoDati} ({t.type})
                             </option>
                         ))}
                     </select>
@@ -150,15 +158,20 @@ export function CruscottoCampoEditor({ initial, esteso = false, onSave, onCancel
                                     key={i}
                                     className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-sm">
                                     <span>
-                                        <span className="font-semibold">{c.name}</span>{" "}
-                                        <span className="text-gray-500">({c.inputType})</span>
+                                        <span className="font-semibold">{c.name}</span> <span className="text-gray-500">({c.inputType})</span>
                                     </span>
                                     <button
                                         type="button"
                                         aria-label="Rimuovi"
                                         onClick={() => rimuoviFiglio(i)}
                                         className="text-gray-400 hover:text-red-600">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2">
                                             <path d="M18 6 6 18M6 6l12 12" />
                                         </svg>
                                     </button>
