@@ -3,6 +3,8 @@ package it.sogei.acrgs.platformms.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.sogei.acrgs.platformms.dto.AbilitazioneDTO;
+import it.sogei.acrgs.platformms.dto.CampoTicketDTO;
+import it.sogei.acrgs.platformms.dto.ComunicazioneOnboardingDTO;
 import it.sogei.acrgs.platformms.dto.ProcessVarDTO;
 import it.sogei.acrgs.platformms.dto.TipologicaCampoDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
@@ -106,6 +108,7 @@ public class AbilitazioneService {
 
     private String buildProcessVars(AbilitazioneDTO dto) {
         ProcessVarDTO processVarDTO = new ProcessVarDTO(dto.getCampi(), dto.getComunicazioni());
+        assegnaIdMancanti(processVarDTO);
         try {
             return this.objectMapper.writeValueAsString(processVarDTO);
         } catch (JsonProcessingException ex) {
@@ -142,7 +145,9 @@ public class AbilitazioneService {
             return new ProcessVarDTO();
         }
         try {
-            return this.objectMapper.readValue(s, ProcessVarDTO.class);
+            ProcessVarDTO processVarDTO = this.objectMapper.readValue(s, ProcessVarDTO.class);
+            assegnaIdMancanti(processVarDTO);
+            return processVarDTO;
         } catch (JsonProcessingException e) {
             log.error("Errore nel parsing di processVars: {}", s, e);
             throw new RuntimeException(e);
@@ -174,6 +179,48 @@ public class AbilitazioneService {
             sb.append(Character.toUpperCase(parte.charAt(0))).append(parte.substring(1));
         }
         return sb.toString();
+    }
+
+    private void assegnaIdMancanti(ProcessVarDTO processVarDTO) {
+        if (processVarDTO == null) {
+            return;
+        }
+        assegnaIdCampi(processVarDTO.getInputs());
+        assegnaIdComunicazioni(processVarDTO.getOnboarding());
+    }
+
+    private void assegnaIdCampi(List<CampoTicketDTO> campi) {
+        if (campi == null || campi.isEmpty()) {
+            return;
+        }
+        long maxId = 0L;
+        for (CampoTicketDTO campo : campi) {
+            if (campo.getId() != null && campo.getId() > maxId) {
+                maxId = campo.getId();
+            }
+        }
+        for (CampoTicketDTO campo : campi) {
+            if (campo.getId() == null) {
+                campo.setId(++maxId);
+            }
+        }
+    }
+
+    private void assegnaIdComunicazioni(List<ComunicazioneOnboardingDTO> comunicazioni) {
+        if (comunicazioni == null || comunicazioni.isEmpty()) {
+            return;
+        }
+        long maxId = 0L;
+        for (ComunicazioneOnboardingDTO comunicazione : comunicazioni) {
+            if (comunicazione.getId() != null && comunicazione.getId() > maxId) {
+                maxId = comunicazione.getId();
+            }
+        }
+        for (ComunicazioneOnboardingDTO comunicazione : comunicazioni) {
+            if (comunicazione.getId() == null) {
+                comunicazione.setId(++maxId);
+            }
+        }
     }
 
     private String nullToEmpty(String value) {
