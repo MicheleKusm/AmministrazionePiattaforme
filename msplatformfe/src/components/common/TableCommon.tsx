@@ -9,9 +9,16 @@ export function TableCommon<T>({
     tableClassName = ""
 }: TableProps<T>) {
     if (!data || data.length === 0) {
-        return <p>{emptyMessage}</p>
+        return (
+            <tr>
+                <td
+                    colSpan={columns.length}
+                    className="px-6 py-6 text-center text-sm text-500">
+                    {emptyMessage}
+                </td>
+            </tr>
+        )
     }
-
     return (
         <div className={`overflow-x-auto ${className}`.trim()}>
             <table className={`min-w-full divide-y divide-gray-200 border border-gray-300 ${tableClassName}`.trim()}>

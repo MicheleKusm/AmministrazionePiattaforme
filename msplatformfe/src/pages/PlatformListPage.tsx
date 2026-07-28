@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
+import debounce from "lodash/debounce"
 import { useGetPiattaformeQuery } from "../api/piattaformeApi"
 import { PlatformTable } from "../components/tables/PlatformTable"
 import { Pagination } from "../components/platform-list/Pagination"
@@ -9,13 +10,27 @@ import { Constants } from "../utils/Constants"
 const PAGE_SIZE = Constants.common.PAGE_SIZE
 
 export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
+    const [inputValue, setInputValue] = useState("")
     const [search, setSearch] = useState("")
     const [page, setPage] = useState(0)
+    const debouncedSetSearch = useRef(
+        debounce((value: string) => {
+            setSearch(value)
+        }, 400)
+    ).current
+
+    const handleInputChange = (value: string) => {
+        setInputValue(value)
+        setPage(0)
+        debouncedSetSearch(value)
+    }
+
     const { data, isLoading, error } = useGetPiattaformeQuery({
         search,
         page,
         size: PAGE_SIZE
     })
+
     const rows = data?.content ?? []
     const totalElements = data?.totalElements ?? 0
     const totalPages = data?.totalPages ?? 1
@@ -41,10 +56,9 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
                 <div className="flex items-center justify-between gap-4 px-6 py-4">
                     <h3 className="text-lg font-bold text-gray-900">Piattaforme configurate</h3>
                     <input
-                        value={search}
+                        value={inputValue}
                         onChange={(e) => {
-                            setPage(0)
-                            setSearch(e.target.value)
+                            handleInputChange(e.target.value)
                         }}
                         placeholder="Cerca piattaforme..."
                         className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-600 focus:outline-none"
