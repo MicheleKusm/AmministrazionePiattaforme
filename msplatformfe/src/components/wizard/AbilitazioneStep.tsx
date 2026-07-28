@@ -29,16 +29,16 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
 
     const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
 
-    const { data: abilitazioniData } = useGetAbilitazioniQuery(piattaforma?.id ?? skipToken)
+    const { data: abilitazioniData, isFetching } = useGetAbilitazioniQuery(piattaforma?.id ?? skipToken)
     const { data: tipologiche = [] } = useGetTipologicheQuery()
     const { data: processi = [] } = useGetProcessiVerticaliQuery()
 
     useEffect(() => {
-        if (abilitazioniData && !abilitazioniLoaded.current && abilitazioni.length === 0) {
+        if (abilitazioniData && !isFetching && !abilitazioniLoaded.current && abilitazioni.length === 0) {
             dispatch(setAbilitazioni(abilitazioniData))
             abilitazioniLoaded.current = true
         }
-    }, [abilitazioniData, abilitazioni.length, dispatch])
+    }, [abilitazioniData, isFetching, abilitazioni.length, dispatch])
 
     const visibili = abilitazioni.filter((a) => !a.daEliminare)
     const tipoBloccato = visibili.find((a) => a.id !== draft?.id)?.tipo

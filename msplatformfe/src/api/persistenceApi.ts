@@ -10,7 +10,7 @@ export const persistenceApi = platformApi.injectEndpoints({
                 method: "POST",
                 body: data,
             }),
-            invalidatesTags: ["Piattaforme", "Ruoli", "Gruppi"]
+            invalidatesTags: ["Piattaforme", "Ruoli", "Gruppi", "Abilitazioni"]
         })
     }),
     overrideExisting: false
