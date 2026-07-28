@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { skipToken } from "@reduxjs/toolkit/query"
 import { useGetGruppiAllQuery, useGetGruppoDependenciesQuery } from "../api/gruppiApi"
 import { useValidatePiattaformaInitMutation } from "../api/piattaformeApi"
@@ -20,20 +20,16 @@ import { setGruppi as setMainGruppi } from "../store/gruppiSlice"
 import { useAppDispatch, useAppSelector } from "../store/hooks"
 import { useExport } from "../hooks/useExport"
 import {
-    addGruppo,
-    addRuolo,
-    removeGruppo,
-    removeRuolo,
     resetRiepilogo,
     setPiattaforma as setRiepilogoPiattaforma,
     setRuoli,
-    updateGruppo,
-    updatePiattaforma as updateRiepilogoPiattaforma,
-    updateRuolo
+    updatePiattaforma as updateRiepilogoPiattaforma
 } from "../store/riepilogoSlice"
 import { piattaformaSchema } from "../utils/schema"
 import { cruscottoToFormSteps } from "../utils/cruscottoMapper"
 import * as yup from "yup"
+import { useRuoliWizard } from "../hooks/useRuoliWizard"
+import { useGruppiWizard } from "../hooks/useGruppiWizard"
 
 export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: PlatformWizardPageProps) {
     const dispatch = useAppDispatch()
@@ -57,27 +53,16 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [saveErrors, setSaveErrors] = useState<string[]>([])
     const [saveGenericError, setSaveGenericError] = useState(false)
     const { exportSql, isLoading: isExporting } = useExport()
+    const { ruoli, handleAddRuolo, handleUpdateRuolo, confirmDeleteRuolo } = useRuoliWizard()
+    const { editedGruppi, mergedGruppi, handleAddGruppo, handleUpdateGruppo, confirmDeleteGruppo } = useGruppiWizard()
 
     const piattaforma = useAppSelector((state) => state.riepilogo.piattaforma)
-    const ruoli = useAppSelector((state) => state.riepilogo.ruoli)
-    const allGruppi = useAppSelector((state) => state.gruppi.items) // main store
-    const editedGruppi = useAppSelector((state) => state.riepilogo.gruppi) // wizard store
     const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
     const cruscotto = useAppSelector((state) => state.riepilogo.cruscotto)
 
     const { data: ruoliData } = useGetRuoliQuery(piattaforma?.id ?? skipToken)
     const { data: gruppiData } = useGetGruppiAllQuery()
     const { data: dependenciesData, isLoading: depsLoading } = useGetGruppoDependenciesQuery(gruppoToDelete?.id ?? skipToken)
-
-    const mergedGruppi = useMemo(() => {
-        const all = [...allGruppi]
-        for (const t of editedGruppi) {
-            const idx = all.findIndex((g) => g.id === t.id)
-            if (idx >= 0) all[idx] = t
-            else all.push(t)
-        }
-        return all
-    }, [allGruppi, editedGruppi])
 
     const handleResultModalClose = () => {
         setResultModalOpen(false)
@@ -202,53 +187,13 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         }
     }
 
-    const handleAddRuolo = (ruolo: Ruolo) => dispatch(addRuolo(ruolo))
-    const handleUpdateRuolo = (ruolo: Ruolo) => dispatch(updateRuolo(ruolo))
     const handleDeleteRuolo = (ruolo: Ruolo) => {
         setRuoloToDelete(ruolo)
         setDeleteModalOpen(true)
     }
-    const confirmDeleteRuolo = () => {
-        if (ruoloToDelete) {
-            dispatch(removeRuolo(ruoloToDelete))
-            setRuoloToDelete(null)
-            setDeleteModalOpen(false)
-        }
-    }
-    const handleAddGruppo = (gruppo: Gruppo) => dispatch(addGruppo(gruppo))
-    const handleUpdateGruppo = (gruppo: Gruppo) => {
-        const isEdited = editedGruppi.some((g) => g.id === gruppo.id)
-        if (!isEdited && gruppo.id && gruppo.id > 0) {
-            const original = allGruppi.find((g) => g.id === gruppo.id)
-            if (original) {
-                dispatch(addGruppo({ ...original, ...gruppo }))
-            } else {
-                dispatch(addGruppo(gruppo))
-            }
-        } else {
-            dispatch(updateGruppo(gruppo))
-        }
-    }
     const handleDeleteGruppo = (gruppo: Gruppo) => {
         setGruppoToDelete(gruppo)
         setDeleteGruppoModalOpen(true)
-    }
-    const confirmDeleteGruppo = () => {
-        if (gruppoToDelete) {
-            const isEdited = editedGruppi.some((g) => g.id === gruppoToDelete.id)
-            if (!isEdited && gruppoToDelete.id && gruppoToDelete.id > 0) {
-                const original = allGruppi.find((g) => g.id === gruppoToDelete.id)
-                if (original) {
-                    dispatch(addGruppo({ ...original, daEliminare: true }))
-                } else {
-                    dispatch(addGruppo({ ...gruppoToDelete, daEliminare: true }))
-                }
-            } else {
-                dispatch(removeGruppo(gruppoToDelete))
-            }
-            setGruppoToDelete(null)
-            setDeleteGruppoModalOpen(false)
-        }
     }
 
     const handlePiattaformaChange = (updated: Piattaforma) => {
@@ -258,7 +203,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     return (
         <>
             <Stepper currentStep={step} />
-
             {step === 2 && (
                 <PiattaformaStep
                     piattaforma={piattaforma ?? initialPiattaforma}
@@ -266,7 +210,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     errors={piattaformaErrors}
                 />
             )}
-
             {step === 3 && (
                 <RuoliStep
                     piattaformaId={piattaforma?.id}
@@ -284,13 +227,11 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onEdit={setRoleDraft}
                 />
             )}
-
             {step === 4 && <AbilitazioneStep piattaforma={piattaforma ?? initialPiattaforma} />}
-
             {step === 5 && (
                 <GruppiStep
                     gruppi={mergedGruppi}
-                    ruoli={ruoli} // 👈 pass down
+                    ruoli={ruoli}
                     onAdd={() => {
                         const tempId = gruppiTempIdCounter.current--
                         setGroupDraft({
@@ -304,9 +245,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     onEdit={setGroupDraft}
                 />
             )}
-
             {step === 6 && <CruscottoStep piattaforma={piattaforma ?? initialPiattaforma} />}
-
             {step === 7 && (
                 <RiepilogoStep
                     gruppi={editedGruppi}
@@ -315,7 +254,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     tipoAbilitazione={tipoAbilitazione}
                 />
             )}
-
             <div className="actions">
                 <button
                     className="btn-secondary"
@@ -350,7 +288,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     </button>
                 )}
             </div>
-
             {roleDraft && (
                 <RoleModal
                     onClose={() => setRoleDraft(null)}
@@ -366,7 +303,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     role={roleDraft}
                 />
             )}
-
             {groupDraft && (
                 <GroupModal
                     group={groupDraft}
@@ -383,14 +319,20 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     ruoli={ruoli}
                 />
             )}
-
+            ;
             <DeleteConfirmationModal
                 isOpen={deleteModalOpen}
                 onClose={() => {
                     setDeleteModalOpen(false)
                     setRuoloToDelete(null)
                 }}
-                onConfirm={confirmDeleteRuolo}
+                onConfirm={() => {
+                    if (ruoloToDelete) {
+                        confirmDeleteRuolo(ruoloToDelete)
+                        setRuoloToDelete(null)
+                        setDeleteModalOpen(false)
+                    }
+                }}
                 message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
             />
             <DeleteConfirmationModal
@@ -399,7 +341,13 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     setDeleteGruppoModalOpen(false)
                     setGruppoToDelete(null)
                 }}
-                onConfirm={confirmDeleteGruppo}
+                onConfirm={() => {
+                    if (gruppoToDelete) {
+                        confirmDeleteGruppo(gruppoToDelete)
+                        setGruppoToDelete(null)
+                        setDeleteGruppoModalOpen(false)
+                    }
+                }}
                 title="Elimina gruppo"
                 message={
                     depsLoading
