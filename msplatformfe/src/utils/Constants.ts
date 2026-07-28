@@ -111,7 +111,7 @@ export class Constants {
         CAMPO: "Campo",
         CAMPO_PH: "Seleziona un campo",
         OBBLIGATORIO: "Obbligatorio",
-        TIPO_VALORE: "Tipo valore / Validazione",
+        TIPO_VALORE: "Tipo valore",
         TIPO_VALORE_PH: "Seleziona una tipologia",
         REGEX: "Regex",
         REGEX_OPZIONALE: "(opzionale)",

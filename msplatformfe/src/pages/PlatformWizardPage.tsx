@@ -44,6 +44,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
     const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
     const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
+    const [modalContext, setModalContext] = useState<"save" | "export" | null>(null)
     const [tipoAbilitazione] = useState<"TICKET" | "VERTICALE">("TICKET")
     const ruoliTempIdCounter = useRef(-1)
     const gruppiTempIdCounter = useRef(-1)
@@ -71,6 +72,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             dispatch(resetRiepilogo())
             onDone()
         }
+        setModalContext(null)
     }
 
     const handleExport = async () => {
@@ -82,8 +84,17 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 abilitazioni: abilitazioni
             }
             await exportSql(payload)
+            setSaveSuccess(true)
+            setSaveErrors([])
+            setSaveGenericError(false)
+            setModalContext("export")
+            setResultModalOpen(true)
         } catch (err) {
-            setPiattaformaErrors({ _general: err instanceof Error ? err.message : "Errore sconosciuto" })
+            setSaveSuccess(false)
+            setSaveErrors([err instanceof Error ? err.message : "Errore sconosciuto"])
+            setSaveGenericError(false)
+            setModalContext("export")
+            setResultModalOpen(true)
         }
     }
 
@@ -187,6 +198,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 setSaveErrors([])
                 setSaveGenericError(false)
             }
+            setModalContext("save")
             setResultModalOpen(true)
         } catch (err: any) {
             console.error("Salvataggio fallito: ", err)
@@ -329,7 +341,6 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     ruoli={ruoli}
                 />
             )}
-            ;
             <DeleteConfirmationModal
                 isOpen={deleteModalOpen}
                 onClose={() => {
@@ -375,6 +386,10 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                 success={saveSuccess}
                 errors={saveErrors}
                 genericError={saveGenericError}
+                title={modalContext === "export" ? (saveSuccess ? "Esportazione completata" : "Errore esportazione") : undefined}
+                message={
+                    modalContext === "export" ? (saveSuccess ? "Il file ZIP è stato scaricato correttamente." : saveErrors.join("\n")) : undefined
+                }
             />
         </>
     )
