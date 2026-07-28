@@ -50,6 +50,7 @@ public class AbilitazioneService {
                         .type(t.getType())
                         .regex(t.getRegex())
                         .idTipoDati(t.getIdTipoDati())
+                        .apiSource(t.getApiSource())
                         .build())
                 .toList();
     }

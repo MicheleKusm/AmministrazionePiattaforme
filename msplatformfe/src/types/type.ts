@@ -1,5 +1,5 @@
-import type { ReactNode, SyntheticEvent } from "react"
-import type { FormStepDTO } from "../utils/cruscottoMapper"
+import type {ReactNode, SyntheticEvent} from "react"
+import type {FormStepDTO} from "../utils/cruscottoMapper" // piattaforme
 
 // piattaforme
 export type Piattaforma = {
@@ -137,6 +137,7 @@ export type TipologicaCampoDinamico = {
     type: string
     regex: string | null
     idTipoDati: number
+    apiSource: string | null
 }
 
 export type CampoTicket = {
@@ -148,6 +149,7 @@ export type CampoTicket = {
     required: boolean
     regex: string
     cssClass: string | null
+    apiSource: string | null
 }
 
 export type ComunicazioneOnboarding = {
@@ -197,7 +199,8 @@ export const emptyCampoTicket: CampoTicket = {
     inputType: "",
     required: true,
     regex: "",
-    cssClass: null
+    cssClass: null,
+    apiSource: ""
 }
 
 export const emptyComunicazione: ComunicazioneOnboarding = {
@@ -231,7 +234,7 @@ export type CruscottoFieldConfig = {
     label?: string
     labelRiepilogo?: string
     description?: string
-    apiSource?: string
+    apiSource?: string | null
     children?: CruscottoFieldConfig[]
 }
 
