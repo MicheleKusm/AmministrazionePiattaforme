@@ -1,6 +1,8 @@
+import { useState } from "react"
 import type { CruscottoStepConfig, Gruppo } from "../../types/type"
 import { Toggle } from "../common/Toggle"
 import { Constants } from "../../utils/Constants"
+import { DeleteConfirmationModal } from "../modals/DeleteConfirmModal"
 
 type CruscottoSezioneProps = {
     config: CruscottoStepConfig
@@ -13,6 +15,26 @@ const INPUT =
 
 export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneProps) {
     const gruppiVisibili = gruppi.filter((g) => !g.daEliminare && g.id != null)
+    const [confermaOpen, setConfermaOpen] = useState(false)
+
+    const haDati = config.descrizione.trim() !== "" || config.gruppiIds.length > 0 || config.sezioni.length > 0
+
+    function handleToggle(v: boolean) {
+        if (v) {
+            onChange({ ...config, abilitato: true })
+            return
+        }
+        if (haDati) {
+            setConfermaOpen(true)
+        } else {
+            onChange({ ...config, abilitato: false })
+        }
+    }
+
+    function confermaDisabilita() {
+        onChange({ ...config, abilitato: false, descrizione: "", gruppiIds: [], sezioni: [] })
+        setConfermaOpen(false)
+    }
 
     function toggleGruppo(id: number) {
         const selected = config.gruppiIds.includes(id)
@@ -23,41 +45,11 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
     return (
         <div className="mt-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-700">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2">
-                    <rect
-                        x="3"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    />
-                    <rect
-                        x="14"
-                        y="3"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    />
-                    <rect
-                        x="3"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    />
-                    <rect
-                        x="14"
-                        y="14"
-                        width="7"
-                        height="7"
-                        rx="1"
-                    />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
                 </svg>
                 {Constants.cruscotto.CONFIGURA_SEZIONE}
             </div>
@@ -66,10 +58,7 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                 <div>
                     <p className="text-sm font-semibold text-gray-900">{Constants.cruscotto.ABILITA_STEP}</p>
                 </div>
-                <Toggle
-                    checked={config.abilitato}
-                    onChange={(v) => onChange({ ...config, abilitato: v })}
-                />
+                <Toggle checked={config.abilitato} onChange={handleToggle} />
             </div>
 
             <div className="mt-5">
@@ -79,7 +68,8 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                     value={config.descrizione}
                     placeholder={Constants.cruscotto.DESCRIZIONE_SEZIONE}
                     onChange={(e) => onChange({ ...config, descrizione: e.target.value })}
-                    className={INPUT}
+                    disabled={!config.abilitato}
+                    className={`${INPUT} disabled:cursor-not-allowed disabled:bg-gray-100`}
                 />
             </div>
 
@@ -98,7 +88,8 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                                     key={g.id}
                                     type="button"
                                     onClick={() => toggleGruppo(g.id as number)}
-                                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    disabled={!config.abilitato}
+                                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                                         selected
                                             ? "border-primary-600 bg-primary-50 text-primary-700"
                                             : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
@@ -110,6 +101,16 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                     </div>
                 )}
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={confermaOpen}
+                onClose={() => setConfermaOpen(false)}
+                onConfirm={confermaDisabilita}
+                title="Disabilita step"
+                message={"Disabilitando questo step i dati che hai compilato verranno cancellati.\nVuoi procedere?"}
+                confirmLabel="Disabilita e cancella"
+                cancelLabel="Annulla"
+            />
         </div>
     )
 }
