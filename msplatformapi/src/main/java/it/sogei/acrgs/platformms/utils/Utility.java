@@ -27,7 +27,9 @@ public class Utility {
             if (comunicazione == null || comunicazione.getIcona() == null || comunicazione.getIcona().isBlank()) {
                 continue;
             }
-            comunicazione.setIcona(comunicazione.getIcona().trim().toLowerCase() + SEP_ICONA + comunicazione.getTypeIcona().trim().toLowerCase());
+            if (comunicazione.getTypeIcona() != null && !comunicazione.getTypeIcona().isBlank()) {
+                comunicazione.setIcona(comunicazione.getIcona().trim().toLowerCase() + SEP_ICONA + comunicazione.getTypeIcona().trim().toLowerCase());
+            }
             comunicazione.setTypeIcona(null);
         }
     }
