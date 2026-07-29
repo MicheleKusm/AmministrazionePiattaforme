@@ -7,6 +7,7 @@ import { Constants } from "../../utils/Constants"
 
 type CampoModalProps = {
     campo: CampoTicket
+    order: number
     tipologiche: TipologicaCampoDinamico[]
     onSave: (campo: CampoTicket) => void
     onClose: () => void
@@ -29,6 +30,7 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
         setDraft({
             ...draft,
             key: tip.tipoDati,
+            idTipoDati: tip.idTipoDati,
             inputType: tip.type,
             regex: tip.regex ?? "",
             apiSource: tip.apiSource ?? ""

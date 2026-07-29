@@ -24,6 +24,6 @@ public class CampoTicketDTO implements Serializable {
     private boolean required;
     private String regex;
     private String cssClass;
-    private Long idTipoDato;
+    private Long idTipoDati;
     private Integer order;
 }

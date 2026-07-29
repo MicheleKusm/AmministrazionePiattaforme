@@ -62,7 +62,7 @@ export class Constants {
         CODICE_SCIM: "Codice SCIM",
         CODICE_SCIM_PH: "Inserisci il codice SCIM",
         CAMPI_TICKET: "Campi richiesti nel ticket",
-        AGGIUNGI_CAMPO: "+ Aggiungi chiave",
+        AGGIUNGI_CHIAVE: "+ Aggiungi chiave",
         SELEZIONA_PROCESSO: "Seleziona il processo verticale",
         SELEZIONA_PROCESSO_PH: "Seleziona un processo",
         COMUNICAZIONI: "Comunicazioni onboarding",

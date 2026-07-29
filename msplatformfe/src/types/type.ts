@@ -136,14 +136,16 @@ export type TipologicaCampoDinamico = {
     tipoDati: string
     type: string
     regex: string | null
-    idTipoDati: number
+    idTipoDati?: number
     apiSource: string | null
 }
 
 export type CampoTicket = {
     id: number
+    idTipoDati?: number
     label: string
     descrizione: string
+    order: number
     key: string
     inputType: string
     required: boolean
@@ -196,6 +198,7 @@ export type ComunicazioniTableProps = {
 
 export const emptyCampoTicket: CampoTicket = {
     id: 0,
+    order: 1,
     label: "",
     descrizione: "",
     key: "",
