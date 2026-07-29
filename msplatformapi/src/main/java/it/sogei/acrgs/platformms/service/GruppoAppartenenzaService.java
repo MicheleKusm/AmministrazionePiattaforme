@@ -1,11 +1,17 @@
 package it.sogei.acrgs.platformms.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.sogei.acrgs.platformms.dto.FormStepDTO;
 import it.sogei.acrgs.platformms.dto.GruppoAppartenenzaDTO;
 import it.sogei.acrgs.platformms.dto.GruppoDependenciesDTO;
-import it.sogei.acrgs.platformms.entity.*;
+import it.sogei.acrgs.platformms.dto.SectionDTO;
+import it.sogei.acrgs.platformms.entity.GruppoAppartenenza;
+import it.sogei.acrgs.platformms.entity.Piattaforma;
+import it.sogei.acrgs.platformms.entity.RuoliRefAppartenenza;
+import it.sogei.acrgs.platformms.entity.RuoliRefAppartenenzaId;
 import it.sogei.acrgs.platformms.repository.GruppoAppartenenzaRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
@@ -19,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.sogei.acrgs.platformms.utils.Constants.*;
+import static it.sogei.acrgs.platformms.utils.Constants.FORM_STEPS;
 
 @Slf4j
 @Service
@@ -108,28 +114,57 @@ public class GruppoAppartenenzaService {
     }
 
     private List<GruppoDependenciesDTO.Dependency> extractPiattaformeDependencies(Long gruppoId) {
-        List<GruppoDependenciesDTO.Dependency> deps = new ArrayList<>();
+        List<GruppoDependenciesDTO.Dependency> dipendenze = new ArrayList<>();
         List<Piattaforma> allPiattaforme = piattaformaRepository.findAll();
-
         for (Piattaforma piattaforma : allPiattaforme) {
             String configJson = piattaforma.getConfigJson();
-            if (null != configJson && !configJson.isBlank()) {
-                try {
-                    JsonNode root = objectMapper.readTree(configJson);
-                    List<Long> referencedGroupIds = extractRoleGroups(root);
-                    if (referencedGroupIds.contains(gruppoId)) {
-                        deps.add(GruppoDependenciesDTO.Dependency.builder()
-                                .type(Constants.CRUSCOTTO_PIATTAFORMA)
-                                .name(piattaforma.getNome())
-                                .id(piattaforma.getId())
-                                .build());
-                    }
-                } catch (JsonProcessingException exception) {
-                    log.error("Errore nel parse del json della piattaforma {}: {}", piattaforma.getId(), exception.getMessage());
-                }
-            }
+            if (configJson == null || configJson.isBlank()) continue;
+            extractRoleGroups(configJson, gruppoId, piattaforma, dipendenze);
         }
-        return deps;
+        return dipendenze;
+    }
+
+    /**
+     * estrae tutti i role_groups dal config_json di una piattaforma
+     */
+    private void extractRoleGroups(String configJson, Long gruppoId, Piattaforma piattaforma, List<GruppoDependenciesDTO.Dependency> dipendenze) {
+        try {
+            log.debug("Estrazione dipendenze per piattaforma {}, INIZIO", piattaforma.getId());
+            JsonNode root = objectMapper.readTree(configJson);
+            JsonNode formStepsNode = root.path(FORM_STEPS);
+            if (formStepsNode.isArray()) {
+                List<FormStepDTO> formSteps = objectMapper.convertValue(formStepsNode, new TypeReference<>() {
+                });
+                boolean trovato = false;
+                for (FormStepDTO step : formSteps) {
+                    if (null != step.getRoleGroups() && step.getRoleGroups().contains(gruppoId)) {
+                        log.debug("Step {} contiene il gruppo {} ", step.getStep(), gruppoId);
+                        trovato = true;
+                        break;
+                    }
+                    if (null != step.getSections()) {
+                        for (SectionDTO section : step.getSections()) {
+                            if (null != section.getRoleGroups() && section.getRoleGroups().contains(gruppoId)) {
+                                log.debug("Section {} contiene il gruppo {}", step.getStep(), gruppoId);
+                                trovato = true;
+                                break;
+                            }
+                        }
+                        if (trovato) break;
+                    }
+                }
+                if (trovato) {
+                    dipendenze.add(GruppoDependenciesDTO.Dependency.builder()
+                            .type(Constants.CRUSCOTTO_PIATTAFORMA)
+                            .name(piattaforma.getNome())
+                            .id(piattaforma.getId())
+                            .build());
+                }
+                log.debug("Estrazione dipendenze per piattaforma {}, FINE", piattaforma.getId());
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Errore nel parse del json della piattaforma {}: {}", piattaforma.getId(), e.getMessage());
+        }
     }
 
     /**
@@ -140,30 +175,5 @@ public class GruppoAppartenenzaService {
                 .stream()
                 .map(el -> new GruppoDependenciesDTO.Dependency(el.getType(), el.getName(), el.getId().longValue()))
                 .toList();
-    }
-
-    /**
-     * estrae tutti i role_groups dal config_json di una piattaforma in maniera ricorsiva
-     */
-    // TODO rimpiazzare con metodo che utilizza oggetto che rispecchia json e utilizzare ObjectMapper readValue()
-    private List<Long> extractRoleGroups(JsonNode node) {
-        List<Long> result = new ArrayList<>();
-        if (node.isArray()) {
-            for (JsonNode item : node) {
-                result.addAll(extractRoleGroups(item));
-            }
-        } else if (node.isObject()) {
-            if (node.has(Constants.ROLE_GROUPS) && node.get(Constants.ROLE_GROUPS).isArray()) {
-                for (JsonNode groupIdNode : node.get(Constants.ROLE_GROUPS)) {
-                    if (groupIdNode.isNumber()) {
-                        result.add(groupIdNode.longValue());
-                    }
-                }
-            }
-            node.fields().forEachRemaining(entry -> {
-                result.addAll(extractRoleGroups(entry.getValue()));
-            });
-        }
-        return result;
     }
 }
