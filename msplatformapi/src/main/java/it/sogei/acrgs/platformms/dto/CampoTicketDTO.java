@@ -1,5 +1,6 @@
 package it.sogei.acrgs.platformms.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CampoTicketDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 3340117733455980032L;

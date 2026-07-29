@@ -69,9 +69,9 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
                         value={draft.key}
                         onChange={(e) => selezionaCampo(e.target.value)}>
                         <option value="">{Constants.campoModal.CAMPO_PH}</option>
-                        {tipologiche.map((t) => (
+                        {tipologiche.map((t, index) => (
                             <option
-                                key={t.idTipoDati}
+                                key={index}
                                 value={t.tipoDati}>
                                 {t.tipoDati}
                             </option>
