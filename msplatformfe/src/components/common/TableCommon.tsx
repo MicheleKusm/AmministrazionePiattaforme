@@ -9,17 +9,6 @@ export function TableCommon<T>({
     tableClassName = "",
     colWidths
 }: TableProps<T>) {
-    if (!data || data.length === 0) {
-        return (
-            <tr>
-                <td
-                    colSpan={columns.length}
-                    className="px-6 py-6 text-center text-sm text-500">
-                    {emptyMessage}
-                </td>
-            </tr>
-        )
-    }
     return (
         <div className={`overflow-x-auto ${className}`.trim()}>
             <table className={`min-w-full divide-y divide-gray-200 border border-gray-300 ${tableClassName}`.trim()}>
@@ -44,19 +33,29 @@ export function TableCommon<T>({
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {data.map((item) => (
-                        <tr key={keyExtractor(item)}>
-                            {columns.map((col, colIndex) => (
-                                <td
-                                    key={colIndex}
-                                    className={`px-6 py-4 text-sm border-b border-gray-200 break-words ${
-                                        col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : "text-left"
-                                    }`}>
-                                    {col.render(item)}
-                                </td>
-                            ))}
+                    {data && data.length > 0 ? (
+                        data.map((item) => (
+                            <tr key={keyExtractor(item)}>
+                                {columns.map((col, colIndex) => (
+                                    <td
+                                        key={colIndex}
+                                        className={`px-6 py-4 text-sm border-b border-gray-200 break-words ${
+                                            col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : "text-left"
+                                        }`}>
+                                        {col.render(item)}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td
+                                colSpan={columns.length}
+                                className="px-6 py-6 text-center text-sm text-gray-500">
+                                {emptyMessage}
+                            </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>
