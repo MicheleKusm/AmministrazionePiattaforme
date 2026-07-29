@@ -34,7 +34,7 @@ export const piattaformaSchema = yup.object().shape({
     richiedibileInCorso: yup.boolean().default(false),
     ripetibile: yup.boolean().default(false),
     utilizzoModelloAutorizzativo: yup.boolean().default(false),
-    abilitazione: yup.string().oneOf(["TICKET", "VERTICALE"]).required("L'abilitazione è obbligatoria")
+    abilitazione: yup.string().oneOf(["TICKET", "VERTICALE"]).nullable().notRequired()
 })
 
 export type GruppoFormData = yup.InferType<typeof gruppoSchema>

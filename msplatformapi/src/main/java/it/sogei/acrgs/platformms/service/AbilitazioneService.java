@@ -18,17 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static it.sogei.acrgs.platformms.utils.Constants.SEP_ICONA;
+import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AbilitazioneService {
 
-    private static final String TIPO_TICKET = "TICKET";
-    private static final String TIPO_VERTICALE = "VERTICALE";
-    private static final String PROCESS_KEY_TICKET = "altri";
-    private static final String STATO_ATTIVA = "Attiva";
     private final PiattaformaRefProcessRepository refProcessRepository;
     private final TipologicaCampoDinamicoRepository tipologicaRepository;
     private final PiattaformaRepository piattaformaRepository;

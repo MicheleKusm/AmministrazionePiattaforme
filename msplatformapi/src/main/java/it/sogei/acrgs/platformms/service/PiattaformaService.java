@@ -7,6 +7,8 @@ import it.sogei.acrgs.platformms.dto.FormStepDTO;
 import it.sogei.acrgs.platformms.dto.PiattaformaDTO;
 import it.sogei.acrgs.platformms.entity.Piattaforma;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
+import it.sogei.acrgs.platformms.entity.PiattaformaRefProcess;
+import it.sogei.acrgs.platformms.repository.PiattaformaRefProcessRepository;
 import it.sogei.acrgs.platformms.utils.Utility;
 import it.sogei.acrgs.platformms.utils.Validation;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class PiattaformaService {
 
     private final PiattaformaRepository piattaformaRepository;
     private final ObjectMapper objectMapper;
+    private final PiattaformaRefProcessRepository refProcessRepository;
 
     public List<PiattaformaDTO> listAll() {
         return piattaformaRepository.findAll().stream().map(this::toDto).toList();
@@ -95,6 +98,13 @@ public class PiattaformaService {
         entity.setConfigJson(toConfigJson(dto));
     }
 
+    private String deriveAbilitazione(Long idPiattaforma) {
+        if (idPiattaforma == null) return null;
+        List<PiattaformaRefProcess> refs = refProcessRepository.findByIdPiattaforma_Id(idPiattaforma);
+        if (refs == null || refs.isEmpty()) return null;
+        return PROCESS_KEY_TICKET.equalsIgnoreCase(refs.get(0).getProcessKey()) ? "TICKET" : "VERTICALE";
+    }
+
     private PiattaformaDTO toDto(Piattaforma entity) {
         Utility utility = new Utility();
         Map<String, Object> config = parseConfig(entity.getConfigJson());
@@ -114,6 +124,7 @@ public class PiattaformaService {
                 .ripetibile(utility.convertToBoolean(entity.getRipetibile()))
                 .utilizzoModelloAutorizzativo(utility.convertToBoolean(entity.getUtilizzoModelloAutorizzativo()))
                 .formSteps(extractFormSteps(config))
+                .abilitazione(deriveAbilitazione(entity.getId()))
                 .build();
     }
 

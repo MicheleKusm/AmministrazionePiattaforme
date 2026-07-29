@@ -52,4 +52,6 @@ public class PiattaformaDTO implements Serializable {
     private Boolean utilizzoModelloAutorizzativo;
 
     private List<FormStepDTO> formSteps;
+
+    private String abilitazione;
 }
