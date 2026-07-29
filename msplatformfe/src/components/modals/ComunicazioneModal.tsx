@@ -16,7 +16,7 @@ const LABEL_CLS = "mb-2 block text-sm font-semibold text-gray-800"
 const INPUT_CLS = "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
 
 export function ComunicazioneModal({ comunicazione, onSave, onClose }: ComunicazioneModalProps) {
-    const [draft, setDraft] = useState<ComunicazioneOnboarding>({ ...comunicazione, typeIcona: comunicazione.typeIcona ?? "Solid" })
+    const [draft, setDraft] = useState<ComunicazioneOnboarding>({ ...comunicazione, typeIcona: comunicazione.typeIcona ?? "solid" })
     const [iconeOpen, setIconeOpen] = useState(false)
 
     const { data: icone = [] } = useGetIconeQuery()
@@ -114,8 +114,8 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                         <label className="flex items-center gap-2 text-sm text-gray-800">
                             <input
                                 type="checkbox"
-                                checked={draft.typeIcona === "Solid"}
-                                onChange={() => setDraft({ ...draft, typeIcona: "Solid" })}
+                                checked={draft.typeIcona === "solid"}
+                                onChange={() => setDraft({ ...draft, typeIcona: "solid" })}
                             />
                             {Constants.comunicazioneModal.TIPO_ICONA_SOLID}
                         </label>

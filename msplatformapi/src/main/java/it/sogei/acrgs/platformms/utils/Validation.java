@@ -16,7 +16,7 @@ public class Validation {
     private static final String TIPO_TICKET = "TICKET";
     private static final String TIPO_VERTICALE = "VERTICALE";
 
-    private static final Set<String> TIPI_ICONA_AMMESSI = Set.of("Solid", "outline");
+    private static final Set<String> TIPI_ICONA_AMMESSI = Set.of("solid", "outline");
 
     public void validazioneNomeDescObjclass(PiattaformaDTO dto, List<String> errors) {
         try {
@@ -343,7 +343,7 @@ public class Validation {
                 log.error("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
                 errors.add("Errore nella validazione delle abilitazioni, testo della comunicazione onboarding nullo");
             }
-            if (null != comunicazione.getTypeIcona() && !TIPI_ICONA_AMMESSI.contains(comunicazione.getTypeIcona())) {
+            if (comunicazione.getTypeIcona() != null && !comunicazione.getTypeIcona().isBlank() && !TIPI_ICONA_AMMESSI.contains(comunicazione.getTypeIcona().trim().toLowerCase())) {
                 errors.add("Errore nella validazione delle abilitazioni, typeIcona non valido: " + comunicazione.getTypeIcona());
             }
         }

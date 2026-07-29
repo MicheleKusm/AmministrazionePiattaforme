@@ -18,14 +18,14 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
             header: Constants.comunicazioneModal.ICONA_LABEL,
             render: (c) => (
                 <span className="inline-flex items-center gap-2 text-gray-700">
-                    {c.icona ? <IconaComunicazioneGlyph nome={c.icona} tipo={c.typeIcona} /> : null}
+                    {c.icona ? <IconaComunicazioneGlyph nome={c.icona} /> : null}
                     {c.icona}
                 </span>
             )
         },
         {
             header: Constants.comunicazioneModal.TIPO_ICONA_LABEL,
-            render: (c) => <span className="text-gray-700">{c.typeIcona === "outline" ? Constants.comunicazioneModal.TIPO_ICONA_OUTLINE : Constants.comunicazioneModal.TIPO_ICONA_SOLID}</span>
+            render: (c) => c.typeIcona ? <span className="text-gray-700">{c.typeIcona === "outline" ? Constants.comunicazioneModal.TIPO_ICONA_OUTLINE : Constants.comunicazioneModal.TIPO_ICONA_SOLID}</span> : null
         },
         {
             header: Constants.abilitazioneTable.AZIONI,
