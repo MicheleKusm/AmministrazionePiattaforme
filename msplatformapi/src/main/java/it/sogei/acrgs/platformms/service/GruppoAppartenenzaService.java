@@ -15,7 +15,6 @@ import it.sogei.acrgs.platformms.entity.RuoliRefAppartenenzaId;
 import it.sogei.acrgs.platformms.repository.GruppoAppartenenzaRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.RuoliRefAppartenenzaRepository;
-import it.sogei.acrgs.platformms.repository.RuoloRepository;
 import it.sogei.acrgs.platformms.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,15 +34,10 @@ public class GruppoAppartenenzaService {
     private final GruppoAppartenenzaRepository gruppoRepository;
     private final RuoliRefAppartenenzaRepository refRepository;
     private final PiattaformaRepository piattaformaRepository;
-    private final RuoloRepository ruoloRepository;
     private final ObjectMapper objectMapper;
 
     public boolean existsByNomeExcludingId(String nome, Long excludeId) {
         return gruppoRepository.countByCategoriaAndIdNot(nome, excludeId) > 0;
-    }
-
-    public boolean existsBridgeByRuoloAndGruppo(Long idRuolo, Long idGruppo) {
-        return gruppoRepository.countByRuoloAndGruppo(idRuolo, idGruppo) > 0;
     }
 
     @Transactional(readOnly = true)

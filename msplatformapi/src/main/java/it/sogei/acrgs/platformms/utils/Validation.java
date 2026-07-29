@@ -254,6 +254,7 @@ public class Validation {
                 }
                 // ticket -> codice SCIM obbligatorio
                 if (ticket) {
+                    validazioneCampiTicket(abilitazione.getCampi(), errors);
                     if (null == abilitazione.getCodiceScim() || abilitazione.getCodiceScim().isBlank()) {
                         log.error("Errore nella validazione delle abilitazioni, codice SCIM obbligatorio per le abilitazioni ticket");
                         errors.add("Errore nella validazione delle abilitazioni, codice SCIM obbligatorio per le abilitazioni ticket");
@@ -277,7 +278,6 @@ public class Validation {
                     }
                 }
                 // campi ticket e comunicazioni onboarding
-                validazioneCampiTicket(abilitazione.getCampi(), errors);
                 validazioneComunicazioni(abilitazione.getComunicazioni(), errors);
                 // reset skip a ogni ciclo
                 skipTipo = false;
