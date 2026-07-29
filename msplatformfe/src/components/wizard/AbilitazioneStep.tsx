@@ -41,7 +41,7 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
     }, [abilitazioniData, isFetching, abilitazioni.length, dispatch])
 
     const visibili = abilitazioni.filter((a) => !a.daEliminare)
-    const tipoBloccato = visibili.find((a) => a.id !== draft?.id)?.tipo
+    const tipoBloccato = visibili.find((a) => a.id !== draft?.id)?.tipo ?? (piattaforma?.id ? piattaforma.abilitazione : undefined)
 
     function salva(abilitazione: Abilitazione) {
         if (abilitazione.id === 0) {
