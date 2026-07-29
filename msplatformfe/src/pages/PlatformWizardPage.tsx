@@ -224,7 +224,13 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const handlePiattaformaChange = (updated: Piattaforma) => {
         const prev = piattaforma ?? initialPiattaforma
         const disattivaCruscotto = Boolean(prev.richiedibileDaCruscotto) && !updated.richiedibileDaCruscotto
-        const cruscottoHaDati = cruscotto.some((s) => s.descrizione.trim() !== "" || s.gruppiIds.length > 0 || s.sezioni.length > 0)
+        const cruscottoHaDati = piattaforma?.formSteps?.some(
+            (s) =>
+                s.descrizione?.trim() !== "" ||
+                (s.role_groups != undefined && s.role_groups!.length > 0) ||
+                (s.sections != undefined && s.sections!.length > 0)
+        )
+        console.log(cruscotto)
         if (disattivaCruscotto && cruscottoHaDati) {
             setPendingPiattaforma(updated)
             setCruscottoConfirmOpen(true)
