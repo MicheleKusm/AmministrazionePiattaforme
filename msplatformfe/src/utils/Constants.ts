@@ -21,7 +21,8 @@ export class Constants {
         RIPETIBILE: "Ripetibile",
         UTILIZZO_MODELLO_AUTORIZZATIVO: "Utilizzo modello autorizzativo",
         NUMERO_RUOLI: 5,
-        PAGE_SIZE: 5
+        PAGE_SIZE: 5,
+        ACTION_BTN: "rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors"
     } as const
 
     static readonly validation = {

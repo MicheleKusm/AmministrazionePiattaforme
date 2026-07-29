@@ -3,7 +3,7 @@ import { Badge } from "../common/Badge"
 import { TableCommon } from "../common/TableCommon"
 import { Constants } from "../../utils/Constants"
 
-const ACTION_BTN = "rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors"
+const ACTION_BTN = Constants.common.ACTION_BTN
 
 export function AbilitazioniTable({ abilitazioni, onEdit, onDelete }: AbilitazioniTableProps) {
     const columns: Column<Abilitazione>[] = [
