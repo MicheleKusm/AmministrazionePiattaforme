@@ -35,7 +35,7 @@ export function PlatformTable({ rows, onEdit }: PlatformTableProps) {
                             <td className={TD}>{row.canale}</td>
                             <td className={TD}>{row.objClass}</td>
                             <td className={TD}>
-                                {row.abilitazione === "VERTICALE" ? <Badge tone="green">Verticale</Badge> : <Badge tone="blue">Ticket</Badge>}
+                                {row.abilitazione === "VERTICALE" ? <Badge tone="green">Verticale</Badge> : row.abilitazione === "TICKET" ? <Badge tone="blue">Ticket</Badge> : <Badge tone="red">Nessuna</Badge>}
                             </td>
                             <td className={TD}>{row.readOnly ? <Badge tone="orange">Sì</Badge> : <Badge tone="gray">No</Badge>}</td>
                             <td className={TD}>
