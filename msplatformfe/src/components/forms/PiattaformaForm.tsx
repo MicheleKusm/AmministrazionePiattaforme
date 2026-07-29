@@ -1,5 +1,7 @@
 import type { Piattaforma } from "../../types/type"
 import { FormField } from "../common/FormField"
+import { CheckboxConInfo } from "../../components/common/CheckboxConInfo"
+import { Constants } from "../../utils/Constants"
 
 type PiattaformaFormProps = {
     piattaforma: Piattaforma
@@ -7,12 +9,12 @@ type PiattaformaFormProps = {
     errors?: Record<string, string>
 }
 
-const TOGGLES: [string, keyof Piattaforma][] = [
-    ["Richiedibile da cruscotto", "richiedibileDaCruscotto"],
-    ["In sola lettura", "readOnly"],
-    ["Richiedibile in corso", "richiedibileInCorso"],
-    ["Ripetibile", "ripetibile"],
-    ["Utilizzo modello autorizzativo", "utilizzoModelloAutorizzativo"]
+const TOGGLES: [string, keyof Piattaforma, keyof typeof Constants.infoMessages][] = [
+    ["Richiedibile da cruscotto", "richiedibileDaCruscotto", "RICHIEDIBILE_DA_CRUSCOTTO"],
+    ["In sola lettura", "readOnly", "READ_ONLY"],
+    ["Richiedibile in corso", "richiedibileInCorso", "RICHIEDIBILE_IN_CORSO"],
+    ["Ripetibile", "ripetibile", "RIPETIBILE"],
+    ["Utilizzo modello autorizzativo", "utilizzoModelloAutorizzativo", "UTILIZZO_MODELLO_AUTORIZZATIVO"]
 ]
 
 export function PiattaformaForm({ piattaforma, onChange, errors = {} }: PiattaformaFormProps) {
@@ -105,17 +107,14 @@ export function PiattaformaForm({ piattaforma, onChange, errors = {} }: Piattafo
             </div>
 
             <div className="space-y-2">
-                {TOGGLES.map(([label, key]) => (
-                    <label
+                {TOGGLES.map(([label, key, messageKey]) => (
+                    <CheckboxConInfo
                         key={key}
-                        className="flex items-center gap-2 text-sm">
-                        <input
-                            type="checkbox"
-                            checked={Boolean(piattaforma[key])}
-                            onChange={(e) => onChange({ ...piattaforma, [key]: e.target.checked })}
-                        />
-                        {label}
-                    </label>
+                        label={label}
+                        checked={Boolean(piattaforma[key])}
+                        onChange={(checked) => onChange({ ...piattaforma, [key]: checked })}
+                        infoMessage={Constants.infoMessages[messageKey]}
+                    />
                 ))}
             </div>
         </div>
