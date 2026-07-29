@@ -46,4 +46,8 @@ public class TipologicaCampoDinamico implements Serializable {
     @Size(max = 100)
     @Column(name = "API_SOURCE", length = 100)
     private String apiSource;
+
+    @Size(max = 200)
+    @Column(name = "LABEL", length = 200)
+    private String label;
 }

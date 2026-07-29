@@ -47,6 +47,7 @@ public class AbilitazioneService {
                         .regex(t.getRegex())
                         .idTipoDati(t.getIdTipoDati())
                         .apiSource(t.getApiSource())
+                        .label(t.getLabel())
                         .build())
                 .toList();
     }
