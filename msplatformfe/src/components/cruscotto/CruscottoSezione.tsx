@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { CruscottoStepConfig, Gruppo } from "../../types/type"
 import { Toggle } from "../common/Toggle"
+import { InfoTooltip } from "../common/InfoTooltip"
 import { Constants } from "../../utils/Constants"
 import { DeleteConfirmationModal } from "../modals/DeleteConfirmModal"
 
@@ -18,6 +19,13 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
     const [confermaOpen, setConfermaOpen] = useState(false)
 
     const haDati = config.descrizione.trim() !== "" || config.gruppiIds.length > 0 || config.sezioni.length > 0
+
+    const infoText =
+        config.chiave === Constants.cruscotto.STEP_RUOLO
+            ? Constants.cruscotto.STEP_RUOLO_INFORMATIVA
+            : config.chiave === Constants.cruscotto.STEP_DATI
+              ? Constants.cruscotto.STEP_DATI_INFORMATIVA
+              : Constants.cruscotto.STEP_METADATI_INFORMATIVA
 
     function handleToggle(v: boolean) {
         if (v) {
@@ -52,13 +60,18 @@ export function CruscottoSezione({ config, gruppi, onChange }: CruscottoSezioneP
                     <rect x="14" y="14" width="7" height="7" rx="1" />
                 </svg>
                 {Constants.cruscotto.CONFIGURA_SEZIONE}
+                <InfoTooltip message={infoText} />
             </div>
+
 
             <div className="mt-5 flex items-start justify-between gap-4">
                 <div>
                     <p className="text-sm font-semibold text-gray-900">{Constants.cruscotto.ABILITA_STEP}</p>
                 </div>
-                <Toggle checked={config.abilitato} onChange={handleToggle} />
+                <Toggle
+                    checked={config.abilitato}
+                    onChange={handleToggle}
+                />
             </div>
 
             <div className="mt-5">
