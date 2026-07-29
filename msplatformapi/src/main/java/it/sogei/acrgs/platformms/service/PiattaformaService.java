@@ -89,7 +89,8 @@ public class PiattaformaService {
         entity.setRichiedibileDaCruscotto(Boolean.TRUE.equals(dto.getRichiedibileDaCruscotto()) ? 1 : 0);
         entity.setRichiedibileInCorso(Boolean.TRUE.equals(dto.getRichiedibileInCorso()) ? 1 : 0);
         entity.setUtilizzoModelloAutorizzativo(Boolean.TRUE.equals(dto.getUtilizzoModelloAutorizzativo()) ? 1 : 0);
-        if (null == dto.getFormSteps() || dto.getFormSteps().isEmpty()) {
+        if (Boolean.TRUE.equals(dto.getRichiedibileDaCruscotto())
+                && (null == dto.getFormSteps() || dto.getFormSteps().isEmpty())) {
             List<FormStepDTO> formStepsEsistenti = extractFormSteps(parseConfig(entity.getConfigJson()));
             if (!formStepsEsistenti.isEmpty()) {
                 dto.setFormSteps(formStepsEsistenti);

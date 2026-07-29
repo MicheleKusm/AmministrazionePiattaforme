@@ -42,6 +42,9 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     const [gruppoToDelete, setGruppoToDelete] = useState<Gruppo | null>(null)
     const [step, setStep] = useState(2)
     const [piattaformaErrors, setPiattaformaErrors] = useState<Record<string, string>>({})
+    const [cruscottoConfirmOpen, setCruscottoConfirmOpen] = useState(false)
+    const [pendingPiattaforma, setPendingPiattaforma] = useState<Piattaforma | null>(null)
+    const [cruscottoResync, setCruscottoResync] = useState(0)
     const [roleDraft, setRoleDraft] = useState<Ruolo | null>(null)
     const [groupDraft, setGroupDraft] = useState<Gruppo | null>(null)
     const [modalContext, setModalContext] = useState<"save" | "export" | null>(null)
@@ -219,7 +222,34 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
     }
 
     const handlePiattaformaChange = (updated: Piattaforma) => {
+        const prev = piattaforma ?? initialPiattaforma
+        const disattivaCruscotto = Boolean(prev.richiedibileDaCruscotto) && !updated.richiedibileDaCruscotto
+        const cruscottoHaDati = cruscotto.some((s) => s.descrizione.trim() !== "" || s.gruppiIds.length > 0 || s.sezioni.length > 0)
+        if (disattivaCruscotto && cruscottoHaDati) {
+            setPendingPiattaforma(updated)
+            setCruscottoConfirmOpen(true)
+            setCruscottoResync((n) => n + 1)
+            return
+        }
+        if (disattivaCruscotto) {
+            dispatch(setCruscotto([]))
+        }
         dispatch(updateRiepilogoPiattaforma(updated))
+    }
+
+    const confermaSvuotaCruscotto = () => {
+        if (pendingPiattaforma) {
+            dispatch(setCruscotto([]))
+            dispatch(updateRiepilogoPiattaforma(pendingPiattaforma))
+        }
+        setPendingPiattaforma(null)
+        setCruscottoConfirmOpen(false)
+    }
+
+    const annullaSvuotaCruscotto = () => {
+        setPendingPiattaforma(null)
+        setCruscottoConfirmOpen(false)
+        setCruscottoResync((n) => n + 1)
     }
 
     return (
@@ -227,6 +257,7 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
             <Stepper currentStep={step} />
             {step === 2 && (
                 <PiattaformaStep
+                    key={`piatt-resync-${cruscottoResync}`}
                     piattaforma={piattaforma ?? initialPiattaforma}
                     onChange={handlePiattaformaChange}
                     errors={piattaformaErrors}
@@ -355,6 +386,15 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
                     }
                 }}
                 message="Sei sicuro di voler eliminare questo ruolo? L'operazione non è reversibile."
+            />
+            <DeleteConfirmationModal
+                isOpen={cruscottoConfirmOpen}
+                onClose={annullaSvuotaCruscotto}
+                onConfirm={confermaSvuotaCruscotto}
+                title="Attenzione: i dati in cruscotto verranno cancellati"
+                message="Sono presenti dati nella pagina cruscotto. Disabilitando 'Richiedibile da cruscotto' i dati in cruscotto verranno cancellati. Vuoi procedere?"
+                confirmLabel="Disabilita e cancella"
+                cancelLabel="Annulla"
             />
             <DeleteConfirmationModal
                 isOpen={deleteGruppoModalOpen}

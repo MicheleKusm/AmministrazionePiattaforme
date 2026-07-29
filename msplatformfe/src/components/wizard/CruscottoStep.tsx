@@ -43,6 +43,7 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
 
     useEffect(() => {
         if (cruscottoLoaded.current || cruscotto.length > 0) return
+        if (!piattaforma?.richiedibileDaCruscotto) return
         if (!piattaforma?.id) {
             dispatch(setCruscotto(makeDefaultCruscotto()))
             cruscottoLoaded.current = true
@@ -50,7 +51,7 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
             dispatch(setCruscotto(mergeConfigs(cruscottoData)))
             cruscottoLoaded.current = true
         }
-    }, [piattaforma?.id, cruscottoData, cruscotto.length, dispatch])
+    }, [piattaforma?.id, piattaforma?.richiedibileDaCruscotto, cruscottoData, cruscotto.length, dispatch])
 
     if (!piattaforma?.richiedibileDaCruscotto) {
         return (
