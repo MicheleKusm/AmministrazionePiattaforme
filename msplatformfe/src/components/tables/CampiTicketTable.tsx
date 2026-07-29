@@ -31,6 +31,8 @@ export function CampiTicketTable({ campi, onEdit, onDelete }: CampiTicketTablePr
         <TableCommon
             data={campi}
             columns={columns}
+            tableClassName="table-fixed w-full"
+            colWidths={["8%", "20%", "34%", "20%", "18%"]}
             keyExtractor={(c: CampoTicket) => c.id}
             emptyMessage={<p className="py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUN_CAMPO}</p>}
         />

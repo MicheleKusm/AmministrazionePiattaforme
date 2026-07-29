@@ -51,6 +51,6 @@ const GLYPHS: Record<string, ReactNode> = {
 
 export function IconaComunicazioneGlyph({ nome, tipo = "outline" }: { nome: string; tipo?: TipoIcona }) {
     const glyph = GLYPHS[nome] ?? <rect x="4" y="4" width="16" height="16" rx="2" />;
-    const paint = tipo === "Solid" ? { fill: "currentColor", stroke: "none", strokeWidth: 0 } : {};
+    const paint = tipo === "solid" ? { fill: "currentColor", stroke: "none", strokeWidth: 0 } : {};
     return <svg {...common} {...paint}>{glyph}</svg>;
 }

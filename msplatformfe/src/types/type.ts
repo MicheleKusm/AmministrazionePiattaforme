@@ -332,6 +332,7 @@ export type TableProps<T> = {
     emptyMessage?: React.ReactNode
     className?: string // container esterno
     tableClassName?: string // per elemento <table>
+    colWidths?: string[] // larghezze colonne (usare con table-fixed) per allineare tabelle diverse
 }
 
 export type PageResponse<T> = {

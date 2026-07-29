@@ -5,6 +5,7 @@ import { makeEmptyAbilitazione } from "../../types/type"
 import { Button } from "../common/Button"
 import { AbilitazioniTable } from "../tables/AbilitazioniTable"
 import { AbilitazioneForm } from "../forms/AbilitazioneForm"
+import { DeleteConfirmationModal } from "../modals/DeleteConfirmModal"
 import {
     useGetAbilitazioniQuery,
     useGetProcessiVerticaliQuery,
@@ -25,6 +26,7 @@ function nextTempId(items: Abilitazione[]): number {
 export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
     const dispatch = useAppDispatch()
     const [draft, setDraft] = useState<Abilitazione | null>(null)
+    const [abilToDelete, setAbilToDelete] = useState<Abilitazione | null>(null)
     const abilitazioniLoaded = useRef(false)
 
     const abilitazioni = useAppSelector((state) => state.riepilogo.abilitazioni)
@@ -41,7 +43,8 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
     }, [abilitazioniData, isFetching, abilitazioni.length, dispatch])
 
     const visibili = abilitazioni.filter((a) => !a.daEliminare)
-    const tipoBloccato = visibili.find((a) => a.id !== draft?.id)?.tipo ?? (piattaforma?.id ? piattaforma.abilitazione : undefined)
+    const tipoBloccato =
+        visibili.find((a) => a.id !== draft?.id)?.tipo ?? (abilitazioni.length === 0 && piattaforma?.id ? piattaforma.abilitazione : undefined)
 
     function salva(abilitazione: Abilitazione) {
         if (abilitazione.id === 0) {
@@ -84,11 +87,24 @@ export function AbilitazioneStep({ piattaforma }: AbilitazioneStepProps) {
                 abilitazioni={visibili}
                 onDetail={setDraft}
                 onEdit={setDraft}
-                onDelete={(a) => elimina(a)}
+                onDelete={(a) => setAbilToDelete(a)}
             />
             <div className="px-6 py-3 text-sm text-gray-500">
                 {Constants.abilitazione.TOTALE} {visibili.length} {Constants.abilitazione.ABILITAZIONI_ASSOCIATE}
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={abilToDelete !== null}
+                onClose={() => setAbilToDelete(null)}
+                onConfirm={() => {
+                    if (abilToDelete) {
+                        elimina(abilToDelete)
+                    }
+                    setAbilToDelete(null)
+                }}
+                title="Elimina abilitazione"
+                message="Sei sicuro di voler eliminare questa abilitazione? L'operazione non è reversibile."
+            />
         </div>
     )
 }

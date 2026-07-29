@@ -6,7 +6,8 @@ export function TableCommon<T>({
     keyExtractor,
     emptyMessage = "Nessun dato trovato.",
     className = "",
-    tableClassName = ""
+    tableClassName = "",
+    colWidths
 }: TableProps<T>) {
     if (!data || data.length === 0) {
         return (
@@ -22,6 +23,13 @@ export function TableCommon<T>({
     return (
         <div className={`overflow-x-auto ${className}`.trim()}>
             <table className={`min-w-full divide-y divide-gray-200 border border-gray-300 ${tableClassName}`.trim()}>
+                {colWidths && (
+                    <colgroup>
+                        {colWidths.map((w, i) => (
+                            <col key={i} style={{ width: w }} />
+                        ))}
+                    </colgroup>
+                )}
                 <thead className="bg-gray-50">
                     <tr>
                         {columns.map((col, index) => (

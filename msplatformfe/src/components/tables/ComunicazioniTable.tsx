@@ -42,6 +42,8 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
         <TableCommon
             data={comunicazioni}
             columns={columns}
+            tableClassName="table-fixed w-full"
+            colWidths={["8%", "20%", "34%", "20%", "18%"]}
             keyExtractor={(c: ComunicazioneOnboarding) => c.id}
             emptyMessage={<p className="py-4 text-sm text-gray-500">{Constants.abilitazione.NESSUNA_COMUNICAZIONE}</p>}
         />
