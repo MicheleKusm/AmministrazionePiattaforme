@@ -8,7 +8,7 @@ import { setCruscotto, updateCruscottoStep } from "../../store/riepilogoSlice"
 import { Constants } from "../../utils/Constants"
 import { CruscottoSezione } from "../cruscotto/CruscottoSezione"
 import { CruscottoSezioniManager } from "../cruscotto/CruscottoSezioniManager"
-import { CruscottoPreviewModal } from "../cruscotto/CruscottoPreviewModal"
+import { CruscottoPreviewModal } from "../modals/CruscottoPreviewModal"
 import { Button } from "../common/Button"
 
 type CruscottoStepProps = {
@@ -108,7 +108,9 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                     <h3 className="text-lg font-bold text-gray-900">{Constants.cruscotto.TITOLO}</h3>
                     <p className="mt-0.5 text-sm text-gray-500">{Constants.cruscotto.SOTTOTITOLO}</p>
                 </div>
-                <Button variant="secondary" onClick={() => setPreviewOpen(true)}>
+                <Button
+                    variant="secondary"
+                    onClick={() => setPreviewOpen(true)}>
                     Genera anteprima
                 </Button>
             </div>
@@ -154,7 +156,11 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                 </div>
             )}
             {previewOpen && (
-                <CruscottoPreviewModal cruscotto={cruscotto} gruppi={gruppi} onClose={() => setPreviewOpen(false)} />
+                <CruscottoPreviewModal
+                    cruscotto={cruscotto}
+                    gruppi={gruppi}
+                    onClose={() => setPreviewOpen(false)}
+                />
             )}
         </div>
     )
