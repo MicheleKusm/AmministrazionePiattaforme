@@ -39,6 +39,7 @@ public class Constants {
     public static final String REGEX_NOMI = "^[a-zA-Z0-9_ ,.#-]+$";
     public static final String REGEX_DESCRIZIONI = "^[^<>&]+$";
     //sql
+    public static final String TABLE_UTILITY_TOOL = "UTILITY_TOOL";
     public static final String TABLE_PIATTAFORMA = "PIATTAFORMA";
     public static final String TABLE_RUOLO = "RUOLO";
     public static final String TABLE_GRUPPO_APPARTENENZA = "GRUPPO_APPARTENENZA_RUOLI";
@@ -46,10 +47,12 @@ public class Constants {
     public static final String SEQ_RUOLO = "SEQ_RUOLO";
     public static final String SEQ_GRUPPO = "SEQ_GRUPPO_DI_APPARTENENZA_RUOLI";
     public static final String COL_ID_PIATTAFORMA = "ID_PIATTAFORMA";
+    public static final String COL_ID = "ID";
     public static final String COL_ID_RUOLO = "ID_RUOLO";
     public static final String COL_ID_GRUPPO = "ID_GRUPPO_APPARTENENZA";
     public static final String TABLE_PIATTAFORMA_REF_PROCESS = "PIATTAFORMA_REF_PROCESS";
     public static final String SEQ_PIATTAFORMA_REF_PROCESS = "SEQ_PIATTAFORMA_REF_PROCESS";
+    public static final String SEQ_UTILITY_TOOL = "SEQ_UTILITY_TOOL";
     public static final String COL_ID_PIATTAFORMA_REF_PROCESS = "ID_PIATTAFORMA_REF_PROCESS";
     // export
     public static final String NOME_SCHEMA = "ANAGRAFICA_RGS";

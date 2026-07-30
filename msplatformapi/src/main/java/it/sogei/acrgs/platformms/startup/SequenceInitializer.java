@@ -1,26 +1,28 @@
 package it.sogei.acrgs.platformms.startup;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
 import static it.sogei.acrgs.platformms.utils.Constants.*;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
 public class SequenceInitializer {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void fixSequences() {
+        fixSequence(TABLE_UTILITY_TOOL, SEQ_UTILITY_TOOL, COL_ID);
         fixSequence(TABLE_PIATTAFORMA, SEQ_PIATTAFORMA, COL_ID_PIATTAFORMA);
         fixSequence(TABLE_RUOLO, SEQ_RUOLO, COL_ID_RUOLO);
         fixSequence(TABLE_GRUPPO_APPARTENENZA, SEQ_GRUPPO, COL_ID_GRUPPO);
@@ -32,13 +34,13 @@ public class SequenceInitializer {
      */
     private void fixSequence(String tableName, String sequenceName, String idColumn) {
         try {
-            Long maxId = jdbcTemplate.queryForObject(
-                    "SELECT MAX(" + idColumn + ") FROM " + tableName, Long.class);
+            String querySelect = "SELECT MAX(%s) FROM %s".formatted(idColumn, tableName);
+            Long maxId = jdbcTemplate.queryForObject(querySelect, Long.class);
             if (maxId == null) {
                 maxId = 0L;
             }
-            Long nextVal = jdbcTemplate.queryForObject(
-                    "SELECT " + sequenceName + ".NEXTVAL FROM DUAL", Long.class);
+            String queryMaxVal = "SELECT %s.NEXTVAL FROM DUAL".formatted(sequenceName);
+            Long nextVal = jdbcTemplate.queryForObject(queryMaxVal, Long.class);
             if (nextVal <= maxId) {
                 long salto = (maxId - nextVal) + 2;
                 log.warn("La sequenza {} è indietro (max={}, next={}). Salto in avanti di {}.",
