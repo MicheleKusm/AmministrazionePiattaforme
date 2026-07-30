@@ -40,7 +40,9 @@ export function CruscottoPreviewModal({ cruscotto, gruppi, onClose }: CruscottoP
     const [pageIndex, setPageIndex] = useState(0)
 
     const idsUsati = new Set<number>()
-    cruscotto.forEach((step) => step.gruppiIds.forEach((id) => idsUsati.add(id)))
+    cruscotto
+        .filter((step) => step.chiave === "STEP_DATI" || step.chiave === "STEP_METADATI")
+        .forEach((step) => step.gruppiIds.forEach((id) => idsUsati.add(id)))
     const gruppiCards = gruppi.filter((g) => !g.daEliminare && idsUsati.has(g.id))
 
     const sezioniGruppo: CruscottoSezioneConfig[] =
