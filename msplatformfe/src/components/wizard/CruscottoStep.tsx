@@ -8,6 +8,8 @@ import { setCruscotto, updateCruscottoStep } from "../../store/riepilogoSlice"
 import { Constants } from "../../utils/Constants"
 import { CruscottoSezione } from "../cruscotto/CruscottoSezione"
 import { CruscottoSezioniManager } from "../cruscotto/CruscottoSezioniManager"
+import { CruscottoPreviewModal } from "../cruscotto/CruscottoPreviewModal"
+import { Button } from "../common/Button"
 
 type CruscottoStepProps = {
     piattaforma?: Piattaforma
@@ -24,6 +26,7 @@ function mergeConfigs(data: CruscottoStepConfig[] | undefined): CruscottoStepCon
 export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
     const dispatch = useAppDispatch()
     const [active, setActive] = useState<CruscottoStepKey>("STEP_RUOLO")
+    const [previewOpen, setPreviewOpen] = useState(false)
     const cruscottoLoaded = useRef(false)
 
     const cruscotto = useAppSelector((state) => state.riepilogo.cruscotto)
@@ -100,8 +103,15 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
 
     return (
         <div className="mt-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900">{Constants.cruscotto.TITOLO}</h3>
-            <p className="mt-0.5 text-sm text-gray-500">{Constants.cruscotto.SOTTOTITOLO}</p>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h3 className="text-lg font-bold text-gray-900">{Constants.cruscotto.TITOLO}</h3>
+                    <p className="mt-0.5 text-sm text-gray-500">{Constants.cruscotto.SOTTOTITOLO}</p>
+                </div>
+                <Button variant="secondary" onClick={() => setPreviewOpen(true)}>
+                    Genera anteprima
+                </Button>
+            </div>
 
             <div className="mt-4 flex flex-wrap gap-3">
                 {STEP_KEYS.map((key) => {
@@ -142,6 +152,9 @@ export function CruscottoStep({ piattaforma }: CruscottoStepProps) {
                 <div className="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center text-sm text-gray-500">
                     {Constants.cruscotto.STEP_NON_DISPONIBILE}
                 </div>
+            )}
+            {previewOpen && (
+                <CruscottoPreviewModal cruscotto={cruscotto} gruppi={gruppi} onClose={() => setPreviewOpen(false)} />
             )}
         </div>
     )
