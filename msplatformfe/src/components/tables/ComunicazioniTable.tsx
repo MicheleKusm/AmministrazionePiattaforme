@@ -1,10 +1,19 @@
+import { useMemo } from "react"
 import type { Column, ComunicazioneOnboarding, ComunicazioniTableProps } from "../../types/type"
 import { TableCommon } from "../common/TableCommon"
 import { IconActions } from "./RowActions"
-import { IconaComunicazioneGlyph } from "../common/IconaComunicazione"
+import { IconaDinamica } from "../common/IconaDinamica"
+import { useGetIconeQuery } from "../../api/abilitazioniApi"
 import { Constants } from "../../utils/Constants"
 
 export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: ComunicazioniTableProps) {
+    const { data: icone = [] } = useGetIconeQuery()
+    const iconeMap = useMemo(() => {
+        const map = new Map<string, string>()
+        icone.forEach((icon) => map.set(icon.name, icon.additionalInfo ?? ""))
+        return map
+    }, [icone])
+
     const columns: Column<ComunicazioneOnboarding>[] = [
         {
             header: Constants.abilitazioneTable.ORDINE,
@@ -18,14 +27,24 @@ export function ComunicazioniTable({ comunicazioni, onEdit, onDelete }: Comunica
             header: Constants.comunicazioneModal.ICONA_LABEL,
             render: (c) => (
                 <span className="inline-flex items-center gap-2 text-gray-700">
-                    {c.icona ? <IconaComunicazioneGlyph nome={c.icona} /> : null}
+                    {c.icona ? (
+                        <IconaDinamica
+                            svg={iconeMap.get(c.icona)}
+                            className="h-5 w-5"
+                        />
+                    ) : null}
                     {c.icona}
                 </span>
             )
         },
         {
             header: Constants.comunicazioneModal.TIPO_ICONA_LABEL,
-            render: (c) => c.typeIcona ? <span className="text-gray-700">{c.typeIcona === "outline" ? Constants.comunicazioneModal.TIPO_ICONA_OUTLINE : Constants.comunicazioneModal.TIPO_ICONA_SOLID}</span> : null
+            render: (c) =>
+                c.typeIcona ? (
+                    <span className="text-gray-700">
+                        {c.typeIcona === "outline" ? Constants.comunicazioneModal.TIPO_ICONA_OUTLINE : Constants.comunicazioneModal.TIPO_ICONA_SOLID}
+                    </span>
+                ) : null
         },
         {
             header: Constants.abilitazioneTable.AZIONI,

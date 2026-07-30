@@ -232,10 +232,10 @@ export class Constants {
     static readonly pageSize = 5
 
     static readonly infoMessages = {
-        RICHIEDIBILE_DA_CRUSCOTTO: "PLACEHOLDER_RICHIEDIBILE_DA_CRUSCOTTO",
-        READ_ONLY: "PLACEHOLDER_READ_ONLY",
-        RICHIEDIBILE_IN_CORSO: "PLACEHOLDER_RICHIEDIBILE_IN_CORSO",
-        RIPETIBILE: "PLACEHOLDER_RIPETIBILE",
-        UTILIZZO_MODELLO_AUTORIZZATIVO: "PLACEHOLDER_UTILIZZO_MODELLO_AUTORIZZATIVO"
+        RICHIEDIBILE_DA_CRUSCOTTO: "Rende fruibile l'abilitazione a questa piattaforma da cruscotto",
+        READ_ONLY: "Inibisce la possibilità di abilitarsi a questa piattaforma",
+        RICHIEDIBILE_IN_CORSO: "Rende possibile richiedere una nuova abilitazione quando ce ne è un'altra in corso",
+        RIPETIBILE: "Rende possibile richiedere una nuova abilitazione quando ce ne è un'altra attiva",
+        UTILIZZO_MODELLO_AUTORIZZATIVO: "Questa piattaforma utilizzerà il modello autorizzativo"
     } as const
 }

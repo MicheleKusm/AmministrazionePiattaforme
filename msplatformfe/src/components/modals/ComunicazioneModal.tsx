@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import type { ComunicazioneOnboarding } from "../../types/type"
 import { Modal } from "../common/Modal"
 import { Button } from "../common/Button"
-import { IconaComunicazioneGlyph } from "../common/IconaComunicazione"
 import { useGetIconeQuery } from "../../api/abilitazioniApi"
 import { Constants } from "../../utils/Constants"
+import { IconaDinamica } from "../../components/common/IconaDinamica"
 
 type ComunicazioneModalProps = {
     comunicazione: ComunicazioneOnboarding
@@ -20,6 +20,11 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
     const [iconeOpen, setIconeOpen] = useState(false)
 
     const { data: icone = [] } = useGetIconeQuery()
+    const iconeMap = useMemo(() => {
+        const map = new Map<string, string>()
+        icone.forEach((icon) => map.set(icon.name, icon.additionalInfo ?? ""))
+        return map
+    }, [icone])
 
     const valido = draft.testo.trim() !== "" && draft.icona.trim() !== ""
 
@@ -60,7 +65,10 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                             className={`${INPUT_CLS} flex items-center justify-between gap-2`}>
                             {draft.icona ? (
                                 <span className="flex items-center gap-2 text-gray-800">
-                                    <IconaComunicazioneGlyph nome={draft.icona} tipo="outline" />
+                                    <IconaDinamica
+                                        svg={iconeMap.get(draft.icona)}
+                                        className="h-5 w-5"
+                                    />
                                     {draft.icona}
                                 </span>
                             ) : (
@@ -86,18 +94,21 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                                     onClick={() => setIconeOpen(false)}
                                 />
                                 <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg">
-                                    {icone.map((nome) => {
-                                        const attivo = draft.icona === nome
+                                    {icone.map((icone) => {
+                                        const attivo = draft.icona === icone.name
                                         return (
-                                            <li key={nome}>
+                                            <li key={icone.name}>
                                                 <button
                                                     type="button"
-                                                    onClick={() => selezionaIcona(nome)}
+                                                    onClick={() => selezionaIcona(icone.name)}
                                                     className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
                                                         attivo ? "bg-primary-50 text-primary-700" : "text-gray-700 hover:bg-gray-50"
                                                     }`}>
-                                                    <IconaComunicazioneGlyph nome={nome} tipo="outline" />
-                                                    {nome}
+                                                    <IconaDinamica
+                                                        svg={icone.additionalInfo}
+                                                        className="h-5 w-5"
+                                                    />
+                                                    {icone.name}
                                                 </button>
                                             </li>
                                         )

@@ -1,6 +1,6 @@
 import { platformApi } from "./rootApi"
 import { ABILITAZIONI, ABILITAZIONI_ICONE, ABILITAZIONI_PROCESSI, ABILITAZIONI_TIPOLOGICHE } from "./apiConstants"
-import type { Abilitazione, TipologicaCampoDinamico } from "../types/type"
+import type { Abilitazione, IconaDTO, TipologicaCampoDinamico } from "../types/type"
 
 const abilitazioniApi = platformApi.injectEndpoints({
     endpoints: (build) => ({
@@ -23,7 +23,7 @@ const abilitazioniApi = platformApi.injectEndpoints({
                 method: "GET"
             })
         }),
-        getIcone: build.query<string[], void>({
+        getIcone: build.query<IconaDTO[], void>({
             query: () => ({
                 url: ABILITAZIONI_ICONE,
                 method: "GET"

@@ -1,6 +1,7 @@
 package it.sogei.acrgs.platformms.utils;
 
 import java.util.List;
+import java.util.Set;
 
 public class Constants {
     public static final String OAM_METADATA_NAME = "msso_metadata_name";
@@ -21,6 +22,7 @@ public class Constants {
     public static final String TIPO_TICKET = "TICKET";
     public static final String TIPO_VERTICALE = "VERTICALE";
     public static final String STATO_ATTIVA = "Attiva";
+    public static final String ICONA = "ICONA";
     //url const
     public static final String CRUSCOTTO = "/cruscotto";
     public static final String ID = "/{id}";
@@ -61,4 +63,8 @@ public class Constants {
     public static final String RUOLI_SQL_FILENAME = "ruoli.sql";
     public static final String RUOLI_REF_APPARTENENZA_SQL_FILENAME = "ruoli_ref_appartenenza.sql";
     public static final String ABILITAZIONI_SQL_FILENAME = "abilitazioni.sql";
+    // validazione
+    public static final Set<String> DANGEROUS_TAGS = Set.of(
+            "script", "object", "embed", "applet"
+    );
 }

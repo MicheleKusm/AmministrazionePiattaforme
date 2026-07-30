@@ -43,7 +43,7 @@ export function InfoTooltip({ message, className = "" }: InfoTooltipProps) {
             </svg>
 
             {isVisible && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 max-w-sm p-3 bg-white text-gray-800 text-xs rounded-lg shadow-lg border border-gray-200 pointer-events-none whitespace-normal">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 sm:w-80 p-4 bg-white text-gray-800 text-sm leading-relaxed rounded-lg shadow-lg border border-gray-200 pointer-events-none">
                     {message}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-r border-b border-gray-200 rotate-45" />
                 </div>

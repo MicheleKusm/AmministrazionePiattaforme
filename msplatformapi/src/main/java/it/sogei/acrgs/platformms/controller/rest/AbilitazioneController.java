@@ -2,6 +2,7 @@ package it.sogei.acrgs.platformms.controller.rest;
 
 import it.sogei.acrgs.platformms.dto.AbilitazioneDTO;
 import it.sogei.acrgs.platformms.dto.TipologicaCampoDTO;
+import it.sogei.acrgs.platformms.dto.UtilityToolDTO;
 import it.sogei.acrgs.platformms.service.AbilitazioneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class AbilitazioneController {
     }
 
     @GetMapping("/icone")
-    public ResponseEntity<List<String>> icone() {
+    public ResponseEntity<List<UtilityToolDTO>> icone() {
         return ResponseEntity.ok(abilitazioneService.listIcone());
     }
 

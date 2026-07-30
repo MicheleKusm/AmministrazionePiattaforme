@@ -191,6 +191,11 @@ export type CampiTicketTableProps = {
     onDelete: (campo: CampoTicket) => void
 }
 
+export type IconaDTO = {
+    name: string
+    additionalInfo: string | null
+}
+
 export type ComunicazioniTableProps = {
     comunicazioni: ComunicazioneOnboarding[]
     onEdit: (comunicazione: ComunicazioneOnboarding) => void

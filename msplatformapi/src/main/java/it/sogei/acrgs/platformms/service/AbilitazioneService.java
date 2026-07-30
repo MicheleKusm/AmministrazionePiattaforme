@@ -9,7 +9,7 @@ import it.sogei.acrgs.platformms.entity.Ruolo;
 import it.sogei.acrgs.platformms.repository.PiattaformaRefProcessRepository;
 import it.sogei.acrgs.platformms.repository.PiattaformaRepository;
 import it.sogei.acrgs.platformms.repository.TipologicaCampoDinamicoRepository;
-import it.sogei.acrgs.platformms.utils.Constants;
+import it.sogei.acrgs.platformms.repository.UtilityToolRepository;
 import it.sogei.acrgs.platformms.utils.Utility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,7 @@ import static it.sogei.acrgs.platformms.utils.Constants.*;
 @RequiredArgsConstructor
 public class AbilitazioneService {
 
+    private final UtilityToolRepository utilityToolRepository;
     private final PiattaformaRefProcessRepository refProcessRepository;
     private final TipologicaCampoDinamicoRepository tipologicaRepository;
     private final PiattaformaRepository piattaformaRepository;
@@ -53,8 +54,16 @@ public class AbilitazioneService {
     }
 
     @Transactional(readOnly = true)
-    public List<String> listIcone() {
-        return Constants.ICONE;
+    public List<UtilityToolDTO> listIcone() {
+        return utilityToolRepository.findByType(ICONA)
+                .stream()
+                .peek(t -> validateIconeSvg(t.getAdditionalInfo()))
+                .map(t -> UtilityToolDTO.builder()
+                        .name(t.getName())
+                        .type(t.getType())
+                        .additionalInfo(t.getAdditionalInfo())
+                        .build())
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -226,6 +235,14 @@ public class AbilitazioneService {
         }
     }
 
+    private void validateIconeSvg(String additionalInfo) {
+        if (additionalInfo == null) return;
+        boolean found = DANGEROUS_TAGS.stream().anyMatch(additionalInfo::contains);
+        if (found) {
+            log.error("La colonna additionalInfo contiene tag non consentite: {}", additionalInfo);
+            throw new IllegalArgumentException("La colonna additionalInfo contiene tag non consentite.");
+        }
+    }
 
     private String nullToEmpty(String value) {
         return value == null ? "" : value;
