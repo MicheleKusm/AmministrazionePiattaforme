@@ -137,50 +137,71 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
         setStep((s) => Math.max(2, s - 1))
     }
 
-    function nextStep() {
-        if (step === 2) {
-            try {
-                piattaformaSchema.validateSync(piattaforma!, {
-                    abortEarly: false,
-                    context: { currentId: piattaforma?.id }
+    async function runStep2Validation(): Promise<boolean> {
+        try {
+            piattaformaSchema.validateSync(piattaforma!, {
+                abortEarly: false,
+                context: { currentId: piattaforma?.id }
+            })
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                const newErrors: Record<string, string> = {}
+                err.inner.forEach((e) => {
+                    if (e.path) newErrors[e.path] = e.message
                 })
-                validatePiattaforma(piattaforma!)
-                    .unwrap()
-                    .then((errors) => {
-                        if (errors.length > 0) {
-                            const errorMap: Record<string, string> = {}
-                            errorMap._general = errors.join(", ")
-                            setPiattaformaErrors(errorMap)
-                        } else {
-                            setPiattaformaErrors({})
-                            setStep(3)
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Errore di validazione:", err)
-                        setPiattaformaErrors({ _general: "Errore durante la validazione." })
-                    })
-            } catch (err) {
-                if (err instanceof yup.ValidationError) {
-                    const newErrors: Record<string, string> = {}
-                    err.inner.forEach((e) => {
-                        if (e.path) newErrors[e.path] = e.message
-                    })
-                    setPiattaformaErrors(newErrors)
-                }
+                setPiattaformaErrors(newErrors)
             }
+            return false
+        }
+        try {
+            const errors = await validatePiattaforma(piattaforma!).unwrap()
+            if (errors.length > 0) {
+                setPiattaformaErrors({ _general: errors.join(", ") })
+                return false
+            }
+            setPiattaformaErrors({})
+            return true
+        } catch (err) {
+            console.error("Errore di validazione:", err)
+            setPiattaformaErrors({ _general: "Errore durante la validazione." })
+            return false
+        }
+    }
+
+    function pulisciCruscotto() {
+        const cruscottoPulito = cruscotto.map((c) => {
+            if (c.chiave !== "STEP_DATI" && c.chiave !== "STEP_METADATI") return c
+            const usati = new Set<number>()
+            c.sezioni.forEach((s) => s.gruppiIds.forEach((id) => usati.add(id)))
+            return { ...c, gruppiIds: c.gruppiIds.filter((id) => usati.has(id)) }
+        })
+        dispatch(setCruscotto(cruscottoPulito))
+    }
+
+    async function nextStep() {
+        if (step === 2) {
+            const ok = await runStep2Validation()
+            if (ok) setStep(3)
             return
         }
         if (step === 6) {
-            const cruscottoPulito = cruscotto.map((c) => {
-                if (c.chiave !== "STEP_DATI" && c.chiave !== "STEP_METADATI") return c
-                const usati = new Set<number>()
-                c.sezioni.forEach((s) => s.gruppiIds.forEach((id) => usati.add(id)))
-                return { ...c, gruppiIds: c.gruppiIds.filter((id) => usati.has(id)) }
-            })
-            dispatch(setCruscotto(cruscottoPulito))
+            pulisciCruscotto()
         }
         setStep((s) => Math.min(7, s + 1))
+    }
+
+    async function goToStep(target: number) {
+        if (target === step) return
+        // Navigazione in avanti: si puo' lasciare lo step 2 solo se la validazione passa(Nome piattaforma, descrizione e obj class compilate)
+        if (target > step && step === 2) {
+            const ok = await runStep2Validation()
+            if (!ok) return
+        }
+        // Uscendo dallo step Cruscotto, ripulisci i gruppiIds non piu' usati
+        if (step === 6) {
+            pulisciCruscotto()
+        }
+        setStep(target)
     }
 
     async function saveFinalConfiguration() {
@@ -260,7 +281,10 @@ export function PlatformWizardPage({ initialPiattaforma, onDone, onCancel }: Pla
 
     return (
         <>
-            <Stepper currentStep={step} />
+            <Stepper
+                currentStep={step}
+                onStepClick={goToStep}
+            />
             {step === 2 && (
                 <PiattaformaStep
                     key={`piatt-resync-${cruscottoResync}`}
