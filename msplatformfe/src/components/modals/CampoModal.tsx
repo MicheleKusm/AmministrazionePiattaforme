@@ -25,12 +25,13 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
     function selezionaCampo(tipoDati: string) {
         const tip = tipologiche.find((t) => t.tipoDati === tipoDati)
         if (!tip) {
-            setDraft({ ...draft, key: "", inputType: "", regex: "", apiSource: "" })
+            setDraft({ ...draft, key: "", label: "", inputType: "", regex: "", apiSource: "" })
             return
         }
         setDraft({
             ...draft,
             key: tip.tipoDati,
+            label: tip.label,
             idTipoDati: tip.idTipoDati,
             inputType: tip.type,
             regex: tip.regex ?? "",

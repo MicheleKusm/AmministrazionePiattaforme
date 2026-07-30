@@ -10,7 +10,7 @@ type CheckboxConInfoProps = {
 
 export function CheckboxConInfo({ label, checked, onChange, infoMessage, disabled = false }: CheckboxConInfoProps) {
     return (
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <div className="flex items-center gap-2 text-sm">
             <input
                 type="checkbox"
                 checked={checked}
@@ -18,8 +18,8 @@ export function CheckboxConInfo({ label, checked, onChange, infoMessage, disable
                 disabled={disabled}
                 className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
             />
-            <span>{label}</span>
+            <span className="flex-shrink-0 mr-1">{label}</span>
             <InfoTooltip message={infoMessage} />
-        </label>
+        </div>
     )
 }

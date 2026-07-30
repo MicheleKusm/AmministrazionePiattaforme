@@ -133,6 +133,7 @@ export type TipoAbilitazione = "TICKET" | "VERTICALE"
 export type StatoAbilitazione = "Attiva" | "Disattiva"
 
 export type TipologicaCampoDinamico = {
+    label: string
     tipoDati: string
     type: string
     regex: string | null
