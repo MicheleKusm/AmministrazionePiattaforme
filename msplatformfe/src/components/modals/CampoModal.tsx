@@ -4,6 +4,7 @@ import { Modal } from "../common/Modal"
 import { Toggle } from "../common/Toggle"
 import { Button } from "../common/Button"
 import { Constants } from "../../utils/Constants"
+import { SelectConLabel } from "../../components/common/SelectConLabel"
 
 type CampoModalProps = {
     campo: CampoTicket
@@ -60,25 +61,16 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
             onClose={onClose}
             footer={footer}>
             <div className="space-y-4">
-                <div>
-                    <label className={LABEL_CLS}>
-                        {Constants.campoModal.CAMPO} <span className="text-primary-600">*</span>
-                    </label>
-                    <select
-                        className={INPUT_CLS}
-                        value={draft.key}
-                        onChange={(e) => selezionaCampo(e.target.value)}>
-                        <option value="">{Constants.campoModal.CAMPO_PH}</option>
-                        {tipologiche.map((t, index) => (
-                            <option
-                                key={index}
-                                value={t.tipoDati}>
-                                {t.tipoDati}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
+                <SelectConLabel
+                    label={Constants.campoModal.CAMPO}
+                    required
+                    placeholder={Constants.campoModal.CAMPO_PH}
+                    value={draft.key}
+                    onChange={selezionaCampo}
+                    options={tipologiche.map((t) => t.tipoDati)}
+                    labelClassName={LABEL_CLS}
+                    selectClassName={INPUT_CLS}
+                />
                 {!selezionato && <p className="text-sm text-gray-500">{Constants.campoModal.HINT}</p>}
 
                 {selezionato && (
