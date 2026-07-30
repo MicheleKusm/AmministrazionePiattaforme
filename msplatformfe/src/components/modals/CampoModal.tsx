@@ -31,7 +31,7 @@ export function CampoModal({ campo, tipologiche, onSave, onClose }: CampoModalPr
         setDraft({
             ...draft,
             key: tip.tipoDati,
-            label: tip.label,
+            label: tip.label ?? "",
             idTipoDati: tip.idTipoDati,
             inputType: tip.type,
             regex: tip.regex ?? "",
