@@ -137,8 +137,6 @@ export class Constants {
         ANNULLA: "Annulla"
     } as const
 
-    static readonly canali = ["Email", "SMS", "In-app", "Push", "Webhook", "WhatsApp"] as const
-
     static readonly cruscotto = {
         TITOLO: "Struttura Cruscotto Dinamico",
         SOTTOTITOLO: "Configura gli step di inserimento e le sezioni del form visualizzati nel cruscotto dinamico (CONFIG JSON v2).",
@@ -209,7 +207,13 @@ export class Constants {
             { name: "PROFILO_MAPPING_SERVIZI_READER", inputType: "multi_select", apiSource: "cruscotto/piattaforme" },
             { name: "PROFILO_MAPPING_SERVIZI_ADMIN", inputType: "multi_select", apiSource: "cruscotto/piattaforme" },
             { name: "PROFILO_MAPPING_FUNZIONALITA", inputType: "multi_select", apiSource: "cruscotto/funzionalita" }
-        ]
+        ],
+        STEP_RUOLO: "STEP_RUOLO",
+        STEP_DATI: "STEP_DATI",
+        STEP_METADATI: "STEP_METADATI",
+        STEP_RUOLO_INFORMATIVA: "Questa è l'informativa step ruolo",
+        STEP_DATI_INFORMATIVA: "Questa è l'informativa step dati",
+        STEP_METADATI_INFORMATIVA: "Questa è l'informativa step metadati"
     } as const
 
     static readonly api = {
