@@ -126,7 +126,11 @@ const IconaTicket = (
 export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologiche, processi, onCancel, onNew, onSave }: AbilitazioneFormProps) {
     const isNew = initial.id === 0
     const [tipo, setTipo] = useState<TipoAbilitazione | "">(isNew ? (tipoBloccato ?? "") : initial.tipo)
-    const [codiceScim, setCodiceScim] = useState(initial.codiceScim)
+    const scimIniziale = (initial.codiceScim ?? "").split("|")
+    const [scimSystem, setScimSystem] = useState(scimIniziale[0] ?? "")
+    const [scimComponent, setScimComponent] = useState(scimIniziale[1] ?? "")
+    const [scimItem, setScimItem] = useState(scimIniziale[2] ?? "")
+    const [scimModule, setScimModule] = useState(scimIniziale[3] ?? "")
     const [processoVerticale, setProcessoVerticale] = useState(initial.processoVerticale)
     const [campi, setCampi] = useState<CampoTicket[]>(initial.campi)
     const [comunicazioni, setComunicazioni] = useState<ComunicazioneOnboarding[]>(initial.comunicazioni)
@@ -139,7 +143,10 @@ export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologic
         if (nuovo === tipo) return
         if (tipoBloccato && nuovo !== tipoBloccato) return
         setTipo(nuovo)
-        setCodiceScim("")
+        setScimSystem("")
+        setScimComponent("")
+        setScimItem("")
+        setScimModule("")
         setProcessoVerticale("")
         setCampi([])
         setComunicazioni([])
@@ -179,7 +186,9 @@ export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologic
             return
         }
         const nome = tipo === "TICKET" ? `Abilitazione ticket ${piattaforma?.nome ?? ""}`.trim() : `Processo ${titleCase(processoVerticale)}`.trim()
-        const riferimento = tipo === "TICKET" ? codiceScim : processoVerticale
+        const codiceScimComposto =
+            [scimSystem.trim(), scimComponent.trim(), scimItem.trim()].join("|") + (scimModule.trim() !== "" ? `|${scimModule.trim()}` : "")
+        const riferimento = tipo === "TICKET" ? codiceScimComposto : processoVerticale
         const processKey = tipo === "TICKET" ? Constants.abilitazione.PROCESS_KEY_TICKET : processoVerticale
 
         onSave({
@@ -189,14 +198,19 @@ export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologic
             riferimento,
             stato: "Attiva",
             processKey,
-            codiceScim: tipo === "TICKET" ? codiceScim : "",
+            codiceScim: tipo === "TICKET" ? codiceScimComposto : "",
             processoVerticale: tipo === "VERTICALE" ? processoVerticale : "",
             campi: tipo === "TICKET" ? campi : [],
             comunicazioni
         })
     }
 
-    const salvabile = tipo === "TICKET" ? codiceScim.trim() !== "" : tipo === "VERTICALE" ? processoVerticale !== "" : false
+    const salvabile =
+        tipo === "TICKET"
+            ? scimSystem.trim() !== "" && scimComponent.trim() !== "" && scimItem.trim() !== ""
+            : tipo === "VERTICALE"
+              ? processoVerticale !== ""
+              : false
 
     return (
         <div className="mt-2 space-y-6">
@@ -307,12 +321,30 @@ export function AbilitazioneForm({ piattaforma, initial, tipoBloccato, tipologic
                     <h3 className="text-lg font-bold text-gray-900">{Constants.abilitazione.DETTAGLI_TICKET}</h3>
                     <div className="mt-4">
                         <label className={LABEL_CLS}>{Constants.abilitazione.CODICE_SCIM}</label>
-                        <input
-                            className={INPUT_CLS}
-                            placeholder={Constants.abilitazione.CODICE_SCIM_PH}
-                            value={codiceScim}
-                            onChange={(e) => setCodiceScim(e.target.value)}
-                        />
+                        <div className="grid gap-3 md:grid-cols-2">
+                            <div>
+                                <label className={LABEL_CLS}>
+                                    {Constants.abilitazione.SCIM_SYSTEM} <span className="text-primary-600">*</span>
+                                </label>
+                                <input className={INPUT_CLS} placeholder={Constants.abilitazione.SCIM_SYSTEM} value={scimSystem} onChange={(e) => setScimSystem(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className={LABEL_CLS}>
+                                    {Constants.abilitazione.SCIM_COMPONENT} <span className="text-primary-600">*</span>
+                                </label>
+                                <input className={INPUT_CLS} placeholder={Constants.abilitazione.SCIM_COMPONENT} value={scimComponent} onChange={(e) => setScimComponent(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className={LABEL_CLS}>
+                                    {Constants.abilitazione.SCIM_ITEM} <span className="text-primary-600">*</span>
+                                </label>
+                                <input className={INPUT_CLS} placeholder={Constants.abilitazione.SCIM_ITEM} value={scimItem} onChange={(e) => setScimItem(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className={LABEL_CLS}>{Constants.abilitazione.SCIM_MODULE}</label>
+                                <input className={INPUT_CLS} placeholder={Constants.abilitazione.SCIM_MODULE} value={scimModule} onChange={(e) => setScimModule(e.target.value)} />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mt-6">
