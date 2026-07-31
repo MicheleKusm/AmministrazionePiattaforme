@@ -3,10 +3,12 @@ import type { GroupModalProps, Gruppo } from "../../types/type"
 import { ModalCommon } from "../common/ModalCommon"
 import * as yup from "yup"
 import { gruppoSchema } from "../../utils/schema"
+import { GruppiPaginati } from "../../components/modals/GruppiPaginati"
 
 export function GroupModal({ group, ruoli, onSave, onClose }: GroupModalProps) {
     const [draft, setDraft] = useState<Gruppo>(group)
     const [errors, setErrors] = useState<{ nome?: string; descrizione?: string }>({})
+    const sortedRuoli = [...ruoli].sort((a, b) => a.nome.localeCompare(b.nome))
 
     const toggleRuolo = (idRuolo?: number) => {
         if (!idRuolo) return
@@ -16,7 +18,6 @@ export function GroupModal({ group, ruoli, onSave, onClose }: GroupModalProps) {
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
-
         try {
             gruppoSchema.validateSync(draft, { abortEarly: false })
             onSave(draft)
@@ -37,7 +38,8 @@ export function GroupModal({ group, ruoli, onSave, onClose }: GroupModalProps) {
         <ModalCommon
             title="Aggiungi / Modifica gruppo"
             onClose={onClose}
-            onSubmit={handleSubmit}>
+            onSubmit={handleSubmit}
+            modalClassName="max-w-7xl min-w-[500px] min-h-[300px] w-auto">
             <div>
                 <input
                     value={draft.nome}
@@ -61,24 +63,21 @@ export function GroupModal({ group, ruoli, onSave, onClose }: GroupModalProps) {
                     }}
                     placeholder="Descrizione"
                     required
-                    className={`w-full rounded border px-3 py-2 text-sm ${errors.descrizione ? "border-red-500" : "border-gray-300"}`}
+                    rows={4}
+                    className={`w-full rounded border px-3 py-2 text-sm resize-y ${errors.descrizione ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.descrizione && <p className="mt-1 text-xs text-red-500">{errors.descrizione}</p>}
             </div>
 
-            <div className="space-y-1">
-                {ruoli.map((ruolo) => (
-                    <label
-                        key={ruolo.id ?? ruolo.nome}
-                        className="flex items-center gap-2 text-sm">
-                        <input
-                            type="checkbox"
-                            checked={Boolean(ruolo.id && draft.ruoliIds.includes(ruolo.id))}
-                            onChange={() => toggleRuolo(ruolo.id)}
-                        />
-                        {ruolo.nome}
-                    </label>
-                ))}
+            <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-700">Ruoli associati</p>
+                <GruppiPaginati
+                    ruoli={sortedRuoli}
+                    selectedIds={draft.ruoliIds}
+                    onToggle={toggleRuolo}
+                    rows={5}
+                    columns={3}
+                />
             </div>
         </ModalCommon>
     )
