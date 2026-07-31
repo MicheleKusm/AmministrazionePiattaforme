@@ -33,18 +33,16 @@ public class SequenceInitializer {
      */
     private void fixSequence(SequenceConfig sequenceConfig) {
         try {
-            String querySelect = "SELECT MAX(%s) FROM %s".formatted(sequenceConfig.idColumn(), sequenceConfig.tableName());
-            Long maxId = jdbcTemplate.queryForObject(querySelect, Long.class);
+            Long maxId = jdbcTemplate.queryForObject(writeSelectMaxQuery(sequenceConfig.idColumn(), sequenceConfig.tableName()), Long.class);
             if (null == maxId) {
                 maxId = 0L;
             }
-            String queryMaxVal = "SELECT %s.NEXTVAL FROM DUAL".formatted(sequenceConfig.sequenceName());
-            Long nextVal = jdbcTemplate.queryForObject(queryMaxVal, Long.class);
+            Long nextVal = jdbcTemplate.queryForObject(writeNextValQuery(sequenceConfig.sequenceName()), Long.class);
             if (nextVal <= maxId) {
                 long salto = (maxId - nextVal) + 2;
                 log.warn("La sequenza {} è indietro (max={}, next={}). Salto in avanti di {}.", sequenceConfig.sequenceName(), maxId, nextVal, salto);
                 jdbcTemplate.execute(writeAlterQuery(sequenceConfig.sequenceName(), salto));
-                jdbcTemplate.queryForObject("SELECT " + sequenceConfig.sequenceName() + ".NEXTVAL FROM DUAL", Long.class);
+                jdbcTemplate.queryForObject(writeNextValQuery(sequenceConfig.sequenceName()), Long.class);
                 jdbcTemplate.execute(writeAlterQuery(sequenceConfig.sequenceName(), 1));
                 log.info("Sequenza {} allineata. Il prossimo valore dovrebbe essere > {}", sequenceConfig.sequenceName(), maxId);
             } else {
@@ -53,6 +51,14 @@ public class SequenceInitializer {
         } catch (Exception e) {
             log.error("Impossibile allineare la sequenza {}: {}", sequenceConfig.sequenceName(), e.getMessage(), e);
         }
+    }
+
+    private String writeSelectMaxQuery(String idColumn, String tableName) {
+        return "SELECT MAX(%s) FROM %s".formatted(idColumn, tableName);
+    }
+
+    private String writeNextValQuery(String sequenceName) {
+        return "SELECT %s.NEXTVAL FROM DUAL".formatted(sequenceName);
     }
 
     private String writeAlterQuery(String sequenceName, long increment) {
