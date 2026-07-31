@@ -43,9 +43,9 @@ public class SequenceInitializer {
             if (nextVal <= maxId) {
                 long salto = (maxId - nextVal) + 2;
                 log.warn("La sequenza {} è indietro (max={}, next={}). Salto in avanti di {}.", sequenceConfig.sequenceName(), maxId, nextVal, salto);
-                jdbcTemplate.execute(alterQuery(sequenceConfig.sequenceName(), salto));
+                jdbcTemplate.execute(writeAlterQuery(sequenceConfig.sequenceName(), salto));
                 jdbcTemplate.queryForObject("SELECT " + sequenceConfig.sequenceName() + ".NEXTVAL FROM DUAL", Long.class);
-                jdbcTemplate.execute(alterQuery(sequenceConfig.sequenceName(), 1));
+                jdbcTemplate.execute(writeAlterQuery(sequenceConfig.sequenceName(), 1));
                 log.info("Sequenza {} allineata. Il prossimo valore dovrebbe essere > {}", sequenceConfig.sequenceName(), maxId);
             } else {
                 log.debug("La sequenza {} è già avanti (max={}, next={})", sequenceConfig.sequenceName(), maxId, nextVal);
@@ -55,7 +55,7 @@ public class SequenceInitializer {
         }
     }
 
-    private String alterQuery(String sequenceName, long increment) {
+    private String writeAlterQuery(String sequenceName, long increment) {
         return String.format("ALTER SEQUENCE %s INCREMENT BY %d", sequenceName, increment);
     }
 }
