@@ -7,6 +7,7 @@ import { Button } from "../components/common/Button"
 import type { PlatformListPageProps } from "../types/type"
 import { Constants } from "../utils/Constants"
 import diagrammaER from "../assets/imgs/diagrammaER.png"
+import { SezioneImmagine } from "../components/common/SezioneImmagine"
 
 const PAGE_SIZE = Constants.common.PAGE_SIZE
 
@@ -45,6 +46,13 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
 
     return (
         <div>
+            <SezioneImmagine
+                title="Diagramma ER"
+                imageSrc={diagrammaER}
+                imageAlt="Diagramma ER"
+                className="mt-6"
+            />
+
             <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-extrabold text-gray-900">Modifica Configurazione</h1>
@@ -82,15 +90,6 @@ export function PlatformListPage({ onCreate, onEdit }: PlatformListPageProps) {
                         onPrev={() => setPage((p) => Math.max(0, p - 1))}
                         onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                     />
-                </div>
-            </div>
-
-            <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-                <div className="px-6 py-4">
-                    <h3 className="text-lg font-bold text-gray-900">Diagramma ER</h3>
-                </div>
-                <div className="px-6 pb-6">
-                    <img src={diagrammaER} alt="Diagramma ER" className="w-full rounded-lg border border-gray-200" />
                 </div>
             </div>
         </div>
