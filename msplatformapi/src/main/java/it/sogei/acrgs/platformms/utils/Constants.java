@@ -1,5 +1,7 @@
 package it.sogei.acrgs.platformms.utils;
 
+import it.sogei.acrgs.platformms.utils.records.SequenceConfig;
+
 import java.util.List;
 import java.util.Set;
 
@@ -67,4 +69,12 @@ public class Constants {
     public static final Set<String> DANGEROUS_TAGS = Set.of(
             "script", "object", "embed", "applet"
     );
+    // sequence init
+    public static final List<SequenceConfig> SEQUENCE_CONFIG_LIST = List.of(
+            new SequenceConfig(TABLE_PIATTAFORMA, SEQ_PIATTAFORMA, COL_ID_PIATTAFORMA),
+            new SequenceConfig(TABLE_RUOLO, SEQ_RUOLO, COL_ID_RUOLO),
+            new SequenceConfig(TABLE_GRUPPO_APPARTENENZA, SEQ_GRUPPO, COL_ID_GRUPPO),
+            new SequenceConfig(TABLE_PIATTAFORMA_REF_PROCESS, SEQ_PIATTAFORMA_REF_PROCESS, COL_ID_PIATTAFORMA_REF_PROCESS)
+    );
+
 }
