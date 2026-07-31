@@ -5,6 +5,7 @@ import { Button } from "../common/Button"
 import { useGetIconeQuery } from "../../api/abilitazioniApi"
 import { Constants } from "../../utils/Constants"
 import { IconaDinamica } from "../../components/common/IconaDinamica"
+import { RadioCommon } from "../../components/common/RadioCommon"
 
 type ComunicazioneModalProps = {
     comunicazione: ComunicazioneOnboarding
@@ -120,25 +121,17 @@ export function ComunicazioneModal({ comunicazione, onSave, onClose }: Comunicaz
                 </div>
 
                 <div>
-                    <label className={LABEL_CLS}>{Constants.comunicazioneModal.TIPO_ICONA_LABEL}</label>
-                    <div className="flex items-center gap-6">
-                        <label className="flex items-center gap-2 text-sm text-gray-800">
-                            <input
-                                type="checkbox"
-                                checked={draft.typeIcona === "solid"}
-                                onChange={() => setDraft({ ...draft, typeIcona: "solid" })}
-                            />
-                            {Constants.comunicazioneModal.TIPO_ICONA_SOLID}
-                        </label>
-                        <label className="flex items-center gap-2 text-sm text-gray-800">
-                            <input
-                                type="checkbox"
-                                checked={draft.typeIcona === "outline"}
-                                onChange={() => setDraft({ ...draft, typeIcona: "outline" })}
-                            />
-                            {Constants.comunicazioneModal.TIPO_ICONA_OUTLINE}
-                        </label>
-                    </div>
+                    <RadioCommon
+                        name="tipoIcona"
+                        label={Constants.comunicazioneModal.TIPO_ICONA_LABEL}
+                        value={draft.typeIcona ?? "solid"}
+                        onChange={(value) => setDraft({ ...draft, typeIcona: value as "solid" | "outline" })}
+                        options={[
+                            { value: "solid", label: Constants.comunicazioneModal.TIPO_ICONA_SOLID },
+                            { value: "outline", label: Constants.comunicazioneModal.TIPO_ICONA_OUTLINE }
+                        ]}
+                        labelClassName={LABEL_CLS}
+                    />
                 </div>
 
                 <div>
