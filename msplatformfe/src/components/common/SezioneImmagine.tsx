@@ -7,7 +7,7 @@ type SezioneImmagineProps = {
 
 export function SezioneImmagine({ title, imageSrc, imageAlt = "", className = "" }: SezioneImmagineProps) {
     return (
-        <div className={`rounded-xl border border-gray-200 bg-white shadow-sm ${className}`}>
+        <div className={`rounded-xl border border-gray-200 bg-white shadow-sm mb-3 ${className}`}>
             <div className="px-6 py-4">
                 <h3 className="text-lg font-bold text-gray-900">{title}</h3>
             </div>
